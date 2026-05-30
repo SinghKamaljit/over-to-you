@@ -346,8 +346,7 @@ import {
   onChildAdded, query, orderByChild, startAfter
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
-  getStorage, ref as storageRef, uploadBytes, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+// Storage: using Cloudinary (see uploadAudio below)
 
 // =============================================
 //  REPLACE WITH YOUR FIREBASE CONFIG
@@ -366,7 +365,9 @@ const firebaseConfig = {
 const app     = initializeApp(firebaseConfig);
 const auth    = getAuth(app);
 const db      = getDatabase(app);
-const storage = getStorage(app);
+// Cloudinary config
+const CLOUDINARY_CLOUD  = "dqwaiio4d";
+const CLOUDINARY_PRESET = "oty123";
 
 const MAX_INBOX       = 20;
 const MAX_RECORD_SECS = 90;
@@ -737,10 +738,19 @@ function stopRecTimer() {
 // ── Audio upload ──────────────────────────────
 
 async function uploadAudio(blob, recipientUid, ext) {
-  const path    = "audio/" + currentUser.uid + "/" + recipientUid + "/" + Date.now() + ext;
-  const fileRef = storageRef(storage, path);
-  await uploadBytes(fileRef, blob);
-  return await getDownloadURL(fileRef);
+  const formData = new FormData();
+  const fileName = currentUser.uid + "_" + recipientUid + "_" + Date.now() + ext;
+  formData.append("file",           new File([blob], fileName, { type: blob.type }));
+  formData.append("upload_preset",  CLOUDINARY_PRESET);
+  formData.append("resource_type",  "video");   // Cloudinary uses "video" for audio files
+
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD + "/video/upload",
+    { method: "POST", body: formData }
+  );
+  if (!res.ok) throw new Error("Cloudinary upload failed: " + res.status);
+  const data = await res.json();
+  return data.secure_url;
 }
 
 // ── Send message ──────────────────────────────
