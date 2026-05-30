@@ -1,74 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <title>Over To You</title>
 
-<!-- ── PWA ── -->
-<meta name="theme-color" content="#090e1a" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="Over To You" />
-<meta name="application-name" content="Over To You" />
-<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Over%20To%20You%22%2C%22short_name%22%3A%22OTY%22%2C%22description%22%3A%22Voice%20messenger%20for%20your%20circle%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23090e1a%22%2C%22theme_color%22%3A%22%23090e1a%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20512%20512'%3E%3Crect%20width%3D'512'%20height%3D'512'%20rx%3D'80'%20fill%3D'%23090e1a'%2F%3E%3Ctext%20x%3D'256'%20y%3D'340'%20font-size%3D'300'%20text-anchor%3D'middle'%3E%F0%9F%93%A1%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D" />
+<!-- PWA -->
+<meta name="theme-color" content="#090e1a"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Over To You"/>
+<link rel="manifest" href="manifest.json"/>
 
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#090e1a;
-  --surface:#111827;
-  --card:#1a2436;
-  --border:#243044;
-  --accent:#00d4ff;
-  --accent2:#ff6b35;
-  --text:#e8f0fe;
-  --muted:#6b7ea0;
-  --recording:#ef4444;
-  --online:#22c55e;
-  --sent:#f59e0b;
+  --bg:#090e1a; --surface:#111827; --card:#1a2436;
+  --border:#243044; --accent:#00d4ff; --accent2:#ff6b35;
+  --green:#22c55e; --yellow:#f59e0b; --purple:#a855f7;
+  --text:#deeaf8; --muted:#5a7090; --recording:#ef4444;
 }
-
 *{ box-sizing:border-box; margin:0; padding:0;
    -webkit-user-select:none; user-select:none;
    -webkit-tap-highlight-color:transparent; }
-
 body{
   background:var(--bg); color:var(--text);
-  font-family:'Nunito',sans-serif;
-  min-height:100vh; display:flex; flex-direction:column;
+  font-family:'Nunito',sans-serif; min-height:100vh;
+  display:flex; flex-direction:column;
 }
-
 body::before{
-  content:''; position:fixed; inset:0;
+  content:''; position:fixed; inset:0; pointer-events:none;
   background-image:
-    linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);
-  background-size:40px 40px; pointer-events:none;
+    linear-gradient(rgba(0,212,255,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);
+  background-size:36px 36px;
 }
 
 /* ── LOGIN ── */
 #loginScreen{
-  position:fixed; inset:0; background:var(--bg);
+  position:fixed; inset:0; background:var(--bg); z-index:100;
   display:flex; flex-direction:column;
   justify-content:center; align-items:center;
-  gap:14px; padding:30px; z-index:100; overflow-y:auto;
+  gap:14px; padding:24px; overflow-y:auto;
 }
-
 .login-logo{
-  font-family:'Rajdhani',sans-serif; font-size:2.8rem;
+  font-family:'Rajdhani',sans-serif; font-size:2.6rem;
   font-weight:700; color:var(--accent);
   text-shadow:0 0 30px rgba(0,212,255,0.5);
   text-align:center; line-height:1.1;
 }
 .login-logo span{ color:var(--accent2); }
-
-.login-subtitle{ color:var(--muted); text-align:center; font-size:0.9rem; }
-
-.tab-row{
-  display:flex; gap:8px; width:100%; max-width:320px;
-}
+.login-subtitle{ color:var(--muted); font-size:0.88rem; text-align:center; }
+.tab-row{ display:flex; gap:8px; width:100%; max-width:320px; }
 .tab-btn{
   flex:1; padding:10px; border-radius:10px;
   border:1.5px solid var(--border); background:transparent;
@@ -76,39 +60,40 @@ body::before{
   font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s;
 }
 .tab-btn.active{ background:var(--card); border-color:var(--accent); color:var(--accent); }
-
-#signupFields, #signinFields{
+#signupFields,#signinFields{
   display:flex; flex-direction:column; gap:12px;
   width:100%; max-width:320px; align-items:center;
 }
-
 .login-input{
-  width:100%; max-width:320px; background:var(--card);
-  border:1.5px solid var(--border); border-radius:14px;
-  padding:14px 18px; color:var(--text); font-size:1rem;
-  outline:none; font-family:'Nunito',sans-serif;
+  width:100%; background:var(--card); border:1.5px solid var(--border);
+  border-radius:14px; padding:14px 18px; color:var(--text);
+  font-size:1rem; outline:none; font-family:'Nunito',sans-serif;
   -webkit-user-select:text !important; user-select:text !important;
 }
 .login-input:focus{ border-color:var(--accent); }
-
+.pass-wrap{ position:relative; width:100%; }
+.pass-wrap .login-input{ padding-right:48px; }
+.eye-btn{
+  position:absolute; right:14px; top:50%; transform:translateY(-50%);
+  background:none; border:none; cursor:pointer;
+  font-size:1.1rem; padding:4px; opacity:0.6;
+}
+.eye-btn:active{ opacity:1; }
 .login-btn{
-  width:100%; max-width:320px; padding:15px; border:none;
-  border-radius:14px;
+  width:100%; padding:15px; border:none; border-radius:14px;
   background:linear-gradient(135deg,var(--accent),#0099bb);
   color:#000; font-family:'Rajdhani',sans-serif;
-  font-size:1.2rem; font-weight:700; cursor:pointer; transition:opacity 0.2s;
+  font-size:1.2rem; font-weight:700; cursor:pointer;
 }
 .login-btn:active{ opacity:0.8; }
-
 .forgot-btn{
   background:none; border:none; color:var(--muted);
   font-size:0.82rem; cursor:pointer; text-decoration:underline;
   font-family:'Nunito',sans-serif;
 }
-
 .login-error{ color:#ff6b6b; display:none; font-size:0.85rem; text-align:center; max-width:320px; }
 
-/* Friend-code reveal box shown after signup */
+/* Code reveal */
 #codeReveal{
   display:none; flex-direction:column; align-items:center;
   gap:12px; width:100%; max-width:320px; text-align:center;
@@ -116,22 +101,17 @@ body::before{
 .code-box{
   background:var(--card); border:2px solid var(--accent);
   border-radius:16px; padding:18px 24px;
-  font-family:'Rajdhani',sans-serif; font-size:2rem;
-  font-weight:700; color:var(--accent);
-  letter-spacing:3px;
-  text-shadow:0 0 20px rgba(0,212,255,0.4);
-  width:100%;
+  font-family:'Rajdhani',sans-serif; font-size:2rem; font-weight:700;
+  color:var(--accent); letter-spacing:3px;
+  text-shadow:0 0 20px rgba(0,212,255,0.4); width:100%;
 }
 .code-label{ color:var(--muted); font-size:0.82rem; }
-.code-hint{
-  color:var(--text); font-size:0.85rem; line-height:1.5;
-  padding:0 8px;
-}
+.code-hint{ color:var(--text); font-size:0.85rem; line-height:1.5; padding:0 8px; }
 .code-copy-btn{
-  width:100%; padding:13px; border-radius:50px; border:1px solid var(--accent);
-  background:transparent; color:var(--accent);
-  font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
-  cursor:pointer;
+  width:100%; padding:13px; border-radius:50px;
+  border:1px solid var(--accent); background:transparent;
+  color:var(--accent); font-family:'Rajdhani',sans-serif;
+  font-size:1rem; font-weight:700; cursor:pointer;
 }
 .code-go-btn{
   width:100%; padding:13px; border-radius:50px; border:none;
@@ -142,103 +122,199 @@ body::before{
 
 /* ── APP ── */
 #appScreen{ display:none; flex-direction:column; min-height:100vh; }
-
 .app-header{
   position:sticky; top:0; z-index:10;
   background:rgba(9,14,26,0.95); backdrop-filter:blur(10px);
-  padding:12px 16px; border-bottom:1px solid var(--border);
+  padding:10px 14px; border-bottom:1px solid var(--border);
   display:flex; justify-content:space-between; align-items:center;
 }
-.app-title{ font-family:'Rajdhani',sans-serif; font-size:1.5rem; font-weight:700; color:var(--accent); }
-
+.app-title{ font-family:'Rajdhani',sans-serif; font-size:1.4rem; font-weight:700; color:var(--accent); }
+.header-right{ display:flex; gap:8px; align-items:center; }
 .user-badge{
   display:flex; align-items:center; gap:6px;
   background:var(--card); border:1px solid var(--border);
   border-radius:20px; padding:5px 12px;
-  font-size:0.82rem; font-weight:700;
-  font-family:'Rajdhani',sans-serif;
-  color:var(--accent); cursor:pointer; letter-spacing:1px;
+  font-family:'Rajdhani',sans-serif; font-size:0.82rem;
+  font-weight:700; color:var(--accent); cursor:pointer; letter-spacing:1px;
 }
-.user-dot{
-  width:7px; height:7px; border-radius:50%;
-  background:var(--online); box-shadow:0 0 6px var(--online);
+.user-dot{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); }
+.out-btn{
+  background:none; border:1px solid var(--border); border-radius:20px;
+  padding:5px 10px; color:var(--muted); font-size:0.72rem; cursor:pointer;
 }
-
 .instructions{
-  text-align:center; font-size:0.78rem; color:var(--muted);
-  padding:8px 16px; background:rgba(0,212,255,0.04);
+  text-align:center; font-size:0.75rem; color:var(--muted);
+  padding:7px 16px; background:rgba(0,212,255,0.04);
   border-bottom:1px solid var(--border);
 }
 
 /* ── GRID ── */
 .grid-container{
   display:grid; grid-template-columns:repeat(2,1fr);
-  gap:12px; padding:14px 12px 100px;
+  gap:10px; padding:12px 10px 100px;
 }
+
+/* Broadcast card — full width */
+.friend-card.broadcast{
+  grid-column:1 / -1;
+  aspect-ratio:auto;
+  padding:18px 20px;
+  flex-direction:row;
+  justify-content:flex-start;
+  gap:16px;
+  border-color:var(--purple);
+  background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(9,14,26,1));
+}
+.friend-card.broadcast .card-town{
+  font-size:1.6rem; color:var(--purple);
+}
+.friend-card.broadcast .card-label{
+  font-size:1.1rem;
+}
+.friend-card.broadcast .pulse-ring{ border-color:var(--purple); }
+.friend-card.broadcast.recording{ border-color:var(--recording); }
+.friend-card.broadcast.has-message{ border-color:var(--yellow); animation:glowPulse 2s infinite; }
 
 .friend-card{
   position:relative; background:var(--card);
   border:1.5px solid var(--border); border-radius:18px;
-  padding:16px 10px 14px; display:flex; flex-direction:column;
+  padding:14px 8px 12px; display:flex; flex-direction:column;
   justify-content:center; align-items:center; text-align:center;
-  aspect-ratio:1/1; cursor:pointer; overflow:hidden; transition:all 0.15s ease;
+  aspect-ratio:1/1; cursor:pointer; overflow:hidden; transition:all 0.15s;
 }
 .friend-card.recording{ background:#1a0a0a; border-color:var(--recording); transform:scale(0.96); }
-.friend-card.has-message{ border-color:var(--sent); animation:glowPulse 2s infinite; }
+.friend-card.has-message{ border-color:var(--yellow); animation:glowPulse 2s infinite; }
+.friend-card.empty{ border-style:dashed; opacity:0.6; }
 
 @keyframes glowPulse{
-  0%,100%{ box-shadow:0 0 12px rgba(245,158,11,0.2); }
+  0%,100%{ box-shadow:0 0 10px rgba(245,158,11,0.2); }
   50%{     box-shadow:0 0 20px rgba(245,158,11,0.5); }
 }
-
 .pulse-ring{
   display:none; position:absolute; inset:-4px; border-radius:20px;
   border:2px solid var(--recording); animation:pulseRing 1s infinite;
 }
 .friend-card.recording .pulse-ring{ display:block; }
-
 @keyframes pulseRing{
   from{ opacity:1; transform:scale(1); }
   to{   opacity:0; transform:scale(1.05); }
 }
-
 .msg-indicator{
   position:absolute; top:7px; left:8px;
   width:10px; height:10px; border-radius:50%;
-  background:var(--sent); display:none; box-shadow:0 0 6px var(--sent);
+  background:var(--yellow); display:none; box-shadow:0 0 6px var(--yellow);
 }
 .friend-card.has-message .msg-indicator{ display:block; }
-
 .edit-btn{
-  position:absolute; top:7px; right:8px; font-size:0.7rem;
-  color:var(--accent); font-family:'Rajdhani',sans-serif; font-weight:700;
+  position:absolute; top:7px; right:8px;
+  font-size:0.65rem; color:var(--accent);
+  font-family:'Rajdhani',sans-serif; font-weight:700;
   background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:20px;
 }
 
-.card-avatar{ font-size:1.6rem; margin-bottom:6px; }
-.card-name{
-  font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+/* Card content */
+.card-town{
+  font-family:'Rajdhani',sans-serif; font-size:1.05rem;
+  font-weight:700; color:var(--accent); letter-spacing:1px;
+  width:100%; white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; margin-bottom:3px;
+}
+.card-label{
+  font-family:'Rajdhani',sans-serif; font-size:0.88rem;
+  font-weight:700; color:var(--text);
   width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .card-status{
-  font-size:0.72rem; color:var(--muted);
+  font-size:0.68rem; color:var(--muted);
   width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  margin-top:2px;
+}
+.card-empty-hint{
+  font-size:0.75rem; color:var(--muted); line-height:1.4; text-align:center;
 }
 
-/* ── RECORDING TIMER ── */
+/* Recording timer */
 .rec-timer{
-  display:none; position:absolute; bottom:10px; left:50%;
-  transform:translateX(-50%); font-family:'Rajdhani',sans-serif;
-  font-size:0.85rem; font-weight:700; color:var(--recording); letter-spacing:1px;
+  display:none; position:absolute; bottom:8px; left:50%;
+  transform:translateX(-50%);
+  font-family:'Rajdhani',sans-serif; font-size:0.8rem;
+  font-weight:700; color:var(--recording); letter-spacing:1px;
 }
 .friend-card.recording .rec-timer{ display:block; }
-
 .rec-bar{
   display:none; position:absolute; bottom:0; left:0;
   height:3px; background:var(--recording);
-  border-radius:0 0 18px 18px; transition:width 1s linear;
+  border-radius:0 0 18px 18px;
 }
 .friend-card.recording .rec-bar{ display:block; }
+
+/* ── EDIT SHEET ── */
+#editModal{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
+  z-index:160; align-items:flex-end; justify-content:center;
+}
+#editModal.open{ display:flex; }
+.edit-sheet{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:24px 24px 0 0; width:100%; max-width:480px;
+  padding:24px 20px 40px;
+}
+.edit-sheet h3{
+  font-family:'Rajdhani',sans-serif; font-size:1.3rem;
+  color:var(--accent); margin-bottom:16px; text-align:center;
+}
+.edit-field{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.edit-label{ font-size:0.75rem; color:var(--muted); font-weight:700; letter-spacing:1px; }
+.edit-input{
+  background:var(--card); border:1.5px solid var(--border);
+  border-radius:12px; padding:12px 16px; color:var(--text);
+  font-size:0.95rem; outline:none; font-family:'Nunito',sans-serif;
+  width:100%; -webkit-user-select:text !important; user-select:text !important;
+}
+.edit-input:focus{ border-color:var(--accent); }
+.edit-input::placeholder{ color:var(--muted); }
+.edit-save-btn{
+  width:100%; padding:14px; border:none; border-radius:50px;
+  background:linear-gradient(135deg,var(--accent),#0099bb);
+  color:#000; font-family:'Rajdhani',sans-serif;
+  font-size:1.1rem; font-weight:700; cursor:pointer; margin-top:4px;
+}
+.edit-cancel-btn{
+  width:100%; padding:12px; border:1px solid var(--border);
+  border-radius:50px; background:transparent;
+  color:var(--muted); font-family:'Rajdhani',sans-serif;
+  font-size:0.95rem; cursor:pointer; margin-top:8px;
+}
+.edit-clear-btn{
+  width:100%; padding:10px; border:1px solid #ef444455;
+  border-radius:50px; background:transparent;
+  color:#ef4444; font-family:'Rajdhani',sans-serif;
+  font-size:0.85rem; cursor:pointer; margin-top:6px;
+}
+
+/* ── PLAY MODAL ── */
+#playModal{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
+  z-index:150; align-items:flex-end; justify-content:center;
+}
+#playModal.open{ display:flex; }
+.play-sheet{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:24px 24px 0 0; width:100%;
+  max-width:480px; padding:24px 20px 40px; text-align:center;
+}
+.play-sheet h3{ margin-bottom:4px; }
+.play-sheet p{ color:var(--muted); font-size:0.82rem; margin-bottom:4px; }
+.play-btn,.dismiss-btn,.save-btn{
+  width:100%; border-radius:50px; padding:13px 20px; margin-top:12px;
+  cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+}
+.play-btn{ background:linear-gradient(135deg,var(--accent),#0099bb); border:none; color:#000; }
+.dismiss-btn{ background:transparent; border:1px solid var(--border); color:var(--muted); }
+.save-btn{ display:none; background:transparent; border:1px solid var(--yellow); color:var(--yellow); }
+.save-btn.visible{ display:block; }
 
 /* ── TOAST ── */
 #toast{
@@ -249,36 +325,11 @@ body::before{
   transition:0.3s; pointer-events:none; font-size:0.85rem; white-space:nowrap;
 }
 #toast.show{ transform:translateX(-50%) translateY(0); }
-
-/* ── PLAY MODAL ── */
-#playModal{
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
-  z-index:150; align-items:flex-end; justify-content:center;
-}
-#playModal.open{ display:flex; }
-
-.play-sheet{
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:24px 24px 0 0; width:100%; max-width:480px;
-  padding:24px 20px 40px; text-align:center;
-}
-.play-sheet h3{ margin-bottom:4px; }
-.play-sheet p{ color:var(--muted); font-size:0.82rem; margin-bottom:4px; }
-
-.play-btn,.dismiss-btn,.save-btn{
-  width:100%; border-radius:50px; padding:13px 20px; margin-top:12px;
-  cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
-}
-.play-btn{ background:linear-gradient(135deg,var(--accent),#0099bb); border:none; color:#000; }
-.dismiss-btn{ background:transparent; border:1px solid var(--border); color:var(--muted); }
-.save-btn{ display:none; background:transparent; border:1px solid var(--sent); color:var(--sent); }
-.save-btn.visible{ display:block; }
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN ── -->
+<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-logo">OVER TO<br><span>YOU</span> 📡</div>
   <div class="login-subtitle">Voice messenger for your circle</div>
@@ -288,27 +339,30 @@ body::before{
     <button class="tab-btn"        id="tabSignin" onclick="switchTab('signin')">SIGN IN</button>
   </div>
 
-  <!-- Sign-up -->
   <div id="signupFields">
-    <input id="signupName"  class="login-input" type="text"     placeholder="Display name (min 2 letters)" maxlength="20" autocomplete="off">
-    <input id="signupEmail" class="login-input" type="email"    placeholder="Email address"                autocomplete="email">
-    <input id="signupPass"  class="login-input" type="password" placeholder="Password (min 6 chars)"       autocomplete="new-password">
+    <input id="signupName"  class="login-input" type="text"  placeholder="Your name (e.g. Kamal)" maxlength="20" autocomplete="off">
+    <input id="signupEmail" class="login-input" type="email" placeholder="Email address" autocomplete="email">
+    <div class="pass-wrap">
+      <input id="signupPass" class="login-input" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
+      <button class="eye-btn" type="button" onclick="togglePass('signupPass',this)">👁</button>
+    </div>
     <button class="login-btn" id="signupBtn">CREATE ACCOUNT →</button>
   </div>
 
-  <!-- Sign-in -->
   <div id="signinFields" style="display:none">
     <input id="signinEmail" class="login-input" type="email"    placeholder="Email address" autocomplete="email">
-    <input id="signinPass"  class="login-input" type="password" placeholder="Password"      autocomplete="current-password">
+    <div class="pass-wrap">
+      <input id="signinPass" class="login-input" type="password" placeholder="Password" autocomplete="current-password">
+      <button class="eye-btn" type="button" onclick="togglePass('signinPass',this)">👁</button>
+    </div>
     <button class="login-btn" id="signinBtn">SIGN IN →</button>
     <button class="forgot-btn" id="forgotBtn">Forgot password?</button>
   </div>
 
-  <!-- Friend-code reveal (shown once after signup) -->
   <div id="codeReveal">
     <div class="code-label">YOUR FRIEND CODE</div>
     <div class="code-box" id="codeDisplay">----</div>
-    <div class="code-hint">Share this code with friends so they can find you. You can always see it by tapping your name in the app.</div>
+    <div class="code-hint">Share this with friends so they can find you. Tap your code anytime in the app to copy it.</div>
     <button class="code-copy-btn" id="codeCopyBtn">📋 COPY CODE</button>
     <button class="code-go-btn"   id="codeGoBtn">LET'S GO →</button>
   </div>
@@ -316,20 +370,45 @@ body::before{
   <div id="loginError" class="login-error"></div>
 </div>
 
-<!-- ── APP ── -->
+<!-- APP -->
 <div id="appScreen">
   <div class="app-header">
     <div class="app-title">📡 OVER TO YOU</div>
-    <div class="user-badge" id="userBadge">
-      <div class="user-dot"></div>
-      <span id="headerCode">----</span>
+    <div class="header-right">
+      <div class="user-badge" id="userBadge">
+        <div class="user-dot"></div>
+        <span id="headerCode">----</span>
+      </div>
+      <button class="out-btn" id="signoutBtn">OUT</button>
     </div>
   </div>
-  <div class="instructions">Hold card to talk · Tap your code to copy · Tap glowing card to play</div>
+  <div class="instructions">Hold card to talk · Tap code to copy · Tap glowing card to play</div>
   <div class="grid-container" id="friendsGrid"></div>
 </div>
 
-<!-- ── PLAY MODAL ── -->
+<!-- EDIT SHEET -->
+<div id="editModal">
+  <div class="edit-sheet">
+    <h3 id="editTitle">Set Up Contact</h3>
+    <div class="edit-field">
+      <div class="edit-label">WHAT DO YOU CALL THIS PERSON?</div>
+      <input id="editLabel" class="edit-input" type="text" placeholder="e.g. Papaji, Mummyji, Deedi, Bhai…" maxlength="20">
+    </div>
+    <div class="edit-field" id="editCodeField">
+      <div class="edit-label">THEIR FRIEND CODE</div>
+      <input id="editCode" class="edit-input" type="text" placeholder="e.g. KAMAL-4837" maxlength="15" autocomplete="off">
+    </div>
+    <div class="edit-field">
+      <div class="edit-label">THEIR TOWN / CITY</div>
+      <input id="editTown" class="edit-input" type="text" placeholder="e.g. Amritsar, Ludhiana, Delhi…" maxlength="20">
+    </div>
+    <button class="edit-save-btn"   id="editSaveBtn">SAVE →</button>
+    <button class="edit-clear-btn"  id="editClearBtn">Remove this contact</button>
+    <button class="edit-cancel-btn" id="editCancelBtn">Cancel</button>
+  </div>
+</div>
+
+<!-- PLAY MODAL -->
 <div id="playModal">
   <div class="play-sheet">
     <h3 id="playFromName">Voice Message</h3>
@@ -345,45 +424,45 @@ body::before{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-  onAuthStateChanged
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  sendPasswordResetEmail, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getDatabase, ref, set, get, update, push, remove,
   onChildAdded, query, orderByChild, startAfter
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
 // =============================================
 //  REPLACE WITH YOUR FIREBASE CONFIG
 // =============================================
 const firebaseConfig = {
-  apiKey:        "AIzaSyAlWc8AFDTF42DyrqlXOFMv5qeFseIxwZk",
-  authDomain:    "over-to-you.firebaseapp.com",
-  projectId:     "over-to-you",
-  storageBucket: "over-to-you.firebasestorage.app",
-  databaseURL:   "https://over-to-you-default-rtdb.asia-southeast1.firebasedatabase.app",
+  apiKey:            "AIzaSyAlWc8AFDTF42DyrqlXOFMv5qeFseIxwZk",
+  authDomain:        "over-to-you.firebaseapp.com",
+  projectId:         "over-to-you",
+  storageBucket:     "over-to-you.firebasestorage.app",
+  databaseURL:       "https://over-to-you-default-rtdb.asia-southeast1.firebasedatabase.app",
   messagingSenderId: "248483734626",
-  appId:         "1:248483734626:web:492766d8b748d7fb875d3b"
+  appId:             "1:248483734626:web:492766d8b748d7fb875d3b"
 };
 // =============================================
 
-const app     = initializeApp(firebaseConfig);
-const auth    = getAuth(app);
-const db      = getDatabase(app);
-// Cloudinary config
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getDatabase(app);
+
+// Cloudinary
 const CLOUDINARY_CLOUD  = "dqwaiio4d";
 const CLOUDINARY_PRESET = "oty123";
 
 const MAX_INBOX       = 20;
 const MAX_RECORD_SECS = 90;
+const TOTAL_CARDS     = 10;   // regular contacts
 
 const messageQueue = [];
 let   queuePlaying = false;
 
 let currentUser        = null;
-let myProfile          = null;   // { name, email, friendCode }
+let myProfile          = null;
 let myFriends          = [];
 let mediaStream        = null;
 let mediaRecorder      = null;
@@ -392,167 +471,127 @@ let isRecording        = false;
 let pendingMessage     = null;
 let lastLoginTimestamp = 0;
 let listenerAttached   = false;
+let editingIndex       = null;   // which card is being edited
 
 let recTimerInterval  = null;
 let recAutoStopTimer  = null;
 let recSecondsElapsed = 0;
 let activeRecCard     = null;
 
-// ── Tab switching ─────────────────────────────
+// ── Tab / password helpers ────────────────────
 
 window.switchTab = function(tab) {
   const su = tab === "signup";
-  document.getElementById("signupFields").style.display  = su ? "flex" : "none";
-  document.getElementById("signinFields").style.display  = su ? "none" : "flex";
-  document.getElementById("codeReveal").style.display    = "none";
+  document.getElementById("signupFields").style.display = su ? "flex" : "none";
+  document.getElementById("signinFields").style.display = su ? "none" : "flex";
+  document.getElementById("codeReveal").style.display   = "none";
   document.getElementById("tabSignup").classList.toggle("active",  su);
   document.getElementById("tabSignin").classList.toggle("active", !su);
-  document.getElementById("loginError").style.display    = "none";
+  document.getElementById("loginError").style.display   = "none";
+};
+
+window.togglePass = function(id, btn) {
+  const el = document.getElementById(id);
+  el.type  = el.type === "password" ? "text" : "password";
+  btn.style.opacity = el.type === "text" ? "1" : "0.6";
 };
 
 // ── Helpers ───────────────────────────────────
 
 function toast(msg) {
   const t = document.getElementById("toast");
-  t.textContent = msg;
-  t.classList.add("show");
+  t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2800);
 }
-
 function showError(msg) {
   const el = document.getElementById("loginError");
-  el.style.color   = "#ff6b6b";
-  el.textContent   = msg;
-  el.style.display = "block";
+  el.style.color = "#ff6b6b"; el.textContent = msg; el.style.display = "block";
 }
-
 function showSuccess(msg) {
   const el = document.getElementById("loginError");
-  el.style.color   = "var(--online)";
-  el.textContent   = msg;
-  el.style.display = "block";
+  el.style.color = "var(--green)"; el.textContent = msg; el.style.display = "block";
 }
-
 function escapeHtml(s) {
   if (!s) return "";
   return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")
           .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
-
-function getEmoji(name) {
-  const e = ["👩","👨","🧑","👵","👴","🧒","🐱","🐶","⭐","🎧"];
-  return e[(name.charCodeAt(0)||65) % e.length];
+function formatTime(s) {
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 }
+function vibrateStart() { if (navigator.vibrate) navigator.vibrate(80); }
+function vibrateSent()  { if (navigator.vibrate) navigator.vibrate([60,40,60]); }
 
-function getDefaultFriends() {
-  return [
-    { id:null, name:"Mom",   emoji:"👩", status:"Tap EDIT to link" },
-    { id:null, name:"Dad",   emoji:"👨", status:"Tap EDIT to link" },
-    { id:null, name:"Amit",  emoji:"🧑", status:"Tap EDIT to link" },
-    { id:null, name:"Pooja", emoji:"👩", status:"Tap EDIT to link" }
-  ];
+function copyToClipboard(text, msg) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => clipboardFallback(text, msg));
+  } else { clipboardFallback(text, msg); }
 }
-
-function formatTime(secs) {
-  return String(Math.floor(secs/60)).padStart(2,"0") + ":" + String(secs%60).padStart(2,"0");
+function clipboardFallback(text, msg) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text; ta.style.cssText = "position:fixed;top:-9999px;opacity:0";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta); toast(msg);
+  } catch(e) { toast("Your code: " + text); }
 }
 
 function friendlyAuthError(code) {
   const m = {
-    "auth/email-already-in-use":   "❌ That email is already registered. Try signing in.",
+    "auth/email-already-in-use":   "❌ Email already registered. Try signing in.",
     "auth/invalid-email":          "❌ Invalid email address.",
-    "auth/weak-password":          "❌ Password must be at least 6 characters.",
+    "auth/weak-password":          "❌ Password needs 6+ characters.",
     "auth/user-not-found":         "❌ No account found for that email.",
     "auth/wrong-password":         "❌ Wrong password.",
     "auth/invalid-credential":     "❌ Wrong email or password.",
-    "auth/too-many-requests":      "❌ Too many attempts. Try again later.",
-    "auth/network-request-failed": "❌ Network error. Check your connection.",
+    "auth/too-many-requests":      "❌ Too many attempts. Try later.",
+    "auth/network-request-failed": "❌ Network error. Check connection.",
   };
   return m[code] || "❌ " + code;
 }
 
-// ── Clipboard (with Safari fallback) ─────────
-function copyToClipboard(text, successMsg) {
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => toast(successMsg))
-      .catch(() => clipboardFallback(text, successMsg));
-  } else {
-    clipboardFallback(text, successMsg);
-  }
-}
+// ── Audio format ──────────────────────────────
 
-function clipboardFallback(text, successMsg) {
-  try {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.setAttribute("readonly", "");
-    ta.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0";
-    document.body.appendChild(ta);
-    ta.focus(); ta.select();
-    const ok = document.execCommand("copy");
-    document.body.removeChild(ta);
-    toast(ok ? successMsg : "Copy: " + text);
-  } catch(e) {
-    toast("Your code: " + text);
-  }
-}
-
-// ── Vibration (silent no-op on iOS) ──────────
-function vibrateStart()  { if (navigator.vibrate) navigator.vibrate(80); }
-function vibrateSent()   { if (navigator.vibrate) navigator.vibrate([60, 40, 60]); }
-
-// ── Audio format detection (iPhone/Safari compatible) ─────
 function getBestMimeType() {
-  const candidates = [
-    "audio/mp4;codecs=mp4a.40.2",  // AAC-LC in MP4 — Safari / iPhone first choice
-    "audio/mp4",                    // MP4 generic
-    "audio/webm;codecs=opus",       // Chrome / Android first choice
-    "audio/webm",                   // WebM generic
-    "audio/ogg;codecs=opus"         // Firefox fallback
-  ];
-  for (const mime of candidates) {
-    if (MediaRecorder.isTypeSupported(mime)) return mime;
-  }
-  return "";   // let browser choose
+  const list = ["audio/mp4;codecs=mp4a.40.2","audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"];
+  for (const m of list) { if (MediaRecorder.isTypeSupported(m)) return m; }
+  return "";
 }
-
 function extForMime(mime) {
-  if (mime.startsWith("audio/mp4"))  return ".m4a";
-  if (mime.startsWith("audio/ogg"))  return ".ogg";
+  if (mime.startsWith("audio/mp4")) return ".m4a";
+  if (mime.startsWith("audio/ogg")) return ".ogg";
   return ".webm";
 }
 
-// ── Friend-code generation ────────────────────
-//
-// Format:  NAME-NNNN   e.g. RAJ-4837
-// Rules:
-//   • prefix = display name, uppercase letters only, max 6 chars
-//   • suffix = 4 random digits
-//   • stored in global_directory keyed by the lowercase code ("raj-4837")
-//   • collision check: regenerate if key already taken (rare)
+// ── Friend code generation ────────────────────
 
 function makeCodePrefix(name) {
-  // Use first word only so "Kamaljit Singh" → "KAMALJ" not "KAMALJ" from full name
-  // and "Kamal" → "KAMAL", "Raj" → "RAJ"
-  const firstName = name.trim().split(/\s+/)[0] || name;
-  const letters   = firstName.toUpperCase().replace(/[^A-Z]/g, "");
-  // Use up to 6 letters but at least 3
-  return letters.slice(0, 6) || "USER";
+  const first = name.trim().split(/\s+/)[0] || name;
+  return first.toUpperCase().replace(/[^A-Z]/g,"").slice(0,6) || "USER";
 }
 
 async function generateUniqueFriendCode(name) {
   const prefix = makeCodePrefix(name);
-  let code, snap;
-  let attempts = 0;
+  let code, snap, attempts = 0;
   do {
-    const digits = String(Math.floor(Math.random() * 9000) + 1000); // 1000-9999
-    code  = prefix + "-" + digits;
-    snap  = await get(ref(db, "global_directory/" + code.toLowerCase()));
-    attempts++;
-    if (attempts > 20) throw new Error("Could not generate unique code");
+    const digits = String(Math.floor(Math.random()*9000)+1000);
+    code = prefix + "-" + digits;
+    snap = await get(ref(db, "global_directory/" + code.toLowerCase()));
+    if (++attempts > 20) throw new Error("Could not generate unique code");
   } while (snap.exists());
   return code;
+}
+
+// ── Default friends (10 blank slots + 1 broadcast) ───
+
+function getDefaultFriends() {
+  const slots = [];
+  for (let i = 1; i <= TOTAL_CARDS; i++) {
+    slots.push({ id:null, label:"", town:"", status:"empty" });
+  }
+  // Broadcast slot
+  slots.push({ id:"__broadcast__", label:"BROADCAST", town:"📢 Everyone", status:"broadcast" });
+  return slots;
 }
 
 // ── Persistence ───────────────────────────────
@@ -560,107 +599,79 @@ async function generateUniqueFriendCode(name) {
 async function saveUserProfile() {
   if (!currentUser) return;
   await set(ref(db, "users/" + currentUser.uid), {
-    name:       myProfile.name,
-    email:      myProfile.email,
+    name: myProfile.name, email: myProfile.email,
     friendCode: myProfile.friendCode,
-    friends:    myFriends,
-    lastSeen:   Date.now()
+    friends: myFriends, lastSeen: Date.now()
   });
 }
 
-// ── Boot app ──────────────────────────────────
+// ── Boot ──────────────────────────────────────
 
 async function bootApp(user) {
   currentUser = user;
   const snap  = await get(ref(db, "users/" + currentUser.uid));
-
   if (snap.exists()) {
-    myProfile          = snap.val();
-    myFriends          = myProfile.friends || getDefaultFriends();
+    myProfile  = snap.val();
+    myFriends  = myProfile.friends && myProfile.friends.length >= TOTAL_CARDS
+                 ? myProfile.friends : getDefaultFriends();
     lastLoginTimestamp = myProfile.lastSeen || 0;
   } else {
-    // Edge case: auth exists but no DB record (e.g. DB was wiped)
-    myProfile = { name: user.email.split("@")[0], email: user.email,
-                  friendCode: await generateUniqueFriendCode(user.email.split("@")[0]) };
-    myFriends = getDefaultFriends();
+    myProfile  = { name: user.email.split("@")[0], email: user.email,
+                   friendCode: await generateUniqueFriendCode(user.email.split("@")[0]) };
+    myFriends  = getDefaultFriends();
     lastLoginTimestamp = Date.now();
     await saveUserProfile();
     await set(ref(db, "global_directory/" + myProfile.friendCode.toLowerCase()),
               { uid: currentUser.uid, name: myProfile.name });
   }
-
-  // Refresh lastSeen
   await update(ref(db, "users/" + currentUser.uid), { lastSeen: Date.now() });
 
-  // Show app
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appScreen").style.display   = "flex";
   document.getElementById("headerCode").textContent    = myProfile.friendCode;
 
-  document.getElementById("userBadge").onclick = () => {
+  document.getElementById("userBadge").onclick = () =>
     copyToClipboard(myProfile.friendCode, "📋 " + myProfile.friendCode + " copied!");
-  };
 
   await initMicrophone();
   buildDashboard();
   if (!listenerAttached) { listenerAttached = true; listenForMessages(); }
 }
 
-// ── Sign Up ───────────────────────────────────
+// ── Auth ──────────────────────────────────────
 
 document.getElementById("signupBtn").onclick = async () => {
   const name  = document.getElementById("signupName").value.trim();
   const email = document.getElementById("signupEmail").value.trim();
   const pass  = document.getElementById("signupPass").value;
-
-  const letters = name.replace(/[^a-zA-Z]/g,"");
-  if (letters.length < 2)  { showError("❌ Display name needs at least 2 letters."); return; }
-  if (!email)               { showError("❌ Enter your email.");                      return; }
-  if (pass.length < 6)      { showError("❌ Password needs 6+ characters.");          return; }
-
+  if (name.replace(/[^a-zA-Z]/g,"").length < 2) { showError("❌ Name needs at least 2 letters."); return; }
+  if (!email)          { showError("❌ Enter your email."); return; }
+  if (pass.length < 6) { showError("❌ Password needs 6+ characters."); return; }
   try {
-    // Generate unique friend code before creating account
     const friendCode = await generateUniqueFriendCode(name);
-
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     currentUser = cred.user;
-
-    myProfile = { name, email, friendCode };
-    myFriends = getDefaultFriends();
+    myProfile   = { name, email, friendCode };
+    myFriends   = getDefaultFriends();
     lastLoginTimestamp = Date.now();
-
-    // Save profile
-    await set(ref(db, "users/" + currentUser.uid), {
-      name, email, friendCode, friends: myFriends, lastSeen: Date.now()
-    });
-
-    // Index in global_directory by the friend code (lowercase key)
+    await set(ref(db, "users/" + currentUser.uid),
+      { name, email, friendCode, friends: myFriends, lastSeen: Date.now() });
     await set(ref(db, "global_directory/" + friendCode.toLowerCase()),
-              { uid: currentUser.uid, name });
-
-    // Show code reveal screen instead of going straight to app
+      { uid: currentUser.uid, name });
     document.getElementById("signupFields").style.display = "none";
     document.getElementById("loginError").style.display   = "none";
     document.getElementById("codeDisplay").textContent    = friendCode;
     document.getElementById("codeReveal").style.display   = "flex";
-
-  } catch (err) {
-    showError(friendlyAuthError(err.code || err.message));
-  }
+  } catch(err) { showError(friendlyAuthError(err.code || err.message)); }
 };
 
-// Copy code button on reveal screen
 document.getElementById("codeCopyBtn").onclick = () => {
   const code = document.getElementById("codeDisplay").textContent;
   copyToClipboard(code, "📋 " + code + " copied!");
 };
-
-// "Let's go" button on reveal screen → boot the app
 document.getElementById("codeGoBtn").onclick = async () => {
   try { await bootApp(currentUser); } catch(e) { showError("Error loading app."); }
 };
-
-// ── Sign In ───────────────────────────────────
 
 document.getElementById("signinBtn").onclick = async () => {
   const email = document.getElementById("signinEmail").value.trim();
@@ -669,12 +680,8 @@ document.getElementById("signinBtn").onclick = async () => {
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     await bootApp(cred.user);
-  } catch (err) {
-    showError(friendlyAuthError(err.code));
-  }
+  } catch(err) { showError(friendlyAuthError(err.code)); }
 };
-
-// ── Forgot password ───────────────────────────
 
 document.getElementById("forgotBtn").onclick = async () => {
   const email = document.getElementById("signinEmail").value.trim();
@@ -682,16 +689,26 @@ document.getElementById("forgotBtn").onclick = async () => {
   try {
     await sendPasswordResetEmail(auth, email);
     showSuccess("✅ Reset email sent! Check your inbox.");
-  } catch (err) { showError(friendlyAuthError(err.code)); }
+  } catch(err) { showError(friendlyAuthError(err.code)); }
 };
-
-// ── Auto-restore session ──────────────────────
 
 onAuthStateChanged(auth, async (user) => {
   if (user && document.getElementById("appScreen").style.display !== "flex") {
-    try { await bootApp(user); } catch(e) { console.error("Session restore failed:", e); }
+    try { await bootApp(user); } catch(e) { console.error(e); }
   }
 });
+
+document.getElementById("signoutBtn").onclick = async () => {
+  if (!confirm("Sign out?")) return;
+  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+  await signOut(auth);
+  document.getElementById("appScreen").style.display   = "none";
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("signupFields").style.display = "flex";
+  document.getElementById("signinFields").style.display = "none";
+  document.getElementById("codeReveal").style.display   = "none";
+  listenerAttached = false; currentUser = null; myProfile = null; myFriends = [];
+};
 
 // ── Microphone ────────────────────────────────
 
@@ -699,10 +716,7 @@ async function initMicrophone() {
   try {
     if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
     mediaStream = await navigator.mediaDevices.getUserMedia({ audio:true });
-    return true;
-  } catch(err) {
-    console.error(err); toast("❌ Microphone access denied"); return false;
-  }
+  } catch(err) { console.error(err); toast("❌ Microphone access denied"); }
 }
 
 // ── Recording timer ───────────────────────────
@@ -711,27 +725,21 @@ function startRecTimer(card) {
   recSecondsElapsed = 0; activeRecCard = card;
   const timerEl = card.querySelector(".rec-timer");
   const barEl   = card.querySelector(".rec-bar");
-
-  barEl.style.transition = "none";
-  barEl.style.width = "0%";
+  barEl.style.transition = "none"; barEl.style.width = "0%";
   requestAnimationFrame(() => {
     barEl.style.transition = "width " + MAX_RECORD_SECS + "s linear";
     barEl.style.width = "100%";
   });
   timerEl.textContent = "● " + formatTime(0);
-
   recTimerInterval = setInterval(() => {
     recSecondsElapsed++;
     timerEl.textContent = "● " + formatTime(recSecondsElapsed);
     if (recSecondsElapsed === MAX_RECORD_SECS - 10) toast("⚠️ 10 seconds left");
   }, 1000);
-
   recAutoStopTimer = setTimeout(() => {
     if (mediaRecorder && mediaRecorder.state === "recording") {
-      toast("⏹ Max length reached — sending…");
-      mediaRecorder.stop();
-      card.classList.remove("recording");
-      isRecording = false;
+      toast("⏹ Max length — sending…");
+      mediaRecorder.stop(); card.classList.remove("recording"); isRecording = false;
     }
     stopRecTimer();
   }, MAX_RECORD_SECS * 1000);
@@ -747,45 +755,60 @@ function stopRecTimer() {
   }
 }
 
-// ── Audio upload ──────────────────────────────
+// ── Cloudinary upload ─────────────────────────
 
 async function uploadAudio(blob, recipientUid, ext) {
-  const formData = new FormData();
-  const fileName = currentUser.uid + "_" + recipientUid + "_" + Date.now() + ext;
-  formData.append("file",           new File([blob], fileName, { type: blob.type }));
-  formData.append("upload_preset",  CLOUDINARY_PRESET);
-  formData.append("resource_type",  "video");   // Cloudinary uses "video" for audio files
-
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD + "/video/upload",
-    { method: "POST", body: formData }
-  );
-  if (!res.ok) throw new Error("Cloudinary upload failed: " + res.status);
-  const data = await res.json();
-  return data.secure_url;
+  const fd = new FormData();
+  fd.append("file",          new File([blob], currentUser.uid+"_"+recipientUid+"_"+Date.now()+ext, { type:blob.type }));
+  fd.append("upload_preset", CLOUDINARY_PRESET);
+  fd.append("resource_type", "video");
+  const res = await fetch("https://api.cloudinary.com/v1_1/"+CLOUDINARY_CLOUD+"/video/upload",
+    { method:"POST", body:fd });
+  if (!res.ok) throw new Error("Upload failed: " + res.status);
+  return (await res.json()).secure_url;
 }
 
-// ── Send message ──────────────────────────────
+// ── Send to one ───────────────────────────────
 
-async function sendMessageToFriend(friend) {
-  if (!friend.id)          { toast("❌ Friend not linked. Tap EDIT."); return; }
-  if (!audioChunks.length) { toast("No audio recorded");               return; }
+async function sendToOne(friendId, friendLabel, audioUrl) {
+  const inboxSnap = await get(ref(db, "messages/" + friendId));
+  if (inboxSnap.exists() && Object.keys(inboxSnap.val()).length >= MAX_INBOX) {
+    toast("❌ " + friendLabel + "'s inbox is full"); return false;
+  }
+  const msgRef = push(ref(db, "messages/" + friendId));
+  await set(msgRef, {
+    from: currentUser.uid, fromName: myProfile.name,
+    audioUrl, timestamp: Date.now(), isRead: false
+  });
+  return true;
+}
+
+// ── Send message (one or broadcast) ──────────
+
+async function sendMessageToFriend(friend, isBroadcast) {
+  if (!audioChunks.length) { toast("No audio recorded"); return; }
   try {
-    const inboxSnap = await get(ref(db, "messages/" + friend.id));
-    if (inboxSnap.exists() && Object.keys(inboxSnap.val()).length >= MAX_INBOX) {
-      toast("❌ Their inbox is full. Try later."); return;
-    }
     const mime     = mediaRecorder.mimeType;
     const ext      = extForMime(mime);
     const blob     = new Blob(audioChunks, { type: mime });
-    const audioUrl = await uploadAudio(blob, friend.id, ext);
-    const msgRef   = push(ref(db, "messages/" + friend.id));
-    await set(msgRef, {
-      from: currentUser.uid, fromName: myProfile.name,
-      audioUrl, timestamp: Date.now(), isRead: false
-    });
-    vibrateSent();
-    toast("✓ Voice sent to " + escapeHtml(friend.name));
+    // Upload once, reuse URL for broadcast
+    const audioUrl = await uploadAudio(blob, isBroadcast ? "broadcast" : friend.id, ext);
+
+    if (isBroadcast) {
+      const linked = myFriends.filter(f => f.id && f.id !== "__broadcast__");
+      if (!linked.length) { toast("❌ No contacts linked yet"); return; }
+      let sent = 0;
+      for (const f of linked) {
+        const ok = await sendToOne(f.id, f.label || "contact", audioUrl);
+        if (ok) sent++;
+      }
+      vibrateSent();
+      toast("📢 Broadcast sent to " + sent + " contact" + (sent !== 1 ? "s" : ""));
+    } else {
+      await sendToOne(friend.id, friend.label || "contact", audioUrl);
+      vibrateSent();
+      toast("✓ Sent to " + escapeHtml(friend.label || "contact"));
+    }
   } catch(err) { console.error(err); toast("❌ Failed to send"); }
 }
 
@@ -794,10 +817,8 @@ async function sendMessageToFriend(friend) {
 function listenForMessages() {
   const msgsRef  = ref(db, "messages/" + currentUser.uid);
   const msgQuery = query(msgsRef, orderByChild("timestamp"), startAfter(lastLoginTimestamp));
-
   onChildAdded(msgQuery, (snap) => {
-    const data = snap.val();
-    if (!data) return;
+    const data = snap.val(); if (!data) return;
     messageQueue.push({
       audioUrl: data.audioUrl, senderName: data.fromName,
       messageId: snap.key, senderId: data.from, timestamp: data.timestamp
@@ -810,26 +831,20 @@ function listenForMessages() {
 
 function showNextInQueue() {
   if (!messageQueue.length) { queuePlaying = false; return; }
-  queuePlaying   = true;
-  pendingMessage = messageQueue.shift();
-  document.getElementById("playFromName").textContent =
-    "📩 Message from " + escapeHtml(pendingMessage.senderName);
-  document.getElementById("playTime").textContent =
-    new Date(pendingMessage.timestamp).toLocaleTimeString();
+  queuePlaying = true; pendingMessage = messageQueue.shift();
+  document.getElementById("playFromName").textContent = "📩 From " + escapeHtml(pendingMessage.senderName);
+  document.getElementById("playTime").textContent     = new Date(pendingMessage.timestamp).toLocaleTimeString();
   document.getElementById("saveBtn").classList.remove("visible");
   document.getElementById("playModal").classList.add("open");
 }
 
-// ── Playback & modal ──────────────────────────
-
 async function playMessage() {
   if (!pendingMessage) return;
   try {
-    const audio = new Audio(pendingMessage.audioUrl);
-    await audio.play();
+    await new Audio(pendingMessage.audioUrl).play();
     document.getElementById("saveBtn").classList.add("visible");
     await remove(ref(db, "messages/" + currentUser.uid + "/" + pendingMessage.messageId));
-  } catch(err) { console.error(err); toast("Playback failed"); }
+  } catch(err) { toast("Playback failed"); }
 }
 
 function saveMessageAudio() {
@@ -842,12 +857,85 @@ function saveMessageAudio() {
 
 function closeModal() {
   document.getElementById("playModal").classList.remove("open");
-  if (pendingMessage && pendingMessage.senderId) {
+  if (pendingMessage) {
     const c = document.querySelector(".friend-card[data-friend-id='" + pendingMessage.senderId + "']");
     if (c) c.classList.remove("has-message");
   }
   pendingMessage = null;
   setTimeout(showNextInQueue, 600);
+}
+
+// ── Edit sheet ────────────────────────────────
+
+function openEditSheet(idx) {
+  editingIndex = idx;
+  const f = myFriends[idx];
+  const isBroadcast = f.id === "__broadcast__";
+
+  document.getElementById("editTitle").textContent  = isBroadcast ? "Broadcast Card" : "Set Up Contact";
+  document.getElementById("editLabel").value        = f.label || "";
+  document.getElementById("editCode").value         = (f.code || "");
+  document.getElementById("editTown").value         = f.town  || "";
+  document.getElementById("editCodeField").style.display = isBroadcast ? "none" : "block";
+  document.getElementById("editClearBtn").style.display  = (f.id && !isBroadcast) ? "block" : "none";
+  document.getElementById("editModal").classList.add("open");
+}
+
+document.getElementById("editSaveBtn").onclick = async () => {
+  const idx   = editingIndex;
+  const f     = myFriends[idx];
+  const label = document.getElementById("editLabel").value.trim();
+  const code  = document.getElementById("editCode").value.trim();
+  const town  = document.getElementById("editTown").value.trim();
+
+  if (!label) { toast("❌ Please enter a name for this person"); return; }
+
+  const isBroadcast = f.id === "__broadcast__";
+
+  if (isBroadcast) {
+    myFriends[idx] = { id:"__broadcast__", label: label || "BROADCAST", town: town || "📢 Everyone", status:"broadcast" };
+    await saveUserProfile(); toast("✅ Broadcast card updated"); closeEditSheet(); buildDashboard(); return;
+  }
+
+  if (!code) { toast("❌ Enter their friend code"); return; }
+
+  const key = code.toLowerCase();
+  if (!/^[a-z]+-\d{4}$/.test(key)) { toast("❌ Code format should be like KAMAL-4837"); return; }
+
+  try {
+    const snap = await get(ref(db, "global_directory/" + key));
+    if (!snap.exists()) { toast("❌ No user found with that code"); return; }
+    const entry = snap.val();
+    if (entry.uid === currentUser.uid) { toast("❌ That's your own code!"); return; }
+
+    myFriends[idx] = {
+      id:    entry.uid,
+      label: label,
+      code:  code.toUpperCase(),
+      town:  town || "",
+      status:"linked"
+    };
+    await saveUserProfile();
+    toast("📡 Connected to " + escapeHtml(label));
+    closeEditSheet(); buildDashboard();
+  } catch(err) { console.error(err); toast("❌ Lookup failed"); }
+};
+
+document.getElementById("editClearBtn").onclick = async () => {
+  if (!confirm("Remove this contact?")) return;
+  myFriends[editingIndex] = { id:null, label:"", town:"", status:"empty" };
+  await saveUserProfile();
+  toast("Contact removed"); closeEditSheet(); buildDashboard();
+};
+
+document.getElementById("editCancelBtn").onclick = closeEditSheet;
+document.getElementById("editModal").addEventListener("click", (e) => {
+  if (e.target === document.getElementById("editModal")) closeEditSheet();
+});
+
+function closeEditSheet() {
+  document.getElementById("editModal").classList.remove("open");
+  editingIndex = null;
 }
 
 // ── Dashboard ─────────────────────────────────
@@ -857,20 +945,48 @@ function buildDashboard() {
   grid.innerHTML = "";
 
   myFriends.forEach((friend, idx) => {
+    const isBroadcast = friend.id === "__broadcast__";
+    const isEmpty     = !friend.id && !friend.label;
+
     const card = document.createElement("div");
-    card.className = "friend-card";
-    if (friend.id) card.setAttribute("data-friend-id", friend.id);
+    card.className = "friend-card" +
+      (isBroadcast ? " broadcast" : "") +
+      (isEmpty     ? " empty"     : "");
+    if (friend.id && !isBroadcast) card.setAttribute("data-friend-id", friend.id);
 
-    card.innerHTML =
-      '<div class="pulse-ring"></div>' +
-      '<div class="msg-indicator"></div>' +
-      '<div class="edit-btn">EDIT</div>' +
-      '<div class="card-avatar">' + (friend.emoji || getEmoji(friend.name)) + '</div>' +
-      '<div class="card-name">'   + escapeHtml(friend.name)    + '</div>' +
-      '<div class="card-status">' + escapeHtml(friend.status)  + '</div>' +
-      '<div class="rec-timer"></div>' +
-      '<div class="rec-bar"></div>';
+    if (isEmpty) {
+      card.innerHTML =
+        '<div class="pulse-ring"></div>' +
+        '<div class="msg-indicator"></div>' +
+        '<div class="edit-btn">EDIT</div>' +
+        '<div class="card-empty-hint">Tap EDIT<br>to add contact</div>' +
+        '<div class="rec-timer"></div><div class="rec-bar"></div>';
+    } else if (isBroadcast) {
+      card.innerHTML =
+        '<div class="pulse-ring"></div>' +
+        '<div class="msg-indicator"></div>' +
+        '<div class="edit-btn">EDIT</div>' +
+        '<div class="card-town">' + escapeHtml(friend.town || "📢 Everyone") + '</div>' +
+        '<div class="card-label">' + escapeHtml(friend.label || "BROADCAST") + '</div>' +
+        '<div class="card-status">Hold to send to all</div>' +
+        '<div class="rec-timer"></div><div class="rec-bar"></div>';
+    } else {
+      card.innerHTML =
+        '<div class="pulse-ring"></div>' +
+        '<div class="msg-indicator"></div>' +
+        '<div class="edit-btn">EDIT</div>' +
+        '<div class="card-town">' + escapeHtml(friend.town  || "—") + '</div>' +
+        '<div class="card-label">' + escapeHtml(friend.label || friend.code || "") + '</div>' +
+        '<div class="card-status">' + (friend.status === "linked" ? "✅ " + escapeHtml(friend.code||"") : "Tap EDIT to link") + '</div>' +
+        '<div class="rec-timer"></div><div class="rec-bar"></div>';
+    }
 
+    // EDIT button
+    card.querySelector(".edit-btn").addEventListener("click", (e) => {
+      e.stopPropagation(); openEditSheet(idx);
+    });
+
+    // Hold to record
     let holdTimer = null, localRecording = false;
 
     function stopLocal() {
@@ -884,16 +1000,18 @@ function buildDashboard() {
     card.addEventListener("pointerdown", (e) => {
       if (e.target.classList.contains("edit-btn")) return;
       e.preventDefault();
-      if (!mediaStream) { toast("⏳ Microphone not ready."); return; }
+      if (isEmpty) { toast("Tap EDIT to set up this contact first"); return; }
+      if (!mediaStream) { toast("⏳ Microphone not ready"); return; }
+      if (!isBroadcast && !friend.id) { toast("Tap EDIT to link this contact"); return; }
+
       holdTimer = setTimeout(async () => {
-        if (!friend.id) { toast("Tap EDIT to link this contact first"); return; }
         try {
           audioChunks = [];
           const mime  = getBestMimeType();
-          const opts  = mime ? { mimeType: mime } : {};
+          const opts  = mime ? { mimeType:mime } : {};
           mediaRecorder = new MediaRecorder(mediaStream, opts);
           mediaRecorder.ondataavailable = (ev) => audioChunks.push(ev.data);
-          mediaRecorder.onstop = () => sendMessageToFriend(friend);
+          mediaRecorder.onstop = () => sendMessageToFriend(friend, isBroadcast);
           mediaRecorder.start();
           vibrateStart();
           localRecording = true; isRecording = true;
@@ -905,38 +1023,6 @@ function buildDashboard() {
 
     card.addEventListener("pointerup",     () => { clearTimeout(holdTimer); stopLocal(); });
     card.addEventListener("pointercancel", () => { clearTimeout(holdTimer); stopLocal(); });
-
-    // ── EDIT: lookup by friend code ──
-    card.querySelector(".edit-btn").addEventListener("click", async (e) => {
-      e.stopPropagation();
-      const raw = prompt("Enter friend's code (e.g. RAJ-4837):");
-      if (!raw || !raw.trim()) return;
-
-      const key = raw.trim().toLowerCase();  // e.g. "raj-4837"
-
-      // Validate format: letters, dash, 4 digits
-      if (!/^[a-z]+-\d{4}$/.test(key)) {
-        alert("❌ Invalid code format. Should look like RAJ-4837"); return;
-      }
-
-      try {
-        const snap = await get(ref(db, "global_directory/" + key));
-        if (!snap.exists()) { alert("❌ No user found with that code."); return; }
-
-        const entry = snap.val();   // { uid, name }
-        if (entry.uid === currentUser.uid) { alert("❌ That's your own code!"); return; }
-
-        myFriends[idx] = {
-          id:     entry.uid,
-          name:   entry.name,
-          emoji:  getEmoji(entry.name),
-          status: "✅ " + raw.trim().toUpperCase()   // show the code as status
-        };
-        await saveUserProfile();
-        toast("📡 Connected to " + escapeHtml(entry.name));
-        buildDashboard();
-      } catch(err) { console.error(err); toast("❌ Lookup failed"); }
-    });
 
     grid.appendChild(card);
   });
