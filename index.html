@@ -166,6 +166,7 @@ body::before{
   padding:14px 8px 12px; display:flex; flex-direction:column;
   justify-content:center; align-items:center; text-align:center;
   aspect-ratio:1/1; cursor:pointer; overflow:hidden; transition:all 0.15s;
+  touch-action:pan-y;
 }
 .friend-card.broadcast{
   grid-column:1 / -1; aspect-ratio:auto;
@@ -447,7 +448,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getDatabase, ref, set, get, update, push, remove,
-  onChildAdded, query, orderByChild, startAfter
+  onChildAdded, query, orderByChild, startAt
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // =============================================
@@ -984,7 +985,7 @@ async function sendMessageToFriend(friend, isBroadcast) {
 
 function listenForMessages() {
   const msgsRef  = ref(db, "messages/" + currentUser.uid);
-  const msgQuery = query(msgsRef, orderByChild("timestamp"), startAfter(lastLoginTimestamp));
+  const msgQuery = query(msgsRef, orderByChild("timestamp"), startAt(lastLoginTimestamp + 1));
   onChildAdded(msgQuery, (snap) => {
     const data = snap.val(); if (!data) return;
     messageQueue.push({
