@@ -4,15 +4,12 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 <title>Over To You</title>
-
-<!-- PWA -->
 <meta name="theme-color" content="#090e1a"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Over To You"/>
 <link rel="manifest" href="manifest.json"/>
-
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -60,7 +57,7 @@ body::before{
   font-size:0.85rem; font-weight:700; cursor:pointer; transition:all 0.2s;
 }
 .tab-btn.active{ background:var(--card); border-color:var(--accent); color:var(--accent); }
-#signupFields,#signinFields{
+#signupFields, #signinFields{
   display:flex; flex-direction:column; gap:12px;
   width:100%; max-width:320px; align-items:center;
 }
@@ -91,7 +88,10 @@ body::before{
   font-size:0.82rem; cursor:pointer; text-decoration:underline;
   font-family:'Nunito',sans-serif;
 }
-.login-error{ color:#ff6b6b; display:none; font-size:0.85rem; text-align:center; max-width:320px; }
+.login-error{
+  display:none; font-size:0.85rem; text-align:center;
+  max-width:320px; padding:4px 0;
+}
 
 /* Code reveal */
 #codeReveal{
@@ -128,7 +128,10 @@ body::before{
   padding:10px 14px; border-bottom:1px solid var(--border);
   display:flex; justify-content:space-between; align-items:center;
 }
-.app-title{ font-family:'Rajdhani',sans-serif; font-size:1.4rem; font-weight:700; color:var(--accent); }
+.app-title{
+  font-family:'Rajdhani',sans-serif; font-size:1.4rem;
+  font-weight:700; color:var(--accent);
+}
 .header-right{ display:flex; gap:8px; align-items:center; }
 .user-badge{
   display:flex; align-items:center; gap:6px;
@@ -137,10 +140,14 @@ body::before{
   font-family:'Rajdhani',sans-serif; font-size:0.82rem;
   font-weight:700; color:var(--accent); cursor:pointer; letter-spacing:1px;
 }
-.user-dot{ width:7px; height:7px; border-radius:50%; background:var(--green); box-shadow:0 0 6px var(--green); }
+.user-dot{
+  width:7px; height:7px; border-radius:50%;
+  background:var(--green); box-shadow:0 0 6px var(--green);
+}
 .out-btn{
-  background:none; border:1px solid var(--border); border-radius:20px;
-  padding:5px 10px; color:var(--muted); font-size:0.72rem; cursor:pointer;
+  background:none; border:1px solid var(--border);
+  border-radius:20px; padding:5px 10px;
+  color:var(--muted); font-size:0.72rem; cursor:pointer;
 }
 .instructions{
   text-align:center; font-size:0.75rem; color:var(--muted);
@@ -153,28 +160,6 @@ body::before{
   display:grid; grid-template-columns:repeat(2,1fr);
   gap:10px; padding:12px 10px 100px;
 }
-
-/* Broadcast card — full width */
-.friend-card.broadcast{
-  grid-column:1 / -1;
-  aspect-ratio:auto;
-  padding:18px 20px;
-  flex-direction:row;
-  justify-content:flex-start;
-  gap:16px;
-  border-color:var(--purple);
-  background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(9,14,26,1));
-}
-.friend-card.broadcast .card-town{
-  font-size:1.6rem; color:var(--purple);
-}
-.friend-card.broadcast .card-label{
-  font-size:1.1rem;
-}
-.friend-card.broadcast .pulse-ring{ border-color:var(--purple); }
-.friend-card.broadcast.recording{ border-color:var(--recording); }
-.friend-card.broadcast.has-message{ border-color:var(--yellow); animation:glowPulse 2s infinite; }
-
 .friend-card{
   position:relative; background:var(--card);
   border:1.5px solid var(--border); border-radius:18px;
@@ -182,10 +167,20 @@ body::before{
   justify-content:center; align-items:center; text-align:center;
   aspect-ratio:1/1; cursor:pointer; overflow:hidden; transition:all 0.15s;
 }
-.friend-card.recording{ background:#1a0a0a; border-color:var(--recording); transform:scale(0.96); }
+.friend-card.broadcast{
+  grid-column:1 / -1; aspect-ratio:auto;
+  padding:18px 20px; flex-direction:row;
+  justify-content:flex-start; gap:16px;
+  border-color:var(--purple);
+  background:linear-gradient(135deg,rgba(168,85,247,0.08),rgba(9,14,26,1));
+}
+.friend-card.broadcast .card-town{ font-size:1.6rem; color:var(--purple); }
+.friend-card.broadcast .card-label{ font-size:1.1rem; }
+.friend-card.recording{
+  background:#1a0a0a; border-color:var(--recording); transform:scale(0.96);
+}
 .friend-card.has-message{ border-color:var(--yellow); animation:glowPulse 2s infinite; }
 .friend-card.empty{ border-style:dashed; opacity:0.6; }
-
 @keyframes glowPulse{
   0%,100%{ box-shadow:0 0 10px rgba(245,158,11,0.2); }
   50%{     box-shadow:0 0 20px rgba(245,158,11,0.5); }
@@ -211,8 +206,6 @@ body::before{
   font-family:'Rajdhani',sans-serif; font-weight:700;
   background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:20px;
 }
-
-/* Card content */
 .card-town{
   font-family:'Rajdhani',sans-serif; font-size:1.05rem;
   font-weight:700; color:var(--accent); letter-spacing:1px;
@@ -226,14 +219,12 @@ body::before{
 }
 .card-status{
   font-size:0.68rem; color:var(--muted);
-  width:100%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  margin-top:2px;
+  width:100%; white-space:nowrap; overflow:hidden;
+  text-overflow:ellipsis; margin-top:2px;
 }
 .card-empty-hint{
-  font-size:0.75rem; color:var(--muted); line-height:1.4; text-align:center;
+  font-size:0.75rem; color:var(--muted); line-height:1.4;
 }
-
-/* Recording timer */
 .rec-timer{
   display:none; position:absolute; bottom:8px; left:50%;
   transform:translateX(-50%);
@@ -265,12 +256,16 @@ body::before{
   color:var(--accent); margin-bottom:16px; text-align:center;
 }
 .edit-field{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
-.edit-label{ font-size:0.75rem; color:var(--muted); font-weight:700; letter-spacing:1px; }
+.edit-label{
+  font-size:0.72rem; color:var(--muted);
+  font-weight:700; letter-spacing:1px;
+}
 .edit-input{
   background:var(--card); border:1.5px solid var(--border);
   border-radius:12px; padding:12px 16px; color:var(--text);
   font-size:0.95rem; outline:none; font-family:'Nunito',sans-serif;
-  width:100%; -webkit-user-select:text !important; user-select:text !important;
+  width:100%;
+  -webkit-user-select:text !important; user-select:text !important;
 }
 .edit-input:focus{ border-color:var(--accent); }
 .edit-input::placeholder{ color:var(--muted); }
@@ -282,15 +277,15 @@ body::before{
 }
 .edit-cancel-btn{
   width:100%; padding:12px; border:1px solid var(--border);
-  border-radius:50px; background:transparent;
-  color:var(--muted); font-family:'Rajdhani',sans-serif;
-  font-size:0.95rem; cursor:pointer; margin-top:8px;
+  border-radius:50px; background:transparent; color:var(--muted);
+  font-family:'Rajdhani',sans-serif; font-size:0.95rem;
+  cursor:pointer; margin-top:8px;
 }
 .edit-clear-btn{
   width:100%; padding:10px; border:1px solid #ef444455;
-  border-radius:50px; background:transparent;
-  color:#ef4444; font-family:'Rajdhani',sans-serif;
-  font-size:0.85rem; cursor:pointer; margin-top:6px;
+  border-radius:50px; background:transparent; color:#ef4444;
+  font-family:'Rajdhani',sans-serif; font-size:0.85rem;
+  cursor:pointer; margin-top:6px;
 }
 
 /* ── PLAY MODAL ── */
@@ -309,11 +304,20 @@ body::before{
 .play-sheet p{ color:var(--muted); font-size:0.82rem; margin-bottom:4px; }
 .play-btn,.dismiss-btn,.save-btn{
   width:100%; border-radius:50px; padding:13px 20px; margin-top:12px;
-  cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+  cursor:pointer; font-family:'Rajdhani',sans-serif;
+  font-size:1rem; font-weight:700;
 }
-.play-btn{ background:linear-gradient(135deg,var(--accent),#0099bb); border:none; color:#000; }
-.dismiss-btn{ background:transparent; border:1px solid var(--border); color:var(--muted); }
-.save-btn{ display:none; background:transparent; border:1px solid var(--yellow); color:var(--yellow); }
+.play-btn{
+  background:linear-gradient(135deg,var(--accent),#0099bb);
+  border:none; color:#000;
+}
+.dismiss-btn{
+  background:transparent; border:1px solid var(--border); color:var(--muted);
+}
+.save-btn{
+  display:none; background:transparent;
+  border:1px solid var(--yellow); color:var(--yellow);
+}
 .save-btn.visible{ display:block; }
 
 /* ── TOAST ── */
@@ -322,7 +326,8 @@ body::before{
   transform:translateX(-50%) translateY(80px);
   background:var(--surface); border:1px solid var(--border);
   border-radius:12px; padding:10px 20px; z-index:200;
-  transition:0.3s; pointer-events:none; font-size:0.85rem; white-space:nowrap;
+  transition:0.3s; pointer-events:none;
+  font-size:0.85rem; white-space:nowrap;
 }
 #toast.show{ transform:translateX(-50%) translateY(0); }
 </style>
@@ -340,19 +345,24 @@ body::before{
   </div>
 
   <div id="signupFields">
-    <input id="signupName"  class="login-input" type="text"  placeholder="Your name (e.g. Kamal)" maxlength="20" autocomplete="off">
-    <input id="signupEmail" class="login-input" type="email" placeholder="Email address" autocomplete="email">
+    <input id="signupName"  class="login-input" type="text"
+           placeholder="Your name (e.g. Kamal)" maxlength="20" autocomplete="off">
+    <input id="signupEmail" class="login-input" type="email"
+           placeholder="Email address" autocomplete="email">
     <div class="pass-wrap">
-      <input id="signupPass" class="login-input" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
+      <input id="signupPass" class="login-input" type="password"
+             placeholder="Password (min 6 chars)" autocomplete="new-password">
       <button class="eye-btn" type="button" onclick="togglePass('signupPass',this)">👁</button>
     </div>
     <button class="login-btn" id="signupBtn">CREATE ACCOUNT →</button>
   </div>
 
   <div id="signinFields" style="display:none">
-    <input id="signinEmail" class="login-input" type="email"    placeholder="Email address" autocomplete="email">
+    <input id="signinEmail" class="login-input" type="email"
+           placeholder="Email address" autocomplete="email">
     <div class="pass-wrap">
-      <input id="signinPass" class="login-input" type="password" placeholder="Password" autocomplete="current-password">
+      <input id="signinPass" class="login-input" type="password"
+             placeholder="Password" autocomplete="current-password">
       <button class="eye-btn" type="button" onclick="togglePass('signinPass',this)">👁</button>
     </div>
     <button class="login-btn" id="signinBtn">SIGN IN →</button>
@@ -362,7 +372,10 @@ body::before{
   <div id="codeReveal">
     <div class="code-label">YOUR FRIEND CODE</div>
     <div class="code-box" id="codeDisplay">----</div>
-    <div class="code-hint">Share this with friends so they can find you. Tap your code anytime in the app to copy it.</div>
+    <div class="code-hint">
+      Share this with friends so they can find you.
+      Tap your code in the app anytime to copy it.
+    </div>
     <button class="code-copy-btn" id="codeCopyBtn">📋 COPY CODE</button>
     <button class="code-go-btn"   id="codeGoBtn">LET'S GO →</button>
   </div>
@@ -382,7 +395,9 @@ body::before{
       <button class="out-btn" id="signoutBtn">OUT</button>
     </div>
   </div>
-  <div class="instructions">Hold card to talk · Tap code to copy · Tap glowing card to play</div>
+  <div class="instructions">
+    Hold card to talk · Tap code to copy · Tap glowing card to play
+  </div>
   <div class="grid-container" id="friendsGrid"></div>
 </div>
 
@@ -392,15 +407,18 @@ body::before{
     <h3 id="editTitle">Set Up Contact</h3>
     <div class="edit-field">
       <div class="edit-label">WHAT DO YOU CALL THIS PERSON?</div>
-      <input id="editLabel" class="edit-input" type="text" placeholder="e.g. Papaji, Mummyji, Deedi, Bhai…" maxlength="20">
+      <input id="editLabel" class="edit-input" type="text"
+             placeholder="e.g. Papaji, Mummyji, Deedi, Bhai…" maxlength="20">
     </div>
     <div class="edit-field" id="editCodeField">
       <div class="edit-label">THEIR FRIEND CODE</div>
-      <input id="editCode" class="edit-input" type="text" placeholder="e.g. KAMAL-4837" maxlength="15" autocomplete="off">
+      <input id="editCode" class="edit-input" type="text"
+             placeholder="e.g. KAMAL-4837" maxlength="15" autocomplete="off">
     </div>
     <div class="edit-field">
       <div class="edit-label">THEIR TOWN / CITY</div>
-      <input id="editTown" class="edit-input" type="text" placeholder="e.g. Amritsar, Ludhiana, Delhi…" maxlength="20">
+      <input id="editTown" class="edit-input" type="text"
+             placeholder="e.g. Amritsar, Ludhiana, Delhi…" maxlength="20">
     </div>
     <button class="edit-save-btn"   id="editSaveBtn">SAVE →</button>
     <button class="edit-clear-btn"  id="editClearBtn">Remove this contact</button>
@@ -433,7 +451,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // =============================================
-//  REPLACE WITH YOUR FIREBASE CONFIG
+//  FIREBASE CONFIG
 // =============================================
 const firebaseConfig = {
   apiKey:            "AIzaSyAlWc8AFDTF42DyrqlXOFMv5qeFseIxwZk",
@@ -456,13 +474,13 @@ const CLOUDINARY_PRESET = "oty123";
 
 const MAX_INBOX       = 20;
 const MAX_RECORD_SECS = 90;
-const TOTAL_CARDS     = 10;   // regular contacts
+const TOTAL_CARDS     = 10;
 
 const messageQueue = [];
 let   queuePlaying = false;
 
 let currentUser        = null;
-let myProfile          = null;
+let myProfile          = null;  // always { name, email, friendCode } — name NEVER from email
 let myFriends          = [];
 let mediaStream        = null;
 let mediaRecorder      = null;
@@ -471,14 +489,14 @@ let isRecording        = false;
 let pendingMessage     = null;
 let lastLoginTimestamp = 0;
 let listenerAttached   = false;
-let editingIndex       = null;   // which card is being edited
+let editingIndex       = null;
 
 let recTimerInterval  = null;
 let recAutoStopTimer  = null;
 let recSecondsElapsed = 0;
 let activeRecCard     = null;
 
-// ── Tab / password helpers ────────────────────
+// ── UI helpers ────────────────────────────────
 
 window.switchTab = function(tab) {
   const su = tab === "signup";
@@ -487,7 +505,7 @@ window.switchTab = function(tab) {
   document.getElementById("codeReveal").style.display   = "none";
   document.getElementById("tabSignup").classList.toggle("active",  su);
   document.getElementById("tabSignin").classList.toggle("active", !su);
-  document.getElementById("loginError").style.display   = "none";
+  clearLoginError();
 };
 
 window.togglePass = function(id, btn) {
@@ -496,20 +514,26 @@ window.togglePass = function(id, btn) {
   btn.style.opacity = el.type === "text" ? "1" : "0.6";
 };
 
-// ── Helpers ───────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById("loginError");
+  el.style.color   = "#ff6b6b";
+  el.textContent   = msg;
+  el.style.display = "block";
+}
+function showSuccess(msg) {
+  const el = document.getElementById("loginError");
+  el.style.color   = "var(--green)";
+  el.textContent   = msg;
+  el.style.display = "block";
+}
+function clearLoginError() {
+  document.getElementById("loginError").style.display = "none";
+}
 
 function toast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg; t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2800);
-}
-function showError(msg) {
-  const el = document.getElementById("loginError");
-  el.style.color = "#ff6b6b"; el.textContent = msg; el.style.display = "block";
-}
-function showSuccess(msg) {
-  const el = document.getElementById("loginError");
-  el.style.color = "var(--green)"; el.textContent = msg; el.style.display = "block";
 }
 function escapeHtml(s) {
   if (!s) return "";
@@ -519,20 +543,26 @@ function escapeHtml(s) {
 function formatTime(s) {
   return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
 }
-function vibrateStart() { if (navigator.vibrate) navigator.vibrate(80); }
-function vibrateSent()  { if (navigator.vibrate) navigator.vibrate([60,40,60]); }
+function vibrateStart() { try { if (navigator.vibrate) navigator.vibrate(80); } catch(e){} }
+function vibrateSent()  { try { if (navigator.vibrate) navigator.vibrate([60,40,60]); } catch(e){} }
 
 function copyToClipboard(text, msg) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => clipboardFallback(text, msg));
-  } else { clipboardFallback(text, msg); }
+    navigator.clipboard.writeText(text)
+      .then(() => toast(msg))
+      .catch(() => clipboardFallback(text, msg));
+  } else {
+    clipboardFallback(text, msg);
+  }
 }
 function clipboardFallback(text, msg) {
   try {
     const ta = document.createElement("textarea");
-    ta.value = text; ta.style.cssText = "position:fixed;top:-9999px;opacity:0";
+    ta.value = text;
+    ta.style.cssText = "position:fixed;top:-9999px;opacity:0";
     document.body.appendChild(ta); ta.focus(); ta.select();
-    document.execCommand("copy"); document.body.removeChild(ta); toast(msg);
+    document.execCommand("copy"); document.body.removeChild(ta);
+    toast(msg);
   } catch(e) { toast("Your code: " + text); }
 }
 
@@ -547,85 +577,123 @@ function friendlyAuthError(code) {
     "auth/too-many-requests":      "❌ Too many attempts. Try later.",
     "auth/network-request-failed": "❌ Network error. Check connection.",
   };
-  return m[code] || "❌ " + code;
+  return m[code] || "❌ " + (code || "Unknown error");
 }
 
-// ── Audio format ──────────────────────────────
+// ── Name validation ───────────────────────────
+// Ensures the name field contains real letters — never auto-generated
 
-function getBestMimeType() {
-  const list = ["audio/mp4;codecs=mp4a.40.2","audio/mp4","audio/webm;codecs=opus","audio/webm","audio/ogg;codecs=opus"];
-  for (const m of list) { if (MediaRecorder.isTypeSupported(m)) return m; }
-  return "";
-}
-function extForMime(mime) {
-  if (mime.startsWith("audio/mp4")) return ".m4a";
-  if (mime.startsWith("audio/ogg")) return ".ogg";
-  return ".webm";
+function validateName(raw) {
+  if (!raw || !raw.trim()) return null;
+  const trimmed = raw.trim();
+  // Must contain at least 2 actual letters
+  if (trimmed.replace(/[^a-zA-Z]/g, "").length < 2) return null;
+  return trimmed;
 }
 
 // ── Friend code generation ────────────────────
 
 function makeCodePrefix(name) {
+  // First word only, uppercase letters only, max 6 chars
   const first = name.trim().split(/\s+/)[0] || name;
-  return first.toUpperCase().replace(/[^A-Z]/g,"").slice(0,6) || "USER";
+  return first.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 6) || "USER";
 }
 
 async function generateUniqueFriendCode(name) {
   const prefix = makeCodePrefix(name);
   let code, snap, attempts = 0;
   do {
-    const digits = String(Math.floor(Math.random()*9000)+1000);
+    const digits = String(Math.floor(Math.random() * 9000) + 1000);
     code = prefix + "-" + digits;
     snap = await get(ref(db, "global_directory/" + code.toLowerCase()));
-    if (++attempts > 20) throw new Error("Could not generate unique code");
+    if (++attempts > 20) throw new Error("Could not generate a unique friend code");
   } while (snap.exists());
   return code;
 }
 
-// ── Default friends (10 blank slots + 1 broadcast) ───
+// ── Default friends ───────────────────────────
 
 function getDefaultFriends() {
   const slots = [];
-  for (let i = 1; i <= TOTAL_CARDS; i++) {
-    slots.push({ id:null, label:"", town:"", status:"empty" });
+  for (let i = 0; i < TOTAL_CARDS; i++) {
+    slots.push({ id: null, label: "", town: "", code: "", status: "empty" });
   }
-  // Broadcast slot
-  slots.push({ id:"__broadcast__", label:"BROADCAST", town:"📢 Everyone", status:"broadcast" });
+  // Broadcast slot always last
+  slots.push({
+    id: "__broadcast__", label: "BROADCAST",
+    town: "Everyone", code: "", status: "broadcast"
+  });
   return slots;
 }
 
-// ── Persistence ───────────────────────────────
+// ── Save profile ──────────────────────────────
 
 async function saveUserProfile() {
-  if (!currentUser) return;
+  if (!currentUser || !myProfile) return;
   await set(ref(db, "users/" + currentUser.uid), {
-    name: myProfile.name, email: myProfile.email,
+    name:       myProfile.name,
+    email:      myProfile.email,
     friendCode: myProfile.friendCode,
-    friends: myFriends, lastSeen: Date.now()
+    friends:    myFriends,
+    lastSeen:   Date.now()
   });
 }
 
-// ── Boot ──────────────────────────────────────
+// ── Show login screen cleanly ─────────────────
+
+function showLoginScreen() {
+  document.getElementById("appScreen").style.display    = "none";
+  document.getElementById("loginScreen").style.display  = "flex";
+  document.getElementById("signupFields").style.display = "flex";
+  document.getElementById("signinFields").style.display = "none";
+  document.getElementById("codeReveal").style.display   = "none";
+  document.getElementById("tabSignup").classList.add("active");
+  document.getElementById("tabSignin").classList.remove("active");
+  clearLoginError();
+  currentUser = null; myProfile = null; myFriends = [];
+  listenerAttached = false;
+}
+
+// ── Boot app ──────────────────────────────────
+// Only called after confirmed auth AND confirmed DB record
 
 async function bootApp(user) {
   currentUser = user;
-  const snap  = await get(ref(db, "users/" + currentUser.uid));
-  if (snap.exists()) {
-    myProfile  = snap.val();
-    myFriends  = myProfile.friends && myProfile.friends.length >= TOTAL_CARDS
-                 ? myProfile.friends : getDefaultFriends();
-    lastLoginTimestamp = myProfile.lastSeen || 0;
-  } else {
-    myProfile  = { name: user.email.split("@")[0], email: user.email,
-                   friendCode: await generateUniqueFriendCode(user.email.split("@")[0]) };
-    myFriends  = getDefaultFriends();
-    lastLoginTimestamp = Date.now();
-    await saveUserProfile();
-    await set(ref(db, "global_directory/" + myProfile.friendCode.toLowerCase()),
-              { uid: currentUser.uid, name: myProfile.name });
+
+  const snap = await get(ref(db, "users/" + currentUser.uid));
+
+  if (!snap.exists()) {
+    // ── STRICT: no DB record = sign out, show login ──
+    // Never auto-generate a profile from email
+    console.warn("OTY: Auth session found but no DB record. Signing out.");
+    await signOut(auth);
+    showLoginScreen();
+    return;
   }
+
+  const data = snap.val();
+
+  // ── STRICT: name must exist in DB record ──
+  if (!data.name || data.name.trim().length < 2) {
+    console.warn("OTY: DB record has no valid name. Signing out.");
+    await signOut(auth);
+    showLoginScreen();
+    showError("❌ Account data incomplete. Please register again.");
+    return;
+  }
+
+  myProfile = {
+    name:       data.name,
+    email:      data.email,
+    friendCode: data.friendCode
+  };
+  myFriends          = (data.friends && data.friends.length >= TOTAL_CARDS)
+                       ? data.friends : getDefaultFriends();
+  lastLoginTimestamp = data.lastSeen || 0;
+
   await update(ref(db, "users/" + currentUser.uid), { lastSeen: Date.now() });
 
+  // Show app
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appScreen").style.display   = "flex";
   document.getElementById("headerCode").textContent    = myProfile.friendCode;
@@ -638,88 +706,146 @@ async function bootApp(user) {
   if (!listenerAttached) { listenerAttached = true; listenForMessages(); }
 }
 
-// ── Auth ──────────────────────────────────────
+// ── SIGN UP ───────────────────────────────────
 
 document.getElementById("signupBtn").onclick = async () => {
-  const name  = document.getElementById("signupName").value.trim();
+  clearLoginError();
+
+  // ── STRICT name validation ──
+  const rawName = document.getElementById("signupName").value;
+  const name    = validateName(rawName);
+  if (!name) {
+    showError("❌ Please enter your real name (at least 2 letters).");
+    document.getElementById("signupName").focus();
+    return;
+  }
+
   const email = document.getElementById("signupEmail").value.trim();
   const pass  = document.getElementById("signupPass").value;
-  if (name.replace(/[^a-zA-Z]/g,"").length < 2) { showError("❌ Name needs at least 2 letters."); return; }
-  if (!email)          { showError("❌ Enter your email."); return; }
-  if (pass.length < 6) { showError("❌ Password needs 6+ characters."); return; }
+
+  if (!email) { showError("❌ Enter your email address."); return; }
+  if (pass.length < 6) { showError("❌ Password needs at least 6 characters."); return; }
+
   try {
+    // Generate code BEFORE creating auth account
+    // so if this fails we haven't created a broken account
     const friendCode = await generateUniqueFriendCode(name);
+
+    // Create Firebase Auth account
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     currentUser = cred.user;
-    myProfile   = { name, email, friendCode };
-    myFriends   = getDefaultFriends();
+
+    // Build profile strictly from the validated name input — NEVER from email
+    myProfile = { name, email, friendCode };
+    myFriends = getDefaultFriends();
     lastLoginTimestamp = Date.now();
-    await set(ref(db, "users/" + currentUser.uid),
-      { name, email, friendCode, friends: myFriends, lastSeen: Date.now() });
+
+    // Write to DB
+    const profileData = {
+      name, email, friendCode,
+      friends:  myFriends,
+      lastSeen: Date.now()
+    };
+    await set(ref(db, "users/" + currentUser.uid), profileData);
+
+    // Write to global_directory so others can find this user by code
     await set(ref(db, "global_directory/" + friendCode.toLowerCase()),
-      { uid: currentUser.uid, name });
+              { uid: currentUser.uid, name });
+
+    // Show code reveal — do NOT auto-boot yet
     document.getElementById("signupFields").style.display = "none";
-    document.getElementById("loginError").style.display   = "none";
-    document.getElementById("codeDisplay").textContent    = friendCode;
-    document.getElementById("codeReveal").style.display   = "flex";
-  } catch(err) { showError(friendlyAuthError(err.code || err.message)); }
+    clearLoginError();
+    document.getElementById("codeDisplay").textContent   = friendCode;
+    document.getElementById("codeReveal").style.display  = "flex";
+
+  } catch(err) {
+    console.error("Signup error:", err);
+    showError(friendlyAuthError(err.code || err.message));
+  }
 };
 
 document.getElementById("codeCopyBtn").onclick = () => {
   const code = document.getElementById("codeDisplay").textContent;
   copyToClipboard(code, "📋 " + code + " copied!");
 };
+
 document.getElementById("codeGoBtn").onclick = async () => {
-  try { await bootApp(currentUser); } catch(e) { showError("Error loading app."); }
+  try {
+    await bootApp(currentUser);
+  } catch(e) {
+    console.error(e);
+    showError("❌ Error loading app. Please try signing in.");
+  }
 };
 
+// ── SIGN IN ───────────────────────────────────
+
 document.getElementById("signinBtn").onclick = async () => {
+  clearLoginError();
   const email = document.getElementById("signinEmail").value.trim();
   const pass  = document.getElementById("signinPass").value;
-  if (!email || !pass) { showError("❌ Enter email and password."); return; }
+  if (!email || !pass) { showError("❌ Enter your email and password."); return; }
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     await bootApp(cred.user);
-  } catch(err) { showError(friendlyAuthError(err.code)); }
+  } catch(err) {
+    console.error("Signin error:", err);
+    showError(friendlyAuthError(err.code));
+  }
 };
 
+// ── FORGOT PASSWORD ───────────────────────────
+
 document.getElementById("forgotBtn").onclick = async () => {
+  clearLoginError();
   const email = document.getElementById("signinEmail").value.trim();
-  if (!email) { showError("❌ Enter your email above first."); return; }
+  if (!email) { showError("❌ Enter your email address above first."); return; }
   try {
     await sendPasswordResetEmail(auth, email);
     showSuccess("✅ Reset email sent! Check your inbox.");
   } catch(err) { showError(friendlyAuthError(err.code)); }
 };
 
+// ── AUTH STATE OBSERVER ───────────────────────
+// STRICT: if no DB record exists, sign out immediately — never auto-generate
+
 onAuthStateChanged(auth, async (user) => {
-  if (user && document.getElementById("appScreen").style.display !== "flex") {
-    try { await bootApp(user); } catch(e) { console.error(e); }
+  if (!user) return;  // not logged in — do nothing
+  // Only auto-boot if the app screen isn't already showing
+  if (document.getElementById("appScreen").style.display === "flex") return;
+  // Only auto-boot if we're not mid-signup (codeReveal visible)
+  if (document.getElementById("codeReveal").style.display === "flex") return;
+  try {
+    await bootApp(user);
+  } catch(e) {
+    console.error("Session restore failed:", e);
+    await signOut(auth).catch(() => {});
+    showLoginScreen();
   }
 });
+
+// ── SIGN OUT ──────────────────────────────────
 
 document.getElementById("signoutBtn").onclick = async () => {
   if (!confirm("Sign out?")) return;
   if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-  await signOut(auth);
-  document.getElementById("appScreen").style.display   = "none";
-  document.getElementById("loginScreen").style.display = "flex";
-  document.getElementById("signupFields").style.display = "flex";
-  document.getElementById("signinFields").style.display = "none";
-  document.getElementById("codeReveal").style.display   = "none";
-  listenerAttached = false; currentUser = null; myProfile = null; myFriends = [];
+  try { await signOut(auth); } catch(e) { console.error(e); }
+  showLoginScreen();
 };
 
-// ── Microphone ────────────────────────────────
+// ── MICROPHONE ────────────────────────────────
 
 async function initMicrophone() {
   try {
     if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-    mediaStream = await navigator.mediaDevices.getUserMedia({ audio:true });
-  } catch(err) { console.error(err); toast("❌ Microphone access denied"); }
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch(err) {
+    console.error("Mic error:", err);
+    toast("❌ Microphone access denied — check browser permissions");
+  }
 }
 
-// ── Recording timer ───────────────────────────
+// ── RECORDING TIMER ───────────────────────────
 
 function startRecTimer(card) {
   recSecondsElapsed = 0; activeRecCard = card;
@@ -739,7 +865,9 @@ function startRecTimer(card) {
   recAutoStopTimer = setTimeout(() => {
     if (mediaRecorder && mediaRecorder.state === "recording") {
       toast("⏹ Max length — sending…");
-      mediaRecorder.stop(); card.classList.remove("recording"); isRecording = false;
+      mediaRecorder.stop();
+      card.classList.remove("recording");
+      isRecording = false;
     }
     stopRecTimer();
   }, MAX_RECORD_SECS * 1000);
@@ -755,43 +883,81 @@ function stopRecTimer() {
   }
 }
 
-// ── Cloudinary upload ─────────────────────────
+// ── MEDIA RECORDER with safe fallback ────────
+// Fix for Point 4: try preferred format first,
+// silently fall back to browser-native if rejected
+
+function createMediaRecorder(stream) {
+  const preferred = [
+    "audio/mp4;codecs=mp4a.40.2",
+    "audio/mp4",
+    "audio/webm;codecs=opus",
+    "audio/webm"
+  ];
+
+  for (const mime of preferred) {
+    if (!MediaRecorder.isTypeSupported(mime)) continue;
+    try {
+      const mr = new MediaRecorder(stream, { mimeType: mime });
+      console.log("OTY: Using audio format:", mime);
+      return mr;
+    } catch(e) {
+      console.warn("OTY: Format rejected at runtime:", mime, e);
+    }
+  }
+
+  // Final fallback — let browser choose its own format
+  console.warn("OTY: All preferred formats failed. Using browser default.");
+  return new MediaRecorder(stream);
+}
+
+function extForRecorder(mr) {
+  const mime = mr.mimeType || "";
+  if (mime.includes("mp4")) return ".m4a";
+  if (mime.includes("ogg")) return ".ogg";
+  return ".webm";
+}
+
+// ── AUDIO UPLOAD ──────────────────────────────
 
 async function uploadAudio(blob, recipientUid, ext) {
   const fd = new FormData();
-  fd.append("file",          new File([blob], currentUser.uid+"_"+recipientUid+"_"+Date.now()+ext, { type:blob.type }));
+  const filename = currentUser.uid + "_" + recipientUid + "_" + Date.now() + ext;
+  fd.append("file",          new File([blob], filename, { type: blob.type }));
   fd.append("upload_preset", CLOUDINARY_PRESET);
   fd.append("resource_type", "video");
-  const res = await fetch("https://api.cloudinary.com/v1_1/"+CLOUDINARY_CLOUD+"/video/upload",
-    { method:"POST", body:fd });
-  if (!res.ok) throw new Error("Upload failed: " + res.status);
+  const res = await fetch(
+    "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD + "/video/upload",
+    { method: "POST", body: fd }
+  );
+  if (!res.ok) throw new Error("Cloudinary upload failed: " + res.status);
   return (await res.json()).secure_url;
 }
 
-// ── Send to one ───────────────────────────────
+// ── SEND MESSAGE ──────────────────────────────
 
 async function sendToOne(friendId, friendLabel, audioUrl) {
   const inboxSnap = await get(ref(db, "messages/" + friendId));
   if (inboxSnap.exists() && Object.keys(inboxSnap.val()).length >= MAX_INBOX) {
-    toast("❌ " + friendLabel + "'s inbox is full"); return false;
+    toast("❌ " + (friendLabel || "Their") + " inbox is full"); return false;
   }
   const msgRef = push(ref(db, "messages/" + friendId));
   await set(msgRef, {
-    from: currentUser.uid, fromName: myProfile.name,
-    audioUrl, timestamp: Date.now(), isRead: false
+    from:      currentUser.uid,
+    fromName:  myProfile.name,
+    audioUrl,
+    timestamp: Date.now(),
+    isRead:    false
   });
   return true;
 }
 
-// ── Send message (one or broadcast) ──────────
-
 async function sendMessageToFriend(friend, isBroadcast) {
   if (!audioChunks.length) { toast("No audio recorded"); return; }
   try {
-    const mime     = mediaRecorder.mimeType;
-    const ext      = extForMime(mime);
-    const blob     = new Blob(audioChunks, { type: mime });
-    // Upload once, reuse URL for broadcast
+    const mime     = mediaRecorder.mimeType || "";
+    const ext      = extForRecorder(mediaRecorder);
+    const blob     = new Blob(audioChunks, { type: mime || "audio/webm" });
     const audioUrl = await uploadAudio(blob, isBroadcast ? "broadcast" : friend.id, ext);
 
     if (isBroadcast) {
@@ -799,20 +965,22 @@ async function sendMessageToFriend(friend, isBroadcast) {
       if (!linked.length) { toast("❌ No contacts linked yet"); return; }
       let sent = 0;
       for (const f of linked) {
-        const ok = await sendToOne(f.id, f.label || "contact", audioUrl);
-        if (ok) sent++;
+        if (await sendToOne(f.id, f.label, audioUrl)) sent++;
       }
       vibrateSent();
       toast("📢 Broadcast sent to " + sent + " contact" + (sent !== 1 ? "s" : ""));
     } else {
-      await sendToOne(friend.id, friend.label || "contact", audioUrl);
+      await sendToOne(friend.id, friend.label, audioUrl);
       vibrateSent();
       toast("✓ Sent to " + escapeHtml(friend.label || "contact"));
     }
-  } catch(err) { console.error(err); toast("❌ Failed to send"); }
+  } catch(err) {
+    console.error("Send error:", err);
+    toast("❌ Failed to send — check connection");
+  }
 }
 
-// ── Message queue ─────────────────────────────
+// ── MESSAGE QUEUE ─────────────────────────────
 
 function listenForMessages() {
   const msgsRef  = ref(db, "messages/" + currentUser.uid);
@@ -820,10 +988,15 @@ function listenForMessages() {
   onChildAdded(msgQuery, (snap) => {
     const data = snap.val(); if (!data) return;
     messageQueue.push({
-      audioUrl: data.audioUrl, senderName: data.fromName,
-      messageId: snap.key, senderId: data.from, timestamp: data.timestamp
+      audioUrl:   data.audioUrl,
+      senderName: data.fromName,
+      messageId:  snap.key,
+      senderId:   data.from,
+      timestamp:  data.timestamp
     });
-    const card = document.querySelector(".friend-card[data-friend-id='" + data.from + "']");
+    const card = document.querySelector(
+      ".friend-card[data-friend-id='" + data.from + "']"
+    );
     if (card) card.classList.add("has-message");
     if (!queuePlaying) showNextInQueue();
   });
@@ -831,9 +1004,12 @@ function listenForMessages() {
 
 function showNextInQueue() {
   if (!messageQueue.length) { queuePlaying = false; return; }
-  queuePlaying = true; pendingMessage = messageQueue.shift();
-  document.getElementById("playFromName").textContent = "📩 From " + escapeHtml(pendingMessage.senderName);
-  document.getElementById("playTime").textContent     = new Date(pendingMessage.timestamp).toLocaleTimeString();
+  queuePlaying   = true;
+  pendingMessage = messageQueue.shift();
+  document.getElementById("playFromName").textContent =
+    "📩 From " + escapeHtml(pendingMessage.senderName);
+  document.getElementById("playTime").textContent =
+    new Date(pendingMessage.timestamp).toLocaleTimeString();
   document.getElementById("saveBtn").classList.remove("visible");
   document.getElementById("playModal").classList.add("open");
 }
@@ -843,39 +1019,42 @@ async function playMessage() {
   try {
     await new Audio(pendingMessage.audioUrl).play();
     document.getElementById("saveBtn").classList.add("visible");
-    await remove(ref(db, "messages/" + currentUser.uid + "/" + pendingMessage.messageId));
-  } catch(err) { toast("Playback failed"); }
+    await remove(ref(db,
+      "messages/" + currentUser.uid + "/" + pendingMessage.messageId));
+  } catch(err) { console.error(err); toast("Playback failed"); }
 }
 
 function saveMessageAudio() {
   if (!pendingMessage) return;
-  const a = document.createElement("a");
+  const ext = pendingMessage.audioUrl.includes(".m4a") ? ".m4a" : ".webm";
+  const a   = document.createElement("a");
   a.href = pendingMessage.audioUrl;
-  a.download = "voice_" + Date.now() + (pendingMessage.audioUrl.includes(".m4a") ? ".m4a" : ".webm");
+  a.download = "voice_" + Date.now() + ext;
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
 function closeModal() {
   document.getElementById("playModal").classList.remove("open");
   if (pendingMessage) {
-    const c = document.querySelector(".friend-card[data-friend-id='" + pendingMessage.senderId + "']");
+    const c = document.querySelector(
+      ".friend-card[data-friend-id='" + pendingMessage.senderId + "']"
+    );
     if (c) c.classList.remove("has-message");
   }
   pendingMessage = null;
   setTimeout(showNextInQueue, 600);
 }
 
-// ── Edit sheet ────────────────────────────────
+// ── EDIT SHEET ────────────────────────────────
 
 function openEditSheet(idx) {
   editingIndex = idx;
   const f = myFriends[idx];
   const isBroadcast = f.id === "__broadcast__";
-
-  document.getElementById("editTitle").textContent  = isBroadcast ? "Broadcast Card" : "Set Up Contact";
-  document.getElementById("editLabel").value        = f.label || "";
-  document.getElementById("editCode").value         = (f.code || "");
-  document.getElementById("editTown").value         = f.town  || "";
+  document.getElementById("editTitle").textContent       = isBroadcast ? "Broadcast Card" : "Set Up Contact";
+  document.getElementById("editLabel").value             = f.label || "";
+  document.getElementById("editCode").value              = f.code  || "";
+  document.getElementById("editTown").value              = f.town  || "";
   document.getElementById("editCodeField").style.display = isBroadcast ? "none" : "block";
   document.getElementById("editClearBtn").style.display  = (f.id && !isBroadcast) ? "block" : "none";
   document.getElementById("editModal").classList.add("open");
@@ -883,6 +1062,7 @@ function openEditSheet(idx) {
 
 document.getElementById("editSaveBtn").onclick = async () => {
   const idx   = editingIndex;
+  if (idx === null) return;
   const f     = myFriends[idx];
   const label = document.getElementById("editLabel").value.trim();
   const code  = document.getElementById("editCode").value.trim();
@@ -893,14 +1073,23 @@ document.getElementById("editSaveBtn").onclick = async () => {
   const isBroadcast = f.id === "__broadcast__";
 
   if (isBroadcast) {
-    myFriends[idx] = { id:"__broadcast__", label: label || "BROADCAST", town: town || "📢 Everyone", status:"broadcast" };
-    await saveUserProfile(); toast("✅ Broadcast card updated"); closeEditSheet(); buildDashboard(); return;
+    myFriends[idx] = {
+      id: "__broadcast__",
+      label: label,
+      town:  town || "Everyone",
+      code:  "",
+      status: "broadcast"
+    };
+    await saveUserProfile();
+    toast("✅ Broadcast card updated");
+    closeEditSheet(); buildDashboard(); return;
   }
 
   if (!code) { toast("❌ Enter their friend code"); return; }
-
   const key = code.toLowerCase();
-  if (!/^[a-z]+-\d{4}$/.test(key)) { toast("❌ Code format should be like KAMAL-4837"); return; }
+  if (!/^[a-z]+-\d{4}$/.test(key)) {
+    toast("❌ Code format should be like KAMAL-4837"); return;
+  }
 
   try {
     const snap = await get(ref(db, "global_directory/" + key));
@@ -909,26 +1098,31 @@ document.getElementById("editSaveBtn").onclick = async () => {
     if (entry.uid === currentUser.uid) { toast("❌ That's your own code!"); return; }
 
     myFriends[idx] = {
-      id:    entry.uid,
-      label: label,
-      code:  code.toUpperCase(),
-      town:  town || "",
-      status:"linked"
+      id:     entry.uid,
+      label:  label,
+      code:   code.toUpperCase(),
+      town:   town || "",
+      status: "linked"
     };
     await saveUserProfile();
     toast("📡 Connected to " + escapeHtml(label));
     closeEditSheet(); buildDashboard();
-  } catch(err) { console.error(err); toast("❌ Lookup failed"); }
+  } catch(err) {
+    console.error("Edit save error:", err);
+    toast("❌ Lookup failed — check connection");
+  }
 };
 
 document.getElementById("editClearBtn").onclick = async () => {
   if (!confirm("Remove this contact?")) return;
-  myFriends[editingIndex] = { id:null, label:"", town:"", status:"empty" };
+  myFriends[editingIndex] = { id: null, label: "", town: "", code: "", status: "empty" };
   await saveUserProfile();
-  toast("Contact removed"); closeEditSheet(); buildDashboard();
+  toast("Contact removed");
+  closeEditSheet(); buildDashboard();
 };
 
 document.getElementById("editCancelBtn").onclick = closeEditSheet;
+
 document.getElementById("editModal").addEventListener("click", (e) => {
   if (e.target === document.getElementById("editModal")) closeEditSheet();
 });
@@ -938,7 +1132,7 @@ function closeEditSheet() {
   editingIndex = null;
 }
 
-// ── Dashboard ─────────────────────────────────
+// ── DASHBOARD ─────────────────────────────────
 
 function buildDashboard() {
   const grid = document.getElementById("friendsGrid");
@@ -952,7 +1146,10 @@ function buildDashboard() {
     card.className = "friend-card" +
       (isBroadcast ? " broadcast" : "") +
       (isEmpty     ? " empty"     : "");
-    if (friend.id && !isBroadcast) card.setAttribute("data-friend-id", friend.id);
+
+    if (friend.id && !isBroadcast) {
+      card.setAttribute("data-friend-id", friend.id);
+    }
 
     if (isEmpty) {
       card.innerHTML =
@@ -966,18 +1163,25 @@ function buildDashboard() {
         '<div class="pulse-ring"></div>' +
         '<div class="msg-indicator"></div>' +
         '<div class="edit-btn">EDIT</div>' +
-        '<div class="card-town">' + escapeHtml(friend.town || "📢 Everyone") + '</div>' +
-        '<div class="card-label">' + escapeHtml(friend.label || "BROADCAST") + '</div>' +
-        '<div class="card-status">Hold to send to all</div>' +
+        '<div style="font-size:1.8rem;margin-right:4px">📢</div>' +
+        '<div>' +
+          '<div class="card-town">' + escapeHtml(friend.town || "Everyone") + '</div>' +
+          '<div class="card-label">' + escapeHtml(friend.label || "BROADCAST") + '</div>' +
+          '<div class="card-status">Hold to send to all contacts</div>' +
+        '</div>' +
         '<div class="rec-timer"></div><div class="rec-bar"></div>';
     } else {
       card.innerHTML =
         '<div class="pulse-ring"></div>' +
         '<div class="msg-indicator"></div>' +
         '<div class="edit-btn">EDIT</div>' +
-        '<div class="card-town">' + escapeHtml(friend.town  || "—") + '</div>' +
-        '<div class="card-label">' + escapeHtml(friend.label || friend.code || "") + '</div>' +
-        '<div class="card-status">' + (friend.status === "linked" ? "✅ " + escapeHtml(friend.code||"") : "Tap EDIT to link") + '</div>' +
+        '<div class="card-town">' + escapeHtml(friend.town || "—") + '</div>' +
+        '<div class="card-label">' + escapeHtml(friend.label || "") + '</div>' +
+        '<div class="card-status">' +
+          (friend.status === "linked"
+            ? "✅ " + escapeHtml(friend.code || "")
+            : "Tap EDIT to link") +
+        '</div>' +
         '<div class="rec-timer"></div><div class="rec-bar"></div>';
     }
 
@@ -986,7 +1190,7 @@ function buildDashboard() {
       e.stopPropagation(); openEditSheet(idx);
     });
 
-    // Hold to record
+    // Hold-to-record
     let holdTimer = null, localRecording = false;
 
     function stopLocal() {
@@ -1001,23 +1205,35 @@ function buildDashboard() {
       if (e.target.classList.contains("edit-btn")) return;
       e.preventDefault();
       if (isEmpty) { toast("Tap EDIT to set up this contact first"); return; }
-      if (!mediaStream) { toast("⏳ Microphone not ready"); return; }
       if (!isBroadcast && !friend.id) { toast("Tap EDIT to link this contact"); return; }
+      if (!mediaStream) {
+        toast("⏳ Microphone not ready — check permissions");
+        return;
+      }
 
-      holdTimer = setTimeout(async () => {
+      holdTimer = setTimeout(() => {
         try {
-          audioChunks = [];
-          const mime  = getBestMimeType();
-          const opts  = mime ? { mimeType:mime } : {};
-          mediaRecorder = new MediaRecorder(mediaStream, opts);
-          mediaRecorder.ondataavailable = (ev) => audioChunks.push(ev.data);
+          audioChunks   = [];
+          // ── SAFE MediaRecorder creation with fallback ──
+          mediaRecorder = createMediaRecorder(mediaStream);
+          mediaRecorder.ondataavailable = (ev) => {
+            if (ev.data && ev.data.size > 0) audioChunks.push(ev.data);
+          };
           mediaRecorder.onstop = () => sendMessageToFriend(friend, isBroadcast);
-          mediaRecorder.start();
+          mediaRecorder.onerror = (err) => {
+            console.error("MediaRecorder error:", err);
+            toast("Recording error — please try again");
+            stopLocal();
+          };
+          mediaRecorder.start(250); // collect data every 250ms
           vibrateStart();
           localRecording = true; isRecording = true;
           card.classList.add("recording");
           startRecTimer(card);
-        } catch(err) { console.error(err); toast("Recording error"); }
+        } catch(err) {
+          console.error("Could not start recording:", err);
+          toast("❌ Could not start recording — check mic permission");
+        }
       }, 300);
     });
 
@@ -1028,7 +1244,7 @@ function buildDashboard() {
   });
 }
 
-// ── Modal buttons ─────────────────────────────
+// ── MODAL BUTTONS ─────────────────────────────
 document.getElementById("playMsgBtn").onclick    = playMessage;
 document.getElementById("saveBtn").onclick       = saveMessageAudio;
 document.getElementById("closeModalBtn").onclick = closeModal;
