@@ -753,9 +753,9 @@ document.getElementById("signupBtn").onclick = async () => {
     await set(ref(db, "global_directory/" + friendCode.toLowerCase()),
               { uid: currentUser.uid, name });
 
-    // Show code reveal — do NOT auto-boot yet
+    // Show success message then code reveal
     document.getElementById("signupFields").style.display = "none";
-    clearLoginError();
+    showSuccess("✅ Account created successfully!");
     document.getElementById("codeDisplay").textContent   = friendCode;
     document.getElementById("codeReveal").style.display  = "flex";
 
@@ -1018,11 +1018,24 @@ function showNextInQueue() {
 async function playMessage() {
   if (!pendingMessage) return;
   try {
-    await new Audio(pendingMessage.audioUrl).play();
+    const audio = new Audio(pendingMessage.audioUrl);
+    // Show save button immediately so user can save before playback ends
     document.getElementById("saveBtn").classList.add("visible");
-    await remove(ref(db,
-      "messages/" + currentUser.uid + "/" + pendingMessage.messageId));
-  } catch(err) { console.error(err); toast("Playback failed"); }
+
+    // Delete from DB only AFTER audio finishes playing — not on play start
+    // This prevents message loss if playback is interrupted or fails mid-way
+    audio.addEventListener("ended", async () => {
+      try {
+        await remove(ref(db,
+          "messages/" + currentUser.uid + "/" + pendingMessage.messageId));
+      } catch(e) { console.warn("Could not delete message from DB:", e); }
+    });
+
+    await audio.play();
+  } catch(err) {
+    console.error("Playback error:", err);
+    toast("❌ Playback failed — tap play to retry");
+  }
 }
 
 function saveMessageAudio() {
@@ -1053,7 +1066,10 @@ function openEditSheet(idx) {
   const f = myFriends[idx];
   const isBroadcast = f.id === "__broadcast__";
   document.getElementById("editTitle").textContent       = isBroadcast ? "Broadcast Card" : "Set Up Contact";
-  document.getElementById("editLabel").value             = f.label || "";
+  // Broadcast: label is locked — only town is editable
+  document.getElementById("editLabel").value             = isBroadcast ? "BROADCAST (fixed)" : (f.label || "");
+  document.getElementById("editLabel").disabled          = isBroadcast;
+  document.getElementById("editLabel").style.opacity     = isBroadcast ? "0.4" : "1";
   document.getElementById("editCode").value              = f.code  || "";
   document.getElementById("editTown").value              = f.town  || "";
   document.getElementById("editCodeField").style.display = isBroadcast ? "none" : "block";
@@ -1075,10 +1091,10 @@ document.getElementById("editSaveBtn").onclick = async () => {
 
   if (isBroadcast) {
     myFriends[idx] = {
-      id: "__broadcast__",
-      label: label,
-      town:  town || "Everyone",
-      code:  "",
+      id:     "__broadcast__",
+      label:  "BROADCAST",          // always fixed — cannot be renamed
+      town:   town || "Everyone",   // only town is user-editable
+      code:   "",
       status: "broadcast"
     };
     await saveUserProfile();
@@ -1130,6 +1146,8 @@ document.getElementById("editModal").addEventListener("click", (e) => {
 
 function closeEditSheet() {
   document.getElementById("editModal").classList.remove("open");
+  document.getElementById("editLabel").disabled      = false;
+  document.getElementById("editLabel").style.opacity = "1";
   editingIndex = null;
 }
 
