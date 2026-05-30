@@ -968,10 +968,9 @@ async function uploadAudio(blob, recipientUid, ext) {
 // ── SEND MESSAGE ──────────────────────────────
 
 async function sendToOne(friendId, friendLabel, audioUrl) {
-  const inboxSnap = await get(ref(db, "messages/" + friendId));
-  if (inboxSnap.exists() && Object.keys(inboxSnap.val()).length >= MAX_INBOX) {
-    toast("❌ " + (friendLabel || "Their") + " inbox is full"); return false;
-  }
+  // Note: we no longer pre-check inbox count here because reading
+  // another user's messages/ node is blocked by security rules.
+  // Flood protection is handled by the MAX_INBOX rule on write side.
   const msgRef = push(ref(db, "messages/" + friendId));
   await set(msgRef, {
     from:      currentUser.uid,
@@ -1007,10 +1006,7 @@ async function sendMessageToFriend(friend, isBroadcast) {
     }
   } catch(err) {
     console.error("Send error:", err);
-    const msg = err.message || "Failed to send";
-    toast("❌ " + msg, 6000);
-    // Also alert so full message is readable on mobile
-    setTimeout(() => alert("Send failed:\n" + msg), 100);
+    toast("❌ " + (err.message || "Failed to send — check connection"), 5000);
   }
 }
 
