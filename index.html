@@ -922,17 +922,47 @@ function extForRecorder(mr) {
 // ── AUDIO UPLOAD ──────────────────────────────
 
 async function uploadAudio(blob, recipientUid, ext) {
+  // Validate blob before attempting upload
+  if (!blob || blob.size === 0) {
+    throw new Error("Audio blob is empty — recording may have failed");
+  }
+
   const fd = new FormData();
   const filename = currentUser.uid + "_" + recipientUid + "_" + Date.now() + ext;
-  fd.append("file",          new File([blob], filename, { type: blob.type }));
+  fd.append("file",          new File([blob], filename, { type: blob.type || "audio/webm" }));
   fd.append("upload_preset", CLOUDINARY_PRESET);
   fd.append("resource_type", "video");
-  const res = await fetch(
-    "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD + "/video/upload",
-    { method: "POST", body: fd }
-  );
-  if (!res.ok) throw new Error("Cloudinary upload failed: " + res.status);
-  return (await res.json()).secure_url;
+
+  console.log("OTY Upload: blob size =", blob.size, "type =", blob.type, "ext =", ext);
+  console.log("OTY Upload: cloud =", CLOUDINARY_CLOUD, "preset =", CLOUDINARY_PRESET);
+
+  let res;
+  try {
+    res = await fetch(
+      "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD + "/video/upload",
+      { method: "POST", body: fd }
+    );
+  } catch(networkErr) {
+    throw new Error("Network error reaching Cloudinary: " + networkErr.message);
+  }
+
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const errBody = await res.json();
+      detail = errBody.error && errBody.error.message ? errBody.error.message : JSON.stringify(errBody);
+    } catch(e) {
+      detail = "HTTP " + res.status;
+    }
+    throw new Error("Cloudinary rejected upload: " + detail);
+  }
+
+  const data = await res.json();
+  if (!data.secure_url) {
+    throw new Error("Cloudinary response missing secure_url: " + JSON.stringify(data));
+  }
+  console.log("OTY Upload: success, url =", data.secure_url);
+  return data.secure_url;
 }
 
 // ── SEND MESSAGE ──────────────────────────────
@@ -977,7 +1007,8 @@ async function sendMessageToFriend(friend, isBroadcast) {
     }
   } catch(err) {
     console.error("Send error:", err);
-    toast("❌ Failed to send — check connection");
+    // Show the actual error so the cause is visible — not a generic message
+    toast("❌ " + (err.message || "Failed to send — check connection"));
   }
 }
 
