@@ -1168,8 +1168,12 @@ async function playMessage() {
     await currentAudio.play();
   } catch(err) {
     console.error("Playback error:", err);
-    currentAudio = null;
-    toast("❌ Playback failed — tap play to retry");
+    // AbortError means a second tap interrupted the first play() promise
+    // — this is not a real failure, audio is actually playing fine
+    if (err.name !== "AbortError" && err.name !== "NotAllowedError") {
+      toast("❌ Playback failed — tap play to retry");
+    }
+    if (err.name !== "AbortError") currentAudio = null;
   }
 }
 
