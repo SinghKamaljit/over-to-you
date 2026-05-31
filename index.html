@@ -892,14 +892,14 @@ async function initMicrophone() {
     if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
     mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: {
-        echoCancellation:   true,
-        noiseSuppression:   true,
-        autoGainControl:    true,
-        sampleRate:         44100
+        echoCancellation: true,    // keeps echo suppressed in shared spaces
+        noiseSuppression: false,   // off — prevents vocal phase artifacts
+        autoGainControl:  true,    // keeps volume normalised
+        sampleRate:       44100    // matched to 128kbps encoder below
       }
     });
   } catch(err) {
-    // If constraints rejected, fall back to basic audio
+    // Constraints rejected — fall back to basic audio
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch(e) {
@@ -959,20 +959,24 @@ function createMediaRecorder(stream) {
     "audio/webm"
   ];
 
+  // Explicit bitrate prevents mobile browsers from crushing quality
+  // 128kbps gives clear voice without excessive file size
+  const recorderOptions = { audioBitsPerSecond: 128000 };
+
   for (const mime of preferred) {
     if (!MediaRecorder.isTypeSupported(mime)) continue;
     try {
-      const mr = new MediaRecorder(stream, { mimeType: mime });
-      console.log("OTY: Using audio format:", mime);
+      const mr = new MediaRecorder(stream, { mimeType: mime, ...recorderOptions });
+      console.log("OTY: Using audio format:", mime, "@ 128kbps");
       return mr;
     } catch(e) {
       console.warn("OTY: Format rejected at runtime:", mime, e);
     }
   }
 
-  // Final fallback — let browser choose its own format
-  console.warn("OTY: All preferred formats failed. Using browser default.");
-  return new MediaRecorder(stream);
+  // Final fallback — no mimeType but keep bitrate constraint
+  console.warn("OTY: All preferred formats failed. Using browser default @ 128kbps.");
+  return new MediaRecorder(stream, recorderOptions);
 }
 
 function extForRecorder(mr) {
