@@ -155,6 +155,28 @@ body::before{
   border-bottom:1px solid var(--border);
 }
 
+/* ── INBOX BANNER ── */
+#inboxBanner{
+  display:none; align-items:center; justify-content:space-between;
+  padding:10px 16px; cursor:pointer;
+  background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06));
+  border-bottom:1px solid rgba(245,158,11,0.3);
+  animation:bannerPulse 2s infinite;
+}
+@keyframes bannerPulse{
+  0%,100%{ background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06)); }
+  50%{     background:linear-gradient(135deg,rgba(245,158,11,0.22),rgba(245,158,11,0.10)); }
+}
+#inboxBanner.visible{ display:flex; }
+.inbox-text{
+  font-family:'Rajdhani',sans-serif; font-size:0.95rem;
+  font-weight:700; color:var(--yellow);
+}
+.inbox-tap{
+  font-family:'Rajdhani',sans-serif; font-size:0.78rem;
+  color:var(--yellow); opacity:0.7; letter-spacing:1px;
+}
+
 /* ── GRID ── */
 .grid-container{
   display:grid; grid-template-columns:repeat(2,1fr);
@@ -527,7 +549,12 @@ body::before{
     </div>
   </div>
   <div class="instructions">
-    Tap card to record · Tap again to send · Tap glowing card to play
+    Tap card to record · Tap again to send · Tap badge to play messages
+  </div>
+  <!-- Inbox banner — shown when messages are waiting, user taps when ready -->
+  <div id="inboxBanner">
+    <div class="inbox-text" id="inboxBannerText">📩 1 new message</div>
+    <div class="inbox-tap">TAP TO LISTEN ›</div>
   </div>
   <div class="grid-container" id="friendsGrid"></div>
 </div>
@@ -572,6 +599,7 @@ body::before{
   <div class="play-sheet">
     <h3 id="playFromName">Voice Message</h3>
     <p  id="playTime">Received just now</p>
+    <div id="playProgress" style="display:none;font-size:0.75rem;color:var(--muted);margin-top:2px;font-family:'Rajdhani',sans-serif;letter-spacing:1px"></div>
     <div id="playDuration" class="duration-pill" style="display:none">⏱ --:--</div>
     <button class="play-btn"    id="playMsgBtn">▶ PLAY MESSAGE</button>
     <button class="save-btn"    id="saveBtn">💾 SAVE TO PHONE</button>
@@ -1228,9 +1256,45 @@ async function loadUnreadCounts() {
         unreadCounts[msg.from] = (unreadCounts[msg.from] || 0) + 1;
       }
     });
-    console.log("OTY: Unread counts loaded:", unreadCounts);
+    // Rebuild queue from unread messages for the banner
+    // so the banner shows correctly even for messages from previous sessions
+    const totalUnread = Object.values(unreadCounts).reduce((a,b) => a+b, 0);
+    if (totalUnread > 0) {
+      // Populate messageQueue from DB for banner accuracy
+      await populateQueueFromDB();
+    }
+    console.log("OTY: Unread counts loaded:", unreadCounts, "total:", totalUnread);
   } catch(e) {
     console.warn("OTY: Could not load unread counts:", e.message);
+  }
+}
+
+// Populate messageQueue from unread DB messages on boot
+async function populateQueueFromDB() {
+  try {
+    const msgsRef = ref(db, "messages/" + currentUser.uid);
+    const snap    = await get(msgsRef);
+    if (!snap.exists()) return;
+    const unread = [];
+    snap.forEach((child) => {
+      const msg = child.val();
+      if (msg && !msg.isRead) {
+        unread.push({
+          audioUrl:   msg.audioUrl,
+          senderName: msg.fromName,
+          messageId:  child.key,
+          senderId:   msg.from,
+          timestamp:  msg.timestamp,
+          duration:   msg.duration || 0
+        });
+      }
+    });
+    // Sort by timestamp — oldest first
+    unread.sort((a,b) => a.timestamp - b.timestamp);
+    messageQueue.push(...unread);
+    console.log("OTY: Loaded", unread.length, "unread message(s) into queue");
+  } catch(e) {
+    console.warn("OTY: Could not populate queue:", e.message);
   }
 }
 
@@ -1307,18 +1371,63 @@ function listenForMessages() {
   });
 }
 
-function showNextInQueue() {
-  if (!messageQueue.length) { queuePlaying = false; return; }
+// ── INBOX BANNER MANAGEMENT ──────────────────
 
-  // ── UI Mutex: if modal is already open, wait — don't overwrite ──
+function updateInboxBanner() {
+  const banner  = document.getElementById("inboxBanner");
+  const textEl  = document.getElementById("inboxBannerText");
+  const total   = messageQueue.length;
+  if (total === 0) {
+    banner.classList.remove("visible");
+  } else {
+    const word = total === 1 ? "message" : "messages";
+    textEl.textContent = "📩 " + total + " new " + word + " waiting";
+    banner.classList.add("visible");
+  }
+}
+
+// Called when user taps the inbox banner — starts playing queue
+function startListening() {
+  if (!messageQueue.length) {
+    document.getElementById("inboxBanner").classList.remove("visible");
+    return;
+  }
+  showNextInQueue(true);
+}
+
+function showNextInQueue(userInitiated) {
+  // If modal is already open, wait — don't overwrite current message
   if (document.getElementById("playModal").classList.contains("open")) return;
+
+  if (!messageQueue.length) {
+    queuePlaying = false;
+    document.getElementById("inboxBanner").classList.remove("visible");
+    return;
+  }
+
+  // Don't auto-open modal — update banner and wait for user tap
+  updateInboxBanner();
+  if (!userInitiated) { queuePlaying = false; return; }
 
   queuePlaying   = true;
   pendingMessage = messageQueue.shift();
+  updateInboxBanner(); // update count after shift
+
   document.getElementById("playFromName").textContent =
     "📩 From " + escapeHtml(pendingMessage.senderName);
   document.getElementById("playTime").textContent =
     new Date(pendingMessage.timestamp).toLocaleTimeString();
+
+  // Show "Message X of Y" progress
+  const total      = messageQueue.length;  // remaining after shift
+  const progEl     = document.getElementById("playProgress");
+  // We don't track total played easily, so show remaining
+  if (total > 0) {
+    progEl.textContent = (total + 1) + " messages — listening in order";
+    progEl.style.display = "block";
+  } else {
+    progEl.style.display = "none";
+  }
 
   // Show duration if available
   const durEl = document.getElementById("playDuration");
@@ -1399,7 +1508,7 @@ function closeModal() {
   pendingMessage = null;
 
   // Short pause before showing next — lets modal animation finish
-  setTimeout(showNextInQueue, 400);
+  setTimeout(() => showNextInQueue(true), 400);  // continue as user-initiated
 }
 
 // ── EDIT SHEET ────────────────────────────────
@@ -1499,6 +1608,7 @@ function closeEditSheet() {
 function buildDashboard() {
   const grid = document.getElementById("friendsGrid");
   grid.innerHTML = "";
+  updateInboxBanner();  // refresh banner count
 
   myFriends.forEach((friend, idx) => {
     const isBroadcast = friend.id === "__broadcast__";
@@ -1749,6 +1859,7 @@ document.getElementById("historyCloseBtn").onclick = () => {
   document.getElementById("historyModal").classList.remove("open");
 };
 
+document.getElementById("inboxBanner").onclick   = startListening;
 document.getElementById("playMsgBtn").onclick    = playMessage;
 document.getElementById("saveBtn").onclick       = saveMessageAudio;
 document.getElementById("closeModalBtn").onclick = closeModal;
