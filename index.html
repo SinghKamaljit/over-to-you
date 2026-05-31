@@ -280,6 +280,17 @@ body::before{
 .friend-card.sending .rec-btn{ display:none; }
 .friend-card.empty .rec-btn{ display:none; }
 
+/* Cancel recording button */
+.cancel-rec-btn{
+  display:none; position:absolute; bottom:10px; right:8px;
+  background:rgba(239,68,68,0.15); border:1px solid var(--recording);
+  border-radius:20px; padding:4px 10px; color:var(--recording);
+  font-family:'Rajdhani',sans-serif; font-size:0.68rem; font-weight:700;
+  cursor:pointer; white-space:nowrap;
+}
+.friend-card.recording .cancel-rec-btn{ display:block; }
+.friend-card.recording .rec-btn{ margin-right:48px; }
+
 /* Message duration pill in play modal */
 .duration-pill{
   display:inline-block;
@@ -608,6 +619,7 @@ let isRecording        = false;
 let pendingMessage     = null;
 let lastLoginTimestamp = 0;
 let listenerAttached   = false;
+let messageListenerOff = null;  // unsubscribe handle for onChildAdded
 let editingIndex       = null;
 let currentAudio       = null;   // global handle — prevents orphaned audio streams
 let historyAudio       = null;   // separate handle for history playback
@@ -707,8 +719,11 @@ function friendlyAuthError(code) {
 function validateName(raw) {
   if (!raw || !raw.trim()) return null;
   const trimmed = raw.trim();
-  // Must contain at least 2 actual letters
+  // Must contain at least 2 actual letters anywhere in the name
+  // Allows spaces, dots, hyphens — so M.K. Gandhi and Jean-Luc are valid
   if (trimmed.replace(/[^a-zA-Z]/g, "").length < 2) return null;
+  // Only allow letters, spaces, dots, hyphens, apostrophes
+  if (!/^[a-zA-Z][a-zA-Z\s.\-']+$/.test(trimmed)) return null;
   return trimmed;
 }
 
@@ -771,6 +786,8 @@ function showLoginScreen() {
   document.getElementById("tabSignup").classList.add("active");
   document.getElementById("tabSignin").classList.remove("active");
   clearLoginError();
+  // Detach listener — prevents double-listener accumulation on re-login
+  if (messageListenerOff) { messageListenerOff(); messageListenerOff = null; }
   currentUser = null; myProfile = null; myFriends = [];
   listenerAttached = false;
 }
@@ -833,6 +850,8 @@ async function bootApp(user) {
 // ── SIGN UP ───────────────────────────────────
 
 document.getElementById("signupBtn").onclick = async () => {
+  const btn = document.getElementById("signupBtn");
+  btn.disabled = true; btn.textContent = "Please wait…";  // Point 5
   clearLoginError();
 
   // ── STRICT name validation ──
@@ -884,7 +903,16 @@ document.getElementById("signupBtn").onclick = async () => {
 
   } catch(err) {
     console.error("Signup error:", err);
+    // Point 4: If DB write failed after auth account was created, roll back
+    if (currentUser && err.code !== "auth/email-already-in-use") {
+      try { await currentUser.delete(); } catch(e) { console.warn("Rollback failed:", e); }
+      currentUser = null;
+    }
     showError(friendlyAuthError(err.code || err.message));
+  } finally {
+    // Point 5: always re-enable button
+    const btn = document.getElementById("signupBtn");
+    btn.disabled = false; btn.textContent = "CREATE ACCOUNT →";
   }
 };
 
@@ -909,12 +937,16 @@ document.getElementById("signinBtn").onclick = async () => {
   const email = document.getElementById("signinEmail").value.trim();
   const pass  = document.getElementById("signinPass").value;
   if (!email || !pass) { showError("❌ Enter your email and password."); return; }
+  const btn = document.getElementById("signinBtn");
+  btn.disabled = true; btn.textContent = "Please wait…";
   try {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     await bootApp(cred.user);
   } catch(err) {
     console.error("Signin error:", err);
     showError(friendlyAuthError(err.code));
+  } finally {
+    btn.disabled = false; btn.textContent = "SIGN IN →";
   }
 };
 
@@ -1203,7 +1235,7 @@ async function cleanupOldMessages() {
 function listenForMessages() {
   const msgsRef  = ref(db, "messages/" + currentUser.uid);
   const msgQuery = query(msgsRef, orderByChild("timestamp"), startAt(lastLoginTimestamp + 1));
-  onChildAdded(msgQuery, (snap) => {
+  messageListenerOff = onChildAdded(msgQuery, (snap) => {
     const data = snap.val(); if (!data) return;
     if (data.isRead) return; // already read — show in history only, not as alert
     messageQueue.push({
@@ -1464,7 +1496,8 @@ function buildDashboard() {
         '</div>' +
         '<div class="rec-timer"></div><div class="rec-bar"></div>' +
         '<div class="sending-label"></div>' +
-        '<button class="rec-btn" id="recBtn_' + idx + '">● REC</button>';
+        '<button class="rec-btn" id="recBtn_' + idx + '">● REC</button>' +
+        '<button class="cancel-rec-btn" id="cancelBtn_' + idx + '">✕ CANCEL</button>';
     }
 
     // EDIT button
@@ -1524,6 +1557,27 @@ function buildDashboard() {
       card.classList.remove("recording");
       const btn = card.querySelector(".rec-btn");
       if (btn) btn.textContent = "● REC";
+    }
+
+    // CANCEL button — discard recording without sending
+    const cancelBtn = card.querySelector(".cancel-rec-btn");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (!localRecording) return;
+        // Stop recorder but don't send — discard chunks
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+          mediaRecorder.onstop = null;  // remove send handler
+          mediaRecorder.stop();
+        }
+        audioChunks = [];  // discard everything recorded
+        stopRecTimer();
+        localRecording = false; isRecording = false;
+        card.classList.remove("recording");
+        const rBtn = card.querySelector(".rec-btn");
+        if (rBtn) rBtn.textContent = "● REC";
+        toast("Recording cancelled");
+      });
     }
 
     // Tap the REC button or the card body to toggle recording
@@ -1636,6 +1690,24 @@ document.getElementById("closeModalBtn").onclick = closeModal;
 
 window.addEventListener("beforeunload", () => {
   if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
+});
+
+// Point 6: stop recording when user switches apps or hides the page
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && isRecording && mediaRecorder &&
+      mediaRecorder.state === "recording") {
+    console.log("OTY: Page hidden — stopping active recording");
+    mediaRecorder.stop();
+    isRecording = false;
+    // Clean up any active recording card UI
+    document.querySelectorAll(".friend-card.recording").forEach(card => {
+      card.classList.remove("recording");
+      const btn = card.querySelector(".rec-btn");
+      if (btn) btn.textContent = "● REC";
+    });
+    stopRecTimer();
+    toast("⏹ Recording stopped — page was hidden");
+  }
 });
 </script>
 </body>
