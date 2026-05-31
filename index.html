@@ -338,7 +338,65 @@ body::before{
   cursor:pointer; margin-top:6px;
 }
 
-/* ── PLAY MODAL ── */
+/* ── HISTORY BUTTON on card ── */
+.hist-btn{
+  position:absolute; top:7px; left:8px;
+  font-size:0.65rem; color:var(--yellow);
+  font-family:'Rajdhani',sans-serif; font-weight:700;
+  background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:20px;
+  z-index:5; display:none; letter-spacing:0.5px;
+}
+.friend-card:not(.empty):not(.broadcast) .hist-btn{ display:block; }
+
+/* ── HISTORY SHEET ── */
+#historyModal{
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
+  z-index:170; align-items:flex-end; justify-content:center;
+}
+#historyModal.open{ display:flex; }
+.history-sheet{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:24px 24px 0 0; width:100%; max-width:480px;
+  padding:24px 20px 40px; display:flex; flex-direction:column; max-height:80vh;
+}
+.history-sheet h3{
+  font-family:'Rajdhani',sans-serif; font-size:1.3rem;
+  color:var(--yellow); margin-bottom:4px; text-align:center;
+}
+.history-subtitle{
+  font-size:0.82rem; color:var(--muted); text-align:center; margin-bottom:16px;
+}
+.history-list{
+  overflow-y:auto; flex:1; display:flex;
+  flex-direction:column; gap:10px; padding-right:4px;
+}
+.history-item{
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:12px 16px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.history-item-left{ display:flex; flex-direction:column; gap:2px; text-align:left; }
+.history-time{
+  font-family:'Rajdhani',sans-serif; font-size:0.9rem;
+  color:var(--text); font-weight:700;
+}
+.history-meta{ font-size:0.75rem; color:var(--muted); }
+.history-play-btn{
+  background:linear-gradient(135deg,var(--yellow),#d97706);
+  border:none; border-radius:20px; padding:6px 14px; color:#000;
+  font-family:'Rajdhani',sans-serif; font-size:0.8rem;
+  font-weight:700; cursor:pointer; white-space:nowrap;
+}
+.history-empty{
+  text-align:center; color:var(--muted); font-size:0.88rem; padding:30px 0;
+}
+.history-close-btn{
+  width:100%; padding:13px; border:1px solid var(--border);
+  border-radius:50px; background:transparent; color:var(--text);
+  font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+  cursor:pointer; margin-top:16px;
+}
 #playModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
@@ -476,6 +534,16 @@ body::before{
   </div>
 </div>
 
+<!-- HISTORY MODAL -->
+<div id="historyModal">
+  <div class="history-sheet">
+    <h3 id="historyTitle">Message History</h3>
+    <div class="history-subtitle">Last 5 received messages</div>
+    <div class="history-list" id="historyList"></div>
+    <button class="history-close-btn" id="historyCloseBtn">Close</button>
+  </div>
+</div>
+
 <!-- PLAY MODAL -->
 <div id="playModal">
   <div class="play-sheet">
@@ -498,7 +566,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getDatabase, ref, set, get, update, push, remove,
-  onChildAdded, query, orderByChild, startAt
+  onChildAdded, query, orderByChild, startAt, limitToLast
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // =============================================
@@ -542,6 +610,7 @@ let lastLoginTimestamp = 0;
 let listenerAttached   = false;
 let editingIndex       = null;
 let currentAudio       = null;   // global handle — prevents orphaned audio streams
+let historyAudio       = null;   // separate handle for history playback
 
 let recTimerInterval  = null;
 let recAutoStopTimer  = null;
@@ -1098,6 +1167,7 @@ function listenForMessages() {
   const msgQuery = query(msgsRef, orderByChild("timestamp"), startAt(lastLoginTimestamp + 1));
   onChildAdded(msgQuery, (snap) => {
     const data = snap.val(); if (!data) return;
+    if (data.isRead) return; // already read — show in history only, not as alert
     messageQueue.push({
       audioUrl:   data.audioUrl,
       senderName: data.fromName,
@@ -1156,12 +1226,13 @@ async function playMessage() {
     // Show save button immediately
     document.getElementById("saveBtn").classList.add("visible");
 
-    // Delete from DB only after audio finishes — never on play start
+    // Mark as read after audio finishes — keeps message in DB for history
     currentAudio.addEventListener("ended", async () => {
       try {
-        await remove(ref(db,
-          "messages/" + currentUser.uid + "/" + pendingMessage.messageId));
-      } catch(e) { console.warn("Could not delete message from DB:", e); }
+        await update(ref(db,
+          "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
+          { isRead: true });
+      } catch(e) { console.warn("Could not mark message as read:", e); }
       currentAudio = null;
     });
 
@@ -1344,6 +1415,7 @@ function buildDashboard() {
       card.innerHTML =
         '<div class="pulse-ring"></div>' +
         '<div class="msg-indicator"></div>' +
+        '<div class="hist-btn">HIST</div>' +
         '<div class="edit-btn">EDIT</div>' +
         '<div class="card-town">' + escapeHtml(friend.town || "—") + '</div>' +
         '<div class="card-label">' + escapeHtml(friend.label || "") + '</div>' +
@@ -1361,6 +1433,14 @@ function buildDashboard() {
     card.querySelector(".edit-btn").addEventListener("click", (e) => {
       e.stopPropagation(); openEditSheet(idx);
     });
+
+    // HISTORY button — only on linked cards
+    const histBtn = card.querySelector(".hist-btn");
+    if (histBtn) {
+      histBtn.addEventListener("click", (e) => {
+        e.stopPropagation(); openHistorySheet(friend);
+      });
+    }
 
     // ── TAP-TO-START / TAP-TO-STOP recording ──
     let localRecording = false;
@@ -1427,6 +1507,90 @@ function buildDashboard() {
 }
 
 // ── MODAL BUTTONS ─────────────────────────────
+// ── HISTORY FEATURE ─────────────────────────────
+
+async function openHistorySheet(friend) {
+  // Stop any history audio already playing
+  if (historyAudio) { historyAudio.pause(); historyAudio = null; }
+
+  document.getElementById("historyTitle").textContent = "History: " + escapeHtml(friend.label || friend.code);
+  const listEl = document.getElementById("historyList");
+  listEl.innerHTML = '<div class="history-empty">Loading…</div>';
+  document.getElementById("historyModal").classList.add("open");
+
+  try {
+    const msgsRef      = ref(db, "messages/" + currentUser.uid);
+    const historyQuery = query(msgsRef, orderByChild("timestamp"), limitToLast(30));
+    const snap         = await get(historyQuery);
+
+    listEl.innerHTML = "";
+    let matches = [];
+
+    if (snap.exists()) {
+      snap.forEach((child) => {
+        const msg = child.val();
+        if (msg.from === friend.id) {
+          matches.push({ id: child.key, url: msg.audioUrl, time: msg.timestamp, duration: msg.duration || 0 });
+        }
+      });
+    }
+
+    // Latest first, max 5
+    matches.sort((a, b) => b.time - a.time);
+    const last5 = matches.slice(0, 5);
+
+    if (!last5.length) {
+      listEl.innerHTML = '<div class="history-empty">No past messages from this contact.</div>';
+      return;
+    }
+
+    last5.forEach((msg) => {
+      const item    = document.createElement("div");
+      item.className = "history-item";
+      const timeStr  = new Date(msg.time).toLocaleDateString() + " " +
+                       new Date(msg.time).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
+      const durStr   = msg.duration ? formatTime(Math.round(msg.duration)) : "--:--";
+      item.innerHTML =
+        '<div class="history-item-left">' +
+          '<div class="history-time">' + timeStr + '</div>' +
+          '<div class="history-meta">Duration: ' + durStr + '</div>' +
+        '</div>' +
+        '<button class="history-play-btn">▶ PLAY</button>';
+
+      const btn = item.querySelector(".history-play-btn");
+      btn.onclick = async () => {
+        try {
+          // Stop any active playback first
+          if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
+          if (historyAudio) { historyAudio.pause(); historyAudio = null; }
+
+          historyAudio = new Audio(msg.url);
+          btn.textContent = "■ STOP";
+          historyAudio.addEventListener("ended", () => {
+            btn.textContent = "▶ PLAY";
+            historyAudio = null;
+          });
+          await historyAudio.play();
+        } catch(e) {
+          btn.textContent = "▶ PLAY";
+          toast("Playback failed");
+        }
+      };
+
+      listEl.appendChild(item);
+    });
+
+  } catch(err) {
+    console.error("History error:", err);
+    listEl.innerHTML = '<div class="history-empty">Could not load history.</div>';
+  }
+}
+
+document.getElementById("historyCloseBtn").onclick = () => {
+  if (historyAudio) { historyAudio.pause(); historyAudio = null; }
+  document.getElementById("historyModal").classList.remove("open");
+};
+
 document.getElementById("playMsgBtn").onclick    = playMessage;
 document.getElementById("saveBtn").onclick       = saveMessageAudio;
 document.getElementById("closeModalBtn").onclick = closeModal;
