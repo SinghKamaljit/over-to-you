@@ -825,6 +825,9 @@ async function bootApp(user) {
   await initMicrophone();
   buildDashboard();
   if (!listenerAttached) { listenerAttached = true; listenForMessages(); }
+
+  // Silent 30-day cleanup — runs in background, ₹0 cost
+  cleanupOldMessages().catch(e => console.warn("Cleanup error:", e));
 }
 
 // ── SIGN UP ───────────────────────────────────
@@ -1161,6 +1164,41 @@ async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
 }
 
 // ── MESSAGE QUEUE ─────────────────────────────
+
+// ── 30-DAY MESSAGE CLEANUP ───────────────────
+// Runs silently on login. Deletes messages older than 30 days
+// from the user's own inbox. No Cloud Functions, no paid plan needed.
+
+async function cleanupOldMessages() {
+  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+  const cutoff         = Date.now() - THIRTY_DAYS_MS;
+
+  try {
+    const msgsRef = ref(db, "messages/" + currentUser.uid);
+    const snap    = await get(msgsRef);
+    if (!snap.exists()) return;
+
+    const deletions = [];
+    snap.forEach((child) => {
+      const msg = child.val();
+      if (msg.timestamp && msg.timestamp < cutoff) {
+        // Only delete if already read — never delete unread messages
+        if (msg.isRead) {
+          deletions.push(remove(ref(db,
+            "messages/" + currentUser.uid + "/" + child.key)));
+        }
+      }
+    });
+
+    if (deletions.length) {
+      await Promise.all(deletions);
+      console.log("OTY Cleanup: removed " + deletions.length + " old message(s)");
+    }
+  } catch(e) {
+    // Cleanup failure is non-critical — log and continue
+    console.warn("OTY Cleanup failed:", e.message);
+  }
+}
 
 function listenForMessages() {
   const msgsRef  = ref(db, "messages/" + currentUser.uid);
@@ -1519,9 +1557,10 @@ async function openHistorySheet(friend) {
   document.getElementById("historyModal").classList.add("open");
 
   try {
-    const msgsRef      = ref(db, "messages/" + currentUser.uid);
-    const historyQuery = query(msgsRef, orderByChild("timestamp"), limitToLast(30));
-    const snap         = await get(historyQuery);
+    // Simple get of all messages — filter and sort client-side
+    // Avoids needing a DB index for the history query
+    const msgsRef = ref(db, "messages/" + currentUser.uid);
+    const snap    = await get(msgsRef);
 
     listEl.innerHTML = "";
     let matches = [];
@@ -1582,7 +1621,7 @@ async function openHistorySheet(friend) {
 
   } catch(err) {
     console.error("History error:", err);
-    listEl.innerHTML = '<div class="history-empty">Could not load history.</div>';
+    listEl.innerHTML = '<div class="history-empty">Could not load history: ' + escapeHtml(err.message || "unknown error") + '</div>';
   }
 }
 
