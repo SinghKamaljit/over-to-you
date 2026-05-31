@@ -240,6 +240,55 @@ body::before{
 }
 .friend-card.recording .rec-bar{ display:block; }
 
+/* Sending overlay */
+.friend-card.sending{
+  border-color:var(--accent) !important;
+  animation:sendingPulse 1s infinite !important;
+}
+@keyframes sendingPulse{
+  0%,100%{ box-shadow:0 0 8px rgba(0,212,255,0.2); }
+  50%{     box-shadow:0 0 18px rgba(0,212,255,0.5); }
+}
+.sending-label{
+  display:none; position:absolute; bottom:10px; left:50%;
+  transform:translateX(-50%);
+  font-family:'Rajdhani',sans-serif; font-size:0.72rem;
+  font-weight:700; color:var(--accent); letter-spacing:1px;
+  white-space:nowrap;
+}
+.friend-card.sending .sending-label{ display:block; }
+
+/* Tap-to-record button (shown instead of hold instruction) */
+.rec-btn{
+  display:none; position:absolute; bottom:10px; left:50%;
+  transform:translateX(-50%);
+  background:var(--recording); border:none; border-radius:20px;
+  padding:4px 12px; color:#fff;
+  font-family:'Rajdhani',sans-serif; font-size:0.72rem; font-weight:700;
+  cursor:pointer; white-space:nowrap; letter-spacing:1px;
+  transition:background 0.2s;
+}
+.friend-card:not(.empty):not(.broadcast) .rec-btn{ display:block; }
+.friend-card.recording .rec-btn{
+  background:var(--yellow); color:#000;
+  animation:btnPulse 0.8s infinite;
+}
+@keyframes btnPulse{
+  0%,100%{ transform:translateX(-50%) scale(1); }
+  50%{     transform:translateX(-50%) scale(1.06); }
+}
+.friend-card.sending .rec-btn{ display:none; }
+.friend-card.empty .rec-btn{ display:none; }
+
+/* Message duration pill in play modal */
+.duration-pill{
+  display:inline-block;
+  background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2);
+  border-radius:20px; padding:3px 10px;
+  font-family:'Rajdhani',sans-serif; font-size:0.78rem;
+  color:var(--accent); margin-top:4px; letter-spacing:1px;
+}
+
 /* ── EDIT SHEET ── */
 #editModal{
   display:none; position:fixed; inset:0;
@@ -397,7 +446,7 @@ body::before{
     </div>
   </div>
   <div class="instructions">
-    Hold card to talk · Tap code to copy · Tap glowing card to play
+    Tap card to record · Tap again to send · Tap glowing card to play
   </div>
   <div class="grid-container" id="friendsGrid"></div>
 </div>
@@ -432,6 +481,7 @@ body::before{
   <div class="play-sheet">
     <h3 id="playFromName">Voice Message</h3>
     <p  id="playTime">Received just now</p>
+    <div id="playDuration" class="duration-pill" style="display:none">⏱ --:--</div>
     <button class="play-btn"    id="playMsgBtn">▶ PLAY MESSAGE</button>
     <button class="save-btn"    id="saveBtn">💾 SAVE TO PHONE</button>
     <button class="dismiss-btn" id="closeModalBtn">Later</button>
@@ -839,10 +889,22 @@ document.getElementById("signoutBtn").onclick = async () => {
 async function initMicrophone() {
   try {
     if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation:   true,
+        noiseSuppression:   true,
+        autoGainControl:    true,
+        sampleRate:         44100
+      }
+    });
   } catch(err) {
-    console.error("Mic error:", err);
-    toast("❌ Microphone access denied — check browser permissions");
+    // If constraints rejected, fall back to basic audio
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch(e) {
+      console.error("Mic error:", e);
+      toast("❌ Microphone access denied — check browser permissions");
+    }
   }
 }
 
@@ -967,27 +1029,34 @@ async function uploadAudio(blob, recipientUid, ext) {
 
 // ── SEND MESSAGE ──────────────────────────────
 
-async function sendToOne(friendId, friendLabel, audioUrl) {
-  // Note: we no longer pre-check inbox count here because reading
-  // another user's messages/ node is blocked by security rules.
-  // Flood protection is handled by the MAX_INBOX rule on write side.
+async function sendToOne(friendId, friendLabel, audioUrl, duration) {
   const msgRef = push(ref(db, "messages/" + friendId));
   await set(msgRef, {
     from:      currentUser.uid,
     fromName:  myProfile.name,
     audioUrl,
+    duration:  duration || 0,
     timestamp: Date.now(),
     isRead:    false
   });
   return true;
 }
 
-async function sendMessageToFriend(friend, isBroadcast) {
+async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
   if (!audioChunks.length) { toast("No audio recorded"); return; }
+
+  // Show sending state on card
+  if (sendingCard) {
+    sendingCard.classList.add("sending");
+    const sl = sendingCard.querySelector(".sending-label");
+    if (sl) sl.textContent = "Sending…";
+  }
+
   try {
     const mime     = mediaRecorder.mimeType || "";
     const ext      = extForRecorder(mediaRecorder);
     const blob     = new Blob(audioChunks, { type: mime || "audio/webm" });
+    const duration = recSecondsElapsed; // seconds recorded
     const audioUrl = await uploadAudio(blob, isBroadcast ? "broadcast" : friend.id, ext);
 
     if (isBroadcast) {
@@ -995,18 +1064,25 @@ async function sendMessageToFriend(friend, isBroadcast) {
       if (!linked.length) { toast("❌ No contacts linked yet"); return; }
       let sent = 0;
       for (const f of linked) {
-        if (await sendToOne(f.id, f.label, audioUrl)) sent++;
+        if (await sendToOne(f.id, f.label, audioUrl, duration)) sent++;
       }
       vibrateSent();
       toast("📢 Broadcast sent to " + sent + " contact" + (sent !== 1 ? "s" : ""));
     } else {
-      await sendToOne(friend.id, friend.label, audioUrl);
+      await sendToOne(friend.id, friend.label, audioUrl, duration);
       vibrateSent();
       toast("✓ Sent to " + escapeHtml(friend.label || "contact"));
     }
   } catch(err) {
     console.error("Send error:", err);
     toast("❌ " + (err.message || "Failed to send — check connection"), 5000);
+  } finally {
+    // Always clear sending state
+    if (sendingCard) {
+      sendingCard.classList.remove("sending");
+      const sl = sendingCard.querySelector(".sending-label");
+      if (sl) sl.textContent = "";
+    }
   }
 }
 
@@ -1022,7 +1098,8 @@ function listenForMessages() {
       senderName: data.fromName,
       messageId:  snap.key,
       senderId:   data.from,
-      timestamp:  data.timestamp
+      timestamp:  data.timestamp,
+      duration:   data.duration || 0
     });
     const card = document.querySelector(
       ".friend-card[data-friend-id='" + data.from + "']"
@@ -1040,6 +1117,16 @@ function showNextInQueue() {
     "📩 From " + escapeHtml(pendingMessage.senderName);
   document.getElementById("playTime").textContent =
     new Date(pendingMessage.timestamp).toLocaleTimeString();
+
+  // Show duration if available
+  const durEl = document.getElementById("playDuration");
+  if (pendingMessage.duration) {
+    durEl.textContent = "⏱ " + formatTime(Math.round(pendingMessage.duration));
+    durEl.style.display = "inline-block";
+  } else {
+    durEl.style.display = "none";
+  }
+
   document.getElementById("saveBtn").classList.remove("visible");
   document.getElementById("playModal").classList.add("open");
 }
@@ -1205,7 +1292,8 @@ function buildDashboard() {
         '<div class="msg-indicator"></div>' +
         '<div class="edit-btn">EDIT</div>' +
         '<div class="card-empty-hint">Tap EDIT<br>to add contact</div>' +
-        '<div class="rec-timer"></div><div class="rec-bar"></div>';
+        '<div class="rec-timer"></div><div class="rec-bar"></div>' +
+        '<div class="sending-label"></div>';
     } else if (isBroadcast) {
       card.innerHTML =
         '<div class="pulse-ring"></div>' +
@@ -1215,9 +1303,10 @@ function buildDashboard() {
         '<div>' +
           '<div class="card-town">' + escapeHtml(friend.town || "Everyone") + '</div>' +
           '<div class="card-label">' + escapeHtml(friend.label || "BROADCAST") + '</div>' +
-          '<div class="card-status">Hold to send to all contacts</div>' +
+          '<div class="card-status">Tap to send to all contacts</div>' +
         '</div>' +
-        '<div class="rec-timer"></div><div class="rec-bar"></div>';
+        '<div class="rec-timer"></div><div class="rec-bar"></div>' +
+        '<div class="sending-label"></div>';
     } else {
       card.innerHTML =
         '<div class="pulse-ring"></div>' +
@@ -1230,7 +1319,9 @@ function buildDashboard() {
             ? "✅ " + escapeHtml(friend.code || "")
             : "Tap EDIT to link") +
         '</div>' +
-        '<div class="rec-timer"></div><div class="rec-bar"></div>';
+        '<div class="rec-timer"></div><div class="rec-bar"></div>' +
+        '<div class="sending-label"></div>' +
+        '<button class="rec-btn" id="recBtn_' + idx + '">● REC</button>';
     }
 
     // EDIT button
@@ -1238,55 +1329,65 @@ function buildDashboard() {
       e.stopPropagation(); openEditSheet(idx);
     });
 
-    // Hold-to-record
-    let holdTimer = null, localRecording = false;
+    // ── TAP-TO-START / TAP-TO-STOP recording ──
+    let localRecording = false;
 
-    function stopLocal() {
-      if (localRecording && mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop(); stopRecTimer();
-        localRecording = false; isRecording = false;
-        card.classList.remove("recording");
+    function startRecording() {
+      if (!mediaStream) { toast("⏳ Microphone not ready — check permissions"); return; }
+      if (isRecording) return; // another card is recording
+      try {
+        audioChunks   = [];
+        mediaRecorder = createMediaRecorder(mediaStream);
+        mediaRecorder.ondataavailable = (ev) => {
+          if (ev.data && ev.data.size > 0) audioChunks.push(ev.data);
+        };
+        mediaRecorder.onstop = () => sendMessageToFriend(friend, isBroadcast, card);
+        mediaRecorder.onerror = (err) => {
+          console.error("MediaRecorder error:", err);
+          toast("Recording error — please try again");
+          stopRecording();
+        };
+        mediaRecorder.start(250);
+        vibrateStart();
+        localRecording = true;
+        isRecording    = true;
+        card.classList.add("recording");
+        startRecTimer(card);
+        // Update button text
+        const btn = card.querySelector(".rec-btn");
+        if (btn) btn.textContent = "■ STOP";
+      } catch(err) {
+        console.error("Could not start recording:", err);
+        toast("❌ Could not start recording — check mic permission");
       }
     }
 
-    card.addEventListener("pointerdown", (e) => {
+    function stopRecording() {
+      if (!localRecording) return;
+      if (mediaRecorder && mediaRecorder.state === "recording") {
+        mediaRecorder.stop();
+      }
+      stopRecTimer();
+      localRecording = false;
+      isRecording    = false;
+      card.classList.remove("recording");
+      const btn = card.querySelector(".rec-btn");
+      if (btn) btn.textContent = "● REC";
+    }
+
+    // Tap the REC button or the card body to toggle recording
+    card.addEventListener("click", (e) => {
       if (e.target.classList.contains("edit-btn")) return;
-      e.preventDefault();
       if (isEmpty) { toast("Tap EDIT to set up this contact first"); return; }
       if (!isBroadcast && !friend.id) { toast("Tap EDIT to link this contact"); return; }
-      if (!mediaStream) {
-        toast("⏳ Microphone not ready — check permissions");
-        return;
+      if (card.classList.contains("sending")) return; // busy uploading
+
+      if (!localRecording) {
+        startRecording();
+      } else {
+        stopRecording();
       }
-
-      holdTimer = setTimeout(() => {
-        try {
-          audioChunks   = [];
-          // ── SAFE MediaRecorder creation with fallback ──
-          mediaRecorder = createMediaRecorder(mediaStream);
-          mediaRecorder.ondataavailable = (ev) => {
-            if (ev.data && ev.data.size > 0) audioChunks.push(ev.data);
-          };
-          mediaRecorder.onstop = () => sendMessageToFriend(friend, isBroadcast);
-          mediaRecorder.onerror = (err) => {
-            console.error("MediaRecorder error:", err);
-            toast("Recording error — please try again");
-            stopLocal();
-          };
-          mediaRecorder.start(250); // collect data every 250ms
-          vibrateStart();
-          localRecording = true; isRecording = true;
-          card.classList.add("recording");
-          startRecTimer(card);
-        } catch(err) {
-          console.error("Could not start recording:", err);
-          toast("❌ Could not start recording — check mic permission");
-        }
-      }, 300);
     });
-
-    card.addEventListener("pointerup",     () => { clearTimeout(holdTimer); stopLocal(); });
-    card.addEventListener("pointercancel", () => { clearTimeout(holdTimer); stopLocal(); });
 
     grid.appendChild(card);
   });
