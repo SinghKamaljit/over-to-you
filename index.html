@@ -201,6 +201,18 @@ body::before{
   background:var(--yellow); display:none; box-shadow:0 0 6px var(--yellow);
 }
 .friend-card.has-message .msg-indicator{ display:block; }
+
+/* Unread badge */
+.unread-badge{
+  position:absolute; top:5px; left:5px;
+  min-width:20px; height:20px; border-radius:10px;
+  background:var(--yellow); color:#000;
+  font-family:'Rajdhani',sans-serif; font-size:0.75rem; font-weight:700;
+  display:none; align-items:center; justify-content:center;
+  padding:0 5px; box-shadow:0 0 8px rgba(245,158,11,0.6);
+  z-index:4;
+}
+.friend-card.has-message .unread-badge{ display:flex; }
 .edit-btn{
   position:absolute; top:7px; right:8px;
   font-size:0.65rem; color:var(--accent);
@@ -622,6 +634,7 @@ let listenerAttached   = false;
 let messageListenerOff = null;  // unsubscribe handle for onChildAdded
 let editingIndex       = null;
 let currentAudio       = null;   // global handle — prevents orphaned audio streams
+let unreadCounts       = {};     // { senderId: count } — unread message counts per contact
 let historyAudio       = null;   // separate handle for history playback
 
 let recTimerInterval  = null;
@@ -840,6 +853,8 @@ async function bootApp(user) {
     copyToClipboard(myProfile.friendCode, "📋 " + myProfile.friendCode + " copied!");
 
   await initMicrophone();
+  // Load unread counts from DB before building dashboard
+  await loadUnreadCounts();
   buildDashboard();
   if (!listenerAttached) { listenerAttached = true; listenForMessages(); }
 
@@ -1197,7 +1212,48 @@ async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
 
 // ── MESSAGE QUEUE ─────────────────────────────
 
-// ── 30-DAY MESSAGE CLEANUP ───────────────────
+// ── UNREAD COUNTS ────────────────────────────
+// Loads unread message counts from DB on boot
+// Gives accurate counts even for messages received while offline
+
+async function loadUnreadCounts() {
+  try {
+    const msgsRef = ref(db, "messages/" + currentUser.uid);
+    const snap    = await get(msgsRef);
+    unreadCounts  = {};
+    if (!snap.exists()) return;
+    snap.forEach((child) => {
+      const msg = child.val();
+      if (msg && !msg.isRead && msg.from) {
+        unreadCounts[msg.from] = (unreadCounts[msg.from] || 0) + 1;
+      }
+    });
+    console.log("OTY: Unread counts loaded:", unreadCounts);
+  } catch(e) {
+    console.warn("OTY: Could not load unread counts:", e.message);
+  }
+}
+
+function updateBadge(senderId, delta) {
+  // delta = +1 (new message) or -1 (message read)
+  unreadCounts[senderId] = Math.max(0, (unreadCounts[senderId] || 0) + delta);
+  // Update the badge on the matching card
+  const card = document.querySelector(".friend-card[data-friend-id='" + senderId + "']");
+  if (!card) return;
+  const badge = card.querySelector(".unread-badge");
+  if (!badge) return;
+  const count = unreadCounts[senderId];
+  badge.textContent = count > 9 ? "9+" : String(count);
+  if (count > 0) {
+    card.classList.add("has-message");
+    badge.style.display = "flex";
+  } else {
+    card.classList.remove("has-message");
+    badge.style.display = "none";
+  }
+}
+
+// ── 30-DAY MESSAGE CLEANUP ─────────────────────
 // Runs silently on login. Deletes messages older than 30 days
 // from the user's own inbox. No Cloud Functions, no paid plan needed.
 
@@ -1246,10 +1302,7 @@ function listenForMessages() {
       timestamp:  data.timestamp,
       duration:   data.duration || 0
     });
-    const card = document.querySelector(
-      ".friend-card[data-friend-id='" + data.from + "']"
-    );
-    if (card) card.classList.add("has-message");
+    updateBadge(data.from, +1);  // increment unread badge on card
     if (!queuePlaying) showNextInQueue();
   });
 }
@@ -1302,6 +1355,10 @@ async function playMessage() {
         await update(ref(db,
           "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
           { isRead: true });
+        // Decrement badge for this sender
+        if (pendingMessage && pendingMessage.senderId) {
+          updateBadge(pendingMessage.senderId, -1);
+        }
       } catch(e) { console.warn("Could not mark message as read:", e); }
       currentAudio = null;
     });
@@ -1337,12 +1394,8 @@ function closeModal() {
 
   document.getElementById("playModal").classList.remove("open");
 
-  if (pendingMessage) {
-    const c = document.querySelector(
-      ".friend-card[data-friend-id='" + pendingMessage.senderId + "']"
-    );
-    if (c) c.classList.remove("has-message");
-  }
+  // Badge is managed by updateBadge() — only remove glow if count reaches 0
+  // (updateBadge handles has-message class automatically)
   pendingMessage = null;
 
   // Short pause before showing next — lets modal animation finish
@@ -1485,6 +1538,7 @@ function buildDashboard() {
       card.innerHTML =
         '<div class="pulse-ring"></div>' +
         '<div class="msg-indicator"></div>' +
+        '<div class="unread-badge" style="display:none"></div>' +
         '<div class="hist-btn">HIST</div>' +
         '<div class="edit-btn">EDIT</div>' +
         '<div class="card-town">' + escapeHtml(friend.town || "—") + '</div>' +
@@ -1511,6 +1565,17 @@ function buildDashboard() {
       histBtn.addEventListener("click", (e) => {
         e.stopPropagation(); openHistorySheet(friend);
       });
+    }
+
+    // Set initial badge count from loaded unreadCounts
+    if (friend.id && !isBroadcast) {
+      const count = unreadCounts[friend.id] || 0;
+      const badge = card.querySelector(".unread-badge");
+      if (badge && count > 0) {
+        badge.textContent = count > 9 ? "9+" : String(count);
+        badge.style.display = "flex";
+        card.classList.add("has-message");
+      }
     }
 
     // ── TAP-TO-START / TAP-TO-STOP recording ──
