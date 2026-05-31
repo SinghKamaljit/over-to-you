@@ -541,6 +541,7 @@ let pendingMessage     = null;
 let lastLoginTimestamp = 0;
 let listenerAttached   = false;
 let editingIndex       = null;
+let currentAudio       = null;   // global handle — prevents orphaned audio streams
 
 let recTimerInterval  = null;
 let recAutoStopTimer  = null;
@@ -1111,6 +1112,10 @@ function listenForMessages() {
 
 function showNextInQueue() {
   if (!messageQueue.length) { queuePlaying = false; return; }
+
+  // ── UI Mutex: if modal is already open, wait — don't overwrite ──
+  if (document.getElementById("playModal").classList.contains("open")) return;
+
   queuePlaying   = true;
   pendingMessage = messageQueue.shift();
   document.getElementById("playFromName").textContent =
@@ -1121,7 +1126,7 @@ function showNextInQueue() {
   // Show duration if available
   const durEl = document.getElementById("playDuration");
   if (pendingMessage.duration) {
-    durEl.textContent = "⏱ " + formatTime(Math.round(pendingMessage.duration));
+    durEl.textContent   = "⏱ " + formatTime(Math.round(pendingMessage.duration));
     durEl.style.display = "inline-block";
   } else {
     durEl.style.display = "none";
@@ -1133,23 +1138,33 @@ function showNextInQueue() {
 
 async function playMessage() {
   if (!pendingMessage) return;
+
+  // ── Stop any orphaned audio stream before starting a new one ──
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = "";
+    currentAudio = null;
+  }
+
   try {
-    const audio = new Audio(pendingMessage.audioUrl);
-    // Show save button immediately so user can save before playback ends
+    currentAudio = new Audio(pendingMessage.audioUrl);
+
+    // Show save button immediately
     document.getElementById("saveBtn").classList.add("visible");
 
-    // Delete from DB only AFTER audio finishes playing — not on play start
-    // This prevents message loss if playback is interrupted or fails mid-way
-    audio.addEventListener("ended", async () => {
+    // Delete from DB only after audio finishes — never on play start
+    currentAudio.addEventListener("ended", async () => {
       try {
         await remove(ref(db,
           "messages/" + currentUser.uid + "/" + pendingMessage.messageId));
       } catch(e) { console.warn("Could not delete message from DB:", e); }
+      currentAudio = null;
     });
 
-    await audio.play();
+    await currentAudio.play();
   } catch(err) {
     console.error("Playback error:", err);
+    currentAudio = null;
     toast("❌ Playback failed — tap play to retry");
   }
 }
@@ -1164,7 +1179,15 @@ function saveMessageAudio() {
 }
 
 function closeModal() {
+  // ── Forcefully stop any active audio stream ──
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = "";
+    currentAudio = null;
+  }
+
   document.getElementById("playModal").classList.remove("open");
+
   if (pendingMessage) {
     const c = document.querySelector(
       ".friend-card[data-friend-id='" + pendingMessage.senderId + "']"
@@ -1172,7 +1195,9 @@ function closeModal() {
     if (c) c.classList.remove("has-message");
   }
   pendingMessage = null;
-  setTimeout(showNextInQueue, 600);
+
+  // Short pause before showing next — lets modal animation finish
+  setTimeout(showNextInQueue, 400);
 }
 
 // ── EDIT SHEET ────────────────────────────────
