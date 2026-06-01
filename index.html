@@ -314,18 +314,19 @@ body::before{
 .friend-card.sending .rec-btn{ display:none; }
 .friend-card.empty .rec-btn{ display:none; }
 
-/* Cancel recording button */
+/* Cancel recording button — top-right corner during recording (Fix 3 / Approach B) */
 .cancel-rec-btn{
-  display:none; position:absolute; bottom:10px; right:8px;
+  display:none; position:absolute; top:7px; right:8px;
   background:rgba(239,68,68,0.15); border:1px solid var(--recording);
-  border-radius:20px; padding:4px 10px; color:var(--recording);
-  font-family:'Rajdhani',sans-serif; font-size:0.68rem; font-weight:700;
-  cursor:pointer; white-space:nowrap;
+  border-radius:20px; padding:2px 8px; color:var(--recording);
+  font-family:'Rajdhani',sans-serif; font-size:0.65rem; font-weight:700;
+  cursor:pointer; white-space:nowrap; z-index:6;
 }
 .friend-card.recording .cancel-rec-btn{ display:block; }
-.friend-card.recording .rec-btn{ margin-right:48px; }
+/* Remove the margin offset — REC button can now be fully centered */
+.friend-card.recording .rec-btn{ margin-right:0; }
 
-/* Message duration pill in play modal */
+.friend-card.recording .edit-btn{ display:none; }
 .duration-pill{
   display:inline-block;
   background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2);
@@ -472,6 +473,12 @@ body::before{
   border:1px solid var(--yellow); color:var(--yellow);
 }
 .save-btn.visible{ display:block; }
+
+/* ── PLAY BUTTON ACTIVE STATE (Fix 2) ── */
+.play-btn.is-playing{
+  background:linear-gradient(135deg,var(--green),#16a34a);
+  opacity:0.85; cursor:default;
+}
 
 /* ── TOAST ── */
 #toast{
@@ -1440,16 +1447,29 @@ function showNextInQueue(userInitiated) {
 
   document.getElementById("saveBtn").classList.remove("visible");
   document.getElementById("playModal").classList.add("open");
-}
+  // Fix 1: honour the user's intent immediately — no second tap needed
+  playMessage();
 
 async function playMessage() {
   if (!pendingMessage) return;
+
+  // Fix 2: instantly lock the button to prevent double-tap / AbortError race
+  const playBtn = document.getElementById("playMsgBtn");
+  playBtn.classList.add("is-playing");
+  playBtn.textContent = "🔊 PLAYING...";
+  playBtn.disabled = true;
 
   // ── Stop any orphaned audio stream before starting a new one ──
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
     currentAudio = null;
+  }
+
+  function resetPlayBtn() {
+    playBtn.classList.remove("is-playing");
+    playBtn.textContent = "▶ PLAY MESSAGE";
+    playBtn.disabled = false;
   }
 
   try {
@@ -1460,6 +1480,7 @@ async function playMessage() {
 
     // Mark as read after audio finishes — keeps message in DB for history
     currentAudio.addEventListener("ended", async () => {
+      resetPlayBtn();
       try {
         await update(ref(db,
           "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
@@ -1472,8 +1493,14 @@ async function playMessage() {
       currentAudio = null;
     });
 
+    currentAudio.addEventListener("error", () => {
+      resetPlayBtn();
+      currentAudio = null;
+    });
+
     await currentAudio.play();
   } catch(err) {
+    resetPlayBtn();
     console.error("Playback error:", err);
     // AbortError means a second tap interrupted the first play() promise
     // — this is not a real failure, audio is actually playing fine
@@ -1500,6 +1527,12 @@ function closeModal() {
     currentAudio.src = "";
     currentAudio = null;
   }
+
+  // Reset play button in case it was mid-play when dismissed
+  const playBtn = document.getElementById("playMsgBtn");
+  playBtn.classList.remove("is-playing");
+  playBtn.textContent = "▶ PLAY MESSAGE";
+  playBtn.disabled = false;
 
   document.getElementById("playModal").classList.remove("open");
 
