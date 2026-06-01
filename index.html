@@ -3,20 +3,29 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
-<title>Over To You</title>
+<title>Over To You - Voice Messenger</title>
 <meta name="theme-color" content="#090e1a"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Over To You"/>
 <link rel="manifest" href="manifest.json"/>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Nunito:wght@400;600;700&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet"/>
 <style>
 :root{
   --bg:#090e1a; --surface:#111827; --card:#1a2436;
   --border:#243044; --accent:#00d4ff; --accent2:#ff6b35;
   --green:#22c55e; --yellow:#f59e0b; --purple:#a855f7;
   --text:#deeaf8; --muted:#5a7090; --recording:#ef4444;
+  
+  /* Audio Player specific custom rules mapped to core theme colors */
+  --bg-panel: #121e2e;
+  --accent-gold: #f5a623;
+  --accent-cyan: #00d4ff;
+  --accent-red:  #ff4444;
+  --accent-green:#2ecc71;
+  --glow-cyan:  0 0 18px rgba(0,212,255,0.35);
+  --glow-gold:  0 0 18px rgba(245,166,35,0.45);
 }
 *{ box-sizing:border-box; margin:0; padding:0;
    -webkit-user-select:none; user-select:none;
@@ -292,7 +301,7 @@ body::before{
 }
 .friend-card.sending .sending-label{ display:block; }
 
-/* Tap-to-record button (shown instead of hold instruction) */
+/* Tap-to-record button */
 .rec-btn{
   display:none; position:absolute; bottom:10px; left:50%;
   transform:translateX(-50%);
@@ -314,7 +323,7 @@ body::before{
 .friend-card.sending .rec-btn{ display:none; }
 .friend-card.empty .rec-btn{ display:none; }
 
-/* Cancel recording button — top-right corner during recording (Fix 3 / Approach B) */
+/* Cancel recording button */
 .cancel-rec-btn{
   display:none; position:absolute; top:8px; right:8px;
   background:rgba(239,68,68,0.2); border:1.5px solid var(--recording);
@@ -324,10 +333,9 @@ body::before{
   letter-spacing:0.5px;
 }
 .friend-card.recording .cancel-rec-btn{ display:block; }
-/* Remove the margin offset — REC button can now be fully centered */
 .friend-card.recording .rec-btn{ margin-right:0; }
-
 .friend-card.recording .edit-btn{ display:none; }
+
 .duration-pill{
   display:inline-block;
   background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2);
@@ -460,6 +468,8 @@ body::before{
   font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
   cursor:pointer; margin-top:16px;
 }
+
+/* ── UPGRADED INTEGRATED AUDIO PLAYER STYLES ── */
 #playModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
@@ -470,25 +480,166 @@ body::before{
   background:var(--surface); border:1px solid var(--border);
   border-radius:24px 24px 0 0; width:100%;
   max-width:480px; padding:24px 20px 40px; text-align:center;
+  box-shadow: 0 8px 48px rgba(0,0,0,0.6);
 }
-.play-sheet h3{ margin-bottom:4px; }
-.play-sheet p{ color:var(--muted); font-size:0.82rem; margin-bottom:4px; }
-.play-btn,.dismiss-btn,.save-btn{
-  width:100%; border-radius:50px; padding:13px 20px; margin-top:12px;
+.play-sheet h3{ font-family: 'Rajdhani', sans-serif; margin-bottom:4px; font-size: 1.4rem; color: var(--accent); }
+.play-sheet p{ color:var(--muted); font-size:0.85rem; margin-bottom:12px; font-family:'Exo 2', sans-serif; }
+
+/* Status Bar Components */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding: 10px 16px;
+  background: var(--bg-panel);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+}
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.dot.playing  { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: playerDotPulse 1s infinite; }
+.dot.paused   { background: var(--accent-gold);  box-shadow: 0 0 8px var(--accent-gold); }
+.dot.stopped  { background: var(--accent-red);   box-shadow: 0 0 8px var(--accent-red); }
+@keyframes playerDotPulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.status-text.playing { color: var(--accent-green); }
+.status-text.paused  { color: var(--accent-gold); }
+.status-text.stopped { color: var(--accent-red); }
+.status-text.idle    { color: var(--muted); }
+.track-info { font-family:'Rajdhani', sans-serif; font-size: 0.8rem; color: var(--muted); text-align: right; }
+
+/* Timeline Progress Seek Bar */
+.progress-wrap { margin-bottom: 14px; }
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 5px;
+  font-family: 'Rajdhani', sans-serif;
+}
+.progress-bar-bg {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.progress-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
+  border-radius: 10px;
+  transition: width 0.1s linear;
+}
+
+/* Volume Layout */
+.volume-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.volume-row span { font-size: 0.9rem; flex-shrink: 0; }
+.volume-row input[type=range] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+}
+.volume-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--accent-cyan);
+  box-shadow: var(--glow-cyan);
+  cursor: pointer;
+}
+.vol-label { font-family:'Rajdhani', sans-serif; font-size: 0.78rem; color: var(--muted); min-width: 32px; text-align: right; }
+
+/* Pro Media Control Button Grid Grid */
+.btn-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.btn-grid .btn-full { grid-column: 1 / -1; }
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 8px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: var(--bg-panel);
+  color: var(--text);
+}
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
+.btn-play { border-color: rgba(46,204,113,0.3); color: var(--accent-green); }
+.btn-pause { border-color: rgba(245,166,35,0.3); color: var(--accent-gold); }
+.btn-resume { border-color: rgba(0,212,255,0.3); color: var(--accent-cyan); }
+.btn-stop { border-color: rgba(255,68,68,0.3); color: var(--accent-red); }
+.btn-next { border-color: rgba(0,212,255,0.2); color: var(--text); }
+
+/* Decorative cosmetic visualizer element */
+.wave-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 20px;
+  margin: 10px 0;
+}
+.wave-bar {
+  width: 3px;
+  background: linear-gradient(to top, var(--accent-cyan), var(--accent-gold));
+  border-radius: 2px;
+  height: 4px;
+}
+.wave-bar.animating { animation: playWaveAnim 0.8s ease-in-out infinite; }
+.wave-bar:nth-child(1)  { animation-delay: 0.0s; }
+.wave-bar:nth-child(2)  { animation-delay: 0.1s; }
+.wave-bar:nth-child(3)  { animation-delay: 0.2s; }
+.wave-bar:nth-child(4)  { animation-delay: 0.3s; }
+.wave-bar:nth-child(5)  { animation-delay: 0.15s; }
+.wave-bar:nth-child(6)  { animation-delay: 0.25s; }
+@keyframes playWaveAnim { 0%,100% { height: 4px; } 50% { height: 18px; } }
+
+/* Main app action buttons */
+.play-btn, .dismiss-btn, .save-btn{
+  width:100%; border-radius:50px; padding:12px 20px; margin-top:8px;
   cursor:pointer; font-family:'Rajdhani',sans-serif;
   font-size:1rem; font-weight:700;
 }
-.play-btn{
-  background:linear-gradient(135deg,var(--accent),#0099bb);
-  border:none; color:#000;
-}
-.dismiss-btn{
-  background:transparent; border:1px solid var(--border); color:var(--muted);
-}
-.save-btn{
-  display:none; background:transparent;
-  border:1px solid var(--yellow); color:var(--yellow);
-}
+.dismiss-btn{ background:transparent; border:1px solid var(--border); color:var(--muted); }
+.save-btn{ display:none; background:transparent; border:1px solid var(--yellow); color:var(--yellow); }
 .save-btn.visible{ display:block; }
 
 /* ── TOAST ── */
@@ -570,7 +721,7 @@ body::before{
   <div class="instructions">
     Tap card to record · Tap again to send · Tap badge to play messages
   </div>
-  <!-- Inbox banner — shown when messages are waiting, user taps when ready -->
+  <!-- Inbox banner — shown when messages are waiting -->
   <div id="inboxBanner">
     <div class="inbox-text" id="inboxBannerText">📩 1 new message</div>
     <div class="inbox-tap">TAP TO LISTEN ›</div>
@@ -613,22 +764,56 @@ body::before{
   </div>
 </div>
 
-<!-- PLAY MODAL -->
+<!-- UPGRADED PLAY MODAL CONTROLS -->
 <div id="playModal">
   <div class="play-sheet">
     <h3 id="playFromName">Voice Message</h3>
     <p  id="playTime">Received just now</p>
-    <div id="playProgress" style="display:none;font-size:0.75rem;color:var(--muted);margin-top:2px;font-family:'Rajdhani',sans-serif;letter-spacing:1px"></div>
-    <div id="playDuration" class="duration-pill" style="display:none">⏱ --:--</div>
-    <div id="playingStatus" style="display:none;padding:14px 0 2px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--green);letter-spacing:1px;text-align:center">🔊 PLAYING…</div>
-    <!-- Playback controls — shown while audio is active -->
-    <div id="playControls" style="display:none;display:none;gap:8px;margin-top:12px">
-      <button class="play-btn"    id="pauseResumeBtn">⏸ PAUSE</button>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="dismiss-btn" id="stopBtn"  style="flex:1">⏹ STOP</button>
-        <button class="dismiss-btn" id="nextBtn"  style="flex:1">NEXT ⏭</button>
+    <div id="playProgress" style="display:none;font-size:0.75rem;color:var(--muted);margin-top:2px;font-family:'Rajdhani',sans-serif;letter-spacing:1px;margin-bottom:8px"></div>
+    
+    <!-- Cosmetic Audio Visualizer bars -->
+    <div class="wave-container" id="playWaveContainer">
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+    </div>
+
+    <!-- Status Bar Area -->
+    <div class="status-bar">
+      <div class="status-indicator">
+        <div class="dot" id="playerStatusDot"></div>
+        <span class="status-text idle" id="playerStatusText">IDLE</span>
+      </div>
+      <div class="track-info" id="playerTrackInfo">— / —</div>
+    </div>
+
+    <!-- Interactive Seekable Progress Bar Elements -->
+    <div class="progress-wrap">
+      <div class="progress-labels">
+        <span id="playerTimeCurrent">0:00</span>
+        <span id="playerTimeTotal">0:00</span>
+      </div>
+      <div class="progress-bar-bg" id="playerProgressBarBg">
+        <div class="progress-bar-fill" id="playerProgressFill"></div>
       </div>
     </div>
+
+    <!-- Live Volume Slider Component Matrix -->
+    <div class="volume-row">
+      <span>🔈</span>
+      <input type="range" id="playerVolumeSlider" min="0" max="100" value="80" />
+      <span>🔊</span>
+      <span class="vol-label" id="playerVolLabel">80%</span>
+    </div>
+
+    <!-- Media Engineering Control Matrix Buttons Grid Row -->
+    <div class="btn-grid" id="integratedMediaGrid">
+      <button class="btn btn-play" id="mediaPlayBtn">▶ Play</button>
+      <button class="btn btn-pause" id="mediaPauseBtn" disabled>⏸ Pause</button>
+      <button class="btn btn-resume" id="mediaResumeBtn" disabled>▶ Resume</button>
+      <button class="btn btn-stop" id="mediaStopBtn" disabled>⏹ Stop</button>
+      <button class="btn btn-next btn-full" id="mediaNextBtn" disabled>NEXT MESSAGE ⏭</button>
+    </div>
+
     <button class="save-btn"    id="saveBtn">💾 SAVE TO PHONE</button>
     <button class="dismiss-btn" id="goHomeBtn">✕ Close &amp; go back</button>
   </div>
@@ -677,7 +862,7 @@ const messageQueue = [];
 let   queuePlaying = false;
 
 let currentUser        = null;
-let myProfile          = null;  // always { name, email, friendCode } — name NEVER from email
+let myProfile          = null;  
 let myFriends          = [];
 let mediaStream        = null;
 let mediaRecorder      = null;
@@ -686,16 +871,18 @@ let isRecording        = false;
 let pendingMessage     = null;
 let lastLoginTimestamp = 0;
 let listenerAttached   = false;
-let messageListenerOff = null;  // unsubscribe handle for onChildAdded
+let messageListenerOff = null;  
 let editingIndex       = null;
-let currentAudio       = null;   // global handle — prevents orphaned audio streams
-let unreadCounts       = {};     // { senderId: count } — unread message counts per contact
-let historyAudio       = null;   // separate handle for history playback
+let currentAudio       = null;   
+let unreadCounts       = {};     
+let historyAudio       = null;   
 
 let recTimerInterval  = null;
 let recAutoStopTimer  = null;
 let recSecondsElapsed = 0;
 let activeRecCard     = null;
+
+let playerState       = 'idle'; // idle | playing | paused | stopped
 
 // ── UI helpers ────────────────────────────────
 
@@ -742,7 +929,8 @@ function escapeHtml(s) {
           .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 }
 function formatTime(s) {
-  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
+  if (!s || isNaN(s)) return '0:00';
+  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(Math.floor(s%60)).padStart(2,"0");
 }
 function vibrateStart() { try { if (navigator.vibrate) navigator.vibrate(80); } catch(e){} }
 function vibrateSent()  { try { if (navigator.vibrate) navigator.vibrate([60,40,60]); } catch(e){} }
@@ -781,24 +969,15 @@ function friendlyAuthError(code) {
   return m[code] || "❌ " + (code || "Unknown error");
 }
 
-// ── Name validation ───────────────────────────
-// Ensures the name field contains real letters — never auto-generated
-
 function validateName(raw) {
   if (!raw || !raw.trim()) return null;
   const trimmed = raw.trim();
-  // Must contain at least 2 actual letters anywhere in the name
-  // Allows spaces, dots, hyphens — so M.K. Gandhi and Jean-Luc are valid
   if (trimmed.replace(/[^a-zA-Z]/g, "").length < 2) return null;
-  // Only allow letters, spaces, dots, hyphens, apostrophes
   if (!/^[a-zA-Z][a-zA-Z\s.\-']+$/.test(trimmed)) return null;
   return trimmed;
 }
 
-// ── Friend code generation ────────────────────
-
 function makeCodePrefix(name) {
-  // First word only, uppercase letters only, max 6 chars
   const first = name.trim().split(/\s+/)[0] || name;
   return first.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 6) || "USER";
 }
@@ -815,22 +994,17 @@ async function generateUniqueFriendCode(name) {
   return code;
 }
 
-// ── Default friends ───────────────────────────
-
 function getDefaultFriends() {
   const slots = [];
   for (let i = 0; i < TOTAL_CARDS; i++) {
     slots.push({ id: null, label: "", town: "", code: "", status: "empty" });
   }
-  // Broadcast slot always last
   slots.push({
     id: "__broadcast__", label: "BROADCAST",
     town: "Everyone", code: "", status: "broadcast"
   });
   return slots;
 }
-
-// ── Save profile ──────────────────────────────
 
 async function saveUserProfile() {
   if (!currentUser || !myProfile) return;
@@ -843,8 +1017,6 @@ async function saveUserProfile() {
   });
 }
 
-// ── Show login screen cleanly ─────────────────
-
 function showLoginScreen() {
   document.getElementById("appScreen").style.display    = "none";
   document.getElementById("loginScreen").style.display  = "flex";
@@ -854,32 +1026,21 @@ function showLoginScreen() {
   document.getElementById("tabSignup").classList.add("active");
   document.getElementById("tabSignin").classList.remove("active");
   clearLoginError();
-  // Detach listener — prevents double-listener accumulation on re-login
   if (messageListenerOff) { messageListenerOff(); messageListenerOff = null; }
   currentUser = null; myProfile = null; myFriends = [];
   listenerAttached = false;
 }
 
-// ── Boot app ──────────────────────────────────
-// Only called after confirmed auth AND confirmed DB record
-
 async function bootApp(user) {
   currentUser = user;
-
   const snap = await get(ref(db, "users/" + currentUser.uid));
-
   if (!snap.exists()) {
-    // ── STRICT: no DB record = sign out, show login ──
-    // Never auto-generate a profile from email
     console.warn("OTY: Auth session found but no DB record. Signing out.");
     await signOut(auth);
     showLoginScreen();
     return;
   }
-
   const data = snap.val();
-
-  // ── STRICT: name must exist in DB record ──
   if (!data.name || data.name.trim().length < 2) {
     console.warn("OTY: DB record has no valid name. Signing out.");
     await signOut(auth);
@@ -899,7 +1060,6 @@ async function bootApp(user) {
 
   await update(ref(db, "users/" + currentUser.uid), { lastSeen: Date.now() });
 
-  // Show app
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("appScreen").style.display   = "flex";
   document.getElementById("headerCode").textContent    = myProfile.friendCode;
@@ -908,64 +1068,50 @@ async function bootApp(user) {
     copyToClipboard(myProfile.friendCode, "📋 " + myProfile.friendCode + " copied!");
 
   await initMicrophone();
-  // Load unread counts from DB before building dashboard
   await loadUnreadCounts();
   buildDashboard();
   if (!listenerAttached) { listenerAttached = true; listenForMessages(); }
-
-  // Silent 30-day cleanup — runs in background, ₹0 cost
   cleanupOldMessages().catch(e => console.warn("Cleanup error:", e));
 }
 
-// ── SIGN UP ───────────────────────────────────
-
+// ── SIGN UP ──
 document.getElementById("signupBtn").onclick = async () => {
   const btn = document.getElementById("signupBtn");
-  btn.disabled = true; btn.textContent = "Please wait…";  // Point 5
+  btn.disabled = true; btn.textContent = "Please wait…";  
   clearLoginError();
 
-  // ── STRICT name validation ──
   const rawName = document.getElementById("signupName").value;
   const name    = validateName(rawName);
   if (!name) {
     showError("❌ Please enter your real name (at least 2 letters).");
     document.getElementById("signupName").focus();
+    btn.disabled = false; btn.textContent = "CREATE ACCOUNT →";
     return;
   }
 
   const email = document.getElementById("signupEmail").value.trim();
   const pass  = document.getElementById("signupPass").value;
 
-  if (!email) { showError("❌ Enter your email address."); return; }
-  if (pass.length < 6) { showError("❌ Password needs at least 6 characters."); return; }
+  if (!email) { showError("❌ Enter your email address."); btn.disabled = false; btn.textContent = "CREATE ACCOUNT →"; return; }
+  if (pass.length < 6) { showError("❌ Password needs at least 6 characters."); btn.disabled = false; btn.textContent = "CREATE ACCOUNT →"; return; }
 
   try {
-    // Generate code BEFORE creating auth account
-    // so if this fails we haven't created a broken account
     const friendCode = await generateUniqueFriendCode(name);
-
-    // Create Firebase Auth account
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     currentUser = cred.user;
 
-    // Build profile strictly from the validated name input — NEVER from email
     myProfile = { name, email, friendCode };
     myFriends = getDefaultFriends();
     lastLoginTimestamp = Date.now();
 
-    // Write to DB
     const profileData = {
       name, email, friendCode,
       friends:  myFriends,
       lastSeen: Date.now()
     };
     await set(ref(db, "users/" + currentUser.uid), profileData);
+    await set(ref(db, "global_directory/" + friendCode.toLowerCase()), { uid: currentUser.uid, name });
 
-    // Write to global_directory so others can find this user by code
-    await set(ref(db, "global_directory/" + friendCode.toLowerCase()),
-              { uid: currentUser.uid, name });
-
-    // Show success message then code reveal
     document.getElementById("signupFields").style.display = "none";
     showSuccess("✅ Account created successfully!");
     document.getElementById("codeDisplay").textContent   = friendCode;
@@ -973,15 +1119,12 @@ document.getElementById("signupBtn").onclick = async () => {
 
   } catch(err) {
     console.error("Signup error:", err);
-    // Point 4: If DB write failed after auth account was created, roll back
     if (currentUser && err.code !== "auth/email-already-in-use") {
       try { await currentUser.delete(); } catch(e) { console.warn("Rollback failed:", e); }
       currentUser = null;
     }
     showError(friendlyAuthError(err.code || err.message));
   } finally {
-    // Point 5: always re-enable button
-    const btn = document.getElementById("signupBtn");
     btn.disabled = false; btn.textContent = "CREATE ACCOUNT →";
   }
 };
@@ -1000,8 +1143,7 @@ document.getElementById("codeGoBtn").onclick = async () => {
   }
 };
 
-// ── SIGN IN ───────────────────────────────────
-
+// ── SIGN IN ──
 document.getElementById("signinBtn").onclick = async () => {
   clearLoginError();
   const email = document.getElementById("signinEmail").value.trim();
@@ -1020,8 +1162,7 @@ document.getElementById("signinBtn").onclick = async () => {
   }
 };
 
-// ── FORGOT PASSWORD ───────────────────────────
-
+// ── FORGOT PASSWORD ──
 document.getElementById("forgotBtn").onclick = async () => {
   clearLoginError();
   const email = document.getElementById("signinEmail").value.trim();
@@ -1032,14 +1173,9 @@ document.getElementById("forgotBtn").onclick = async () => {
   } catch(err) { showError(friendlyAuthError(err.code)); }
 };
 
-// ── AUTH STATE OBSERVER ───────────────────────
-// STRICT: if no DB record exists, sign out immediately — never auto-generate
-
 onAuthStateChanged(auth, async (user) => {
-  if (!user) return;  // not logged in — do nothing
-  // Only auto-boot if the app screen isn't already showing
+  if (!user) return;  
   if (document.getElementById("appScreen").style.display === "flex") return;
-  // Only auto-boot if we're not mid-signup (codeReveal visible)
   if (document.getElementById("codeReveal").style.display === "flex") return;
   try {
     await bootApp(user);
@@ -1050,8 +1186,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-// ── SIGN OUT ──────────────────────────────────
-
 document.getElementById("signoutBtn").onclick = async () => {
   if (!confirm("Sign out?")) return;
   if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
@@ -1059,21 +1193,19 @@ document.getElementById("signoutBtn").onclick = async () => {
   showLoginScreen();
 };
 
-// ── MICROPHONE ────────────────────────────────
-
+// ── MICROPHONE ──
 async function initMicrophone() {
   try {
     if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
     mediaStream = await navigator.mediaDevices.getUserMedia({
       audio: {
-        echoCancellation: true,    // keeps echo suppressed in shared spaces
-        noiseSuppression: false,   // off — prevents vocal phase artifacts
-        autoGainControl:  true,    // keeps volume normalised
-        sampleRate:       44100    // matched to 128kbps encoder below
+        echoCancellation: true,    
+        noiseSuppression: false,   
+        autoGainControl:  true,    
+        sampleRate:       44100    
       }
     });
   } catch(err) {
-    // Constraints rejected — fall back to basic audio
     try {
       mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch(e) {
@@ -1083,8 +1215,7 @@ async function initMicrophone() {
   }
 }
 
-// ── RECORDING TIMER ───────────────────────────
-
+// ── RECORDING TIMER ──
 function startRecTimer(card) {
   recSecondsElapsed = 0; activeRecCard = card;
   const timerEl = card.querySelector(".rec-timer");
@@ -1121,10 +1252,6 @@ function stopRecTimer() {
   }
 }
 
-// ── MEDIA RECORDER with safe fallback ────────
-// Fix for Point 4: try preferred format first,
-// silently fall back to browser-native if rejected
-
 function createMediaRecorder(stream) {
   const preferred = [
     "audio/mp4;codecs=mp4a.40.2",
@@ -1132,9 +1259,6 @@ function createMediaRecorder(stream) {
     "audio/webm;codecs=opus",
     "audio/webm"
   ];
-
-  // Explicit bitrate prevents mobile browsers from crushing quality
-  // 128kbps gives clear voice without excessive file size
   const recorderOptions = { audioBitsPerSecond: 128000 };
 
   for (const mime of preferred) {
@@ -1147,8 +1271,6 @@ function createMediaRecorder(stream) {
       console.warn("OTY: Format rejected at runtime:", mime, e);
     }
   }
-
-  // Final fallback — no mimeType but keep bitrate constraint
   console.warn("OTY: All preferred formats failed. Using browser default @ 128kbps.");
   return new MediaRecorder(stream, recorderOptions);
 }
@@ -1160,22 +1282,16 @@ function extForRecorder(mr) {
   return ".webm";
 }
 
-// ── AUDIO UPLOAD ──────────────────────────────
-
+// ── AUDIO UPLOAD ──
 async function uploadAudio(blob, recipientUid, ext) {
-  // Validate blob before attempting upload
   if (!blob || blob.size === 0) {
     throw new Error("Audio blob is empty — recording may have failed");
   }
-
   const fd = new FormData();
   const filename = currentUser.uid + "_" + recipientUid + "_" + Date.now() + ext;
   fd.append("file",          new File([blob], filename, { type: blob.type || "audio/webm" }));
   fd.append("upload_preset", CLOUDINARY_PRESET);
   fd.append("resource_type", "video");
-
-  console.log("OTY Upload: blob size =", blob.size, "type =", blob.type, "ext =", ext);
-  console.log("OTY Upload: cloud =", CLOUDINARY_CLOUD, "preset =", CLOUDINARY_PRESET);
 
   let res;
   try {
@@ -1202,12 +1318,10 @@ async function uploadAudio(blob, recipientUid, ext) {
   if (!data.secure_url) {
     throw new Error("Cloudinary response missing secure_url: " + JSON.stringify(data));
   }
-  console.log("OTY Upload: success, url =", data.secure_url);
   return data.secure_url;
 }
 
-// ── SEND MESSAGE ──────────────────────────────
-
+// ── SEND MESSAGE ──
 async function sendToOne(friendId, friendLabel, audioUrl, duration) {
   const msgRef = push(ref(db, "messages/" + friendId));
   await set(msgRef, {
@@ -1223,8 +1337,6 @@ async function sendToOne(friendId, friendLabel, audioUrl, duration) {
 
 async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
   if (!audioChunks.length) { toast("No audio recorded"); return; }
-
-  // Show sending state on card
   if (sendingCard) {
     sendingCard.classList.add("sending");
     const sl = sendingCard.querySelector(".sending-label");
@@ -1235,7 +1347,7 @@ async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
     const mime     = mediaRecorder.mimeType || "";
     const ext      = extForRecorder(mediaRecorder);
     const blob     = new Blob(audioChunks, { type: mime || "audio/webm" });
-    const duration = recSecondsElapsed; // seconds recorded
+    const duration = recSecondsElapsed; 
     const audioUrl = await uploadAudio(blob, isBroadcast ? "broadcast" : friend.id, ext);
 
     if (isBroadcast) {
@@ -1256,7 +1368,6 @@ async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
     console.error("Send error:", err);
     toast("❌ " + (err.message || "Failed to send — check connection"), 5000);
   } finally {
-    // Always clear sending state
     if (sendingCard) {
       sendingCard.classList.remove("sending");
       const sl = sendingCard.querySelector(".sending-label");
@@ -1265,12 +1376,7 @@ async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
   }
 }
 
-// ── MESSAGE QUEUE ─────────────────────────────
-
-// ── UNREAD COUNTS ────────────────────────────
-// Loads unread message counts from DB on boot
-// Gives accurate counts even for messages received while offline
-
+// ── UNREAD COUNTS ──
 async function loadUnreadCounts() {
   try {
     const msgsRef = ref(db, "messages/" + currentUser.uid);
@@ -1283,20 +1389,15 @@ async function loadUnreadCounts() {
         unreadCounts[msg.from] = (unreadCounts[msg.from] || 0) + 1;
       }
     });
-    // Rebuild queue from unread messages for the banner
-    // so the banner shows correctly even for messages from previous sessions
     const totalUnread = Object.values(unreadCounts).reduce((a,b) => a+b, 0);
     if (totalUnread > 0) {
-      // Populate messageQueue from DB for banner accuracy
       await populateQueueFromDB();
     }
-    console.log("OTY: Unread counts loaded:", unreadCounts, "total:", totalUnread);
   } catch(e) {
     console.warn("OTY: Could not load unread counts:", e.message);
   }
 }
 
-// Populate messageQueue from unread DB messages received since last login
 async function populateQueueFromDB() {
   try {
     const msgsRef = ref(db, "messages/" + currentUser.uid);
@@ -1305,8 +1406,6 @@ async function populateQueueFromDB() {
     const unread = [];
     snap.forEach((child) => {
       const msg = child.val();
-      // Only queue messages that are unread AND arrived after last login
-      // Older unread messages are stale backlog — visible in history, not as alerts
       if (msg && !msg.isRead && msg.timestamp > lastLoginTimestamp) {
         unread.push({
           audioUrl:   msg.audioUrl,
@@ -1318,19 +1417,15 @@ async function populateQueueFromDB() {
         });
       }
     });
-    // Newest first
     unread.sort((a,b) => b.timestamp - a.timestamp);
     messageQueue.push(...unread);
-    console.log("OTY: Loaded", unread.length, "new unread message(s) into queue");
   } catch(e) {
     console.warn("OTY: Could not populate queue:", e.message);
   }
 }
 
 function updateBadge(senderId, delta) {
-  // delta = +1 (new message) or -1 (message read)
   unreadCounts[senderId] = Math.max(0, (unreadCounts[senderId] || 0) + delta);
-  // Update the badge on the matching card
   const card = document.querySelector(".friend-card[data-friend-id='" + senderId + "']");
   if (!card) return;
   const badge = card.querySelector(".unread-badge");
@@ -1346,37 +1441,25 @@ function updateBadge(senderId, delta) {
   }
 }
 
-// ── 30-DAY MESSAGE CLEANUP ─────────────────────
-// Runs silently on login. Deletes messages older than 30 days
-// from the user's own inbox. No Cloud Functions, no paid plan needed.
-
+// ── 30-DAY CLEANUP ──
 async function cleanupOldMessages() {
   const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
   const cutoff         = Date.now() - THIRTY_DAYS_MS;
-
   try {
     const msgsRef = ref(db, "messages/" + currentUser.uid);
     const snap    = await get(msgsRef);
     if (!snap.exists()) return;
-
     const deletions = [];
     snap.forEach((child) => {
       const msg = child.val();
-      if (msg.timestamp && msg.timestamp < cutoff) {
-        // Only delete if already read — never delete unread messages
-        if (msg.isRead) {
-          deletions.push(remove(ref(db,
-            "messages/" + currentUser.uid + "/" + child.key)));
-        }
+      if (msg.timestamp && msg.timestamp < cutoff && msg.isRead) {
+        deletions.push(remove(ref(db, "messages/" + currentUser.uid + "/" + child.key)));
       }
     });
-
     if (deletions.length) {
       await Promise.all(deletions);
-      console.log("OTY Cleanup: removed " + deletions.length + " old message(s)");
     }
   } catch(e) {
-    // Cleanup failure is non-critical — log and continue
     console.warn("OTY Cleanup failed:", e.message);
   }
 }
@@ -1386,7 +1469,7 @@ function listenForMessages() {
   const msgQuery = query(msgsRef, orderByChild("timestamp"), startAt(lastLoginTimestamp + 1));
   messageListenerOff = onChildAdded(msgQuery, (snap) => {
     const data = snap.val(); if (!data) return;
-    if (data.isRead) return; // already read — show in history only, not as alert
+    if (data.isRead) return; 
     messageQueue.push({
       audioUrl:   data.audioUrl,
       senderName: data.fromName,
@@ -1395,13 +1478,12 @@ function listenForMessages() {
       timestamp:  data.timestamp,
       duration:   data.duration || 0
     });
-    updateBadge(data.from, +1);  // increment unread badge on card
+    updateBadge(data.from, +1);  
     if (!queuePlaying) showNextInQueue();
   });
 }
 
-// ── INBOX BANNER MANAGEMENT ──────────────────
-
+// ── INBOX BANNER MANAGEMENT ──
 function updateInboxBanner() {
   const banner  = document.getElementById("inboxBanner");
   const textEl  = document.getElementById("inboxBannerText");
@@ -1415,7 +1497,6 @@ function updateInboxBanner() {
   }
 }
 
-// Called when user taps the inbox banner — starts playing queue
 function startListening() {
   if (!messageQueue.length) {
     document.getElementById("inboxBanner").classList.remove("visible");
@@ -1425,32 +1506,25 @@ function startListening() {
 }
 
 function showNextInQueue(userInitiated) {
-  // If modal is already open, wait — don't overwrite current message
   if (document.getElementById("playModal").classList.contains("open")) return;
-
   if (!messageQueue.length) {
     queuePlaying = false;
     document.getElementById("inboxBanner").classList.remove("visible");
     return;
   }
 
-  // Don't auto-open modal — update banner and wait for user tap
   updateInboxBanner();
   if (!userInitiated) { queuePlaying = false; return; }
 
   queuePlaying   = true;
   pendingMessage = messageQueue.shift();
-  updateInboxBanner(); // update count after shift
+  updateInboxBanner(); 
 
-  document.getElementById("playFromName").textContent =
-    "📩 From " + escapeHtml(pendingMessage.senderName);
-  document.getElementById("playTime").textContent =
-    new Date(pendingMessage.timestamp).toLocaleTimeString();
+  document.getElementById("playFromName").textContent = "📩 From " + escapeHtml(pendingMessage.senderName);
+  document.getElementById("playTime").textContent = new Date(pendingMessage.timestamp).toLocaleTimeString();
 
-  // Show "Message X of Y" progress
-  const total      = messageQueue.length;  // remaining after shift
+  const total      = messageQueue.length;  
   const progEl     = document.getElementById("playProgress");
-  // We don't track total played easily, so show remaining
   if (total > 0) {
     progEl.textContent = (total + 1) + " messages — listening in order";
     progEl.style.display = "block";
@@ -1458,135 +1532,169 @@ function showNextInQueue(userInitiated) {
     progEl.style.display = "none";
   }
 
-  // Show duration if available
-  const durEl = document.getElementById("playDuration");
-  if (pendingMessage.duration) {
-    durEl.textContent   = "⏱ " + formatTime(Math.round(pendingMessage.duration));
-    durEl.style.display = "inline-block";
-  } else {
-    durEl.style.display = "none";
-  }
-
   document.getElementById("saveBtn").classList.remove("visible");
   document.getElementById("playModal").classList.add("open");
-  // Fix 1: honour the user's intent immediately — no second tap needed
-  playMessage();
+  
+  // Initialize and auto-play item
+  loadAndPlayAudioInstance(pendingMessage.audioUrl);
 }
 
-async function playMessage() {
-  if (!pendingMessage) return;
+// ── ADVANCED AUDIO PLAYER DRIVER ENGINE ──
+function setPlayerUIState(s) {
+  playerState = s;
+  const statusDot = document.getElementById("playerStatusDot");
+  const statusText = document.getElementById("playerStatusText");
+  const waveBars = document.querySelectorAll("#playWaveContainer .wave-bar");
 
-  const statusEl   = document.getElementById("playingStatus");
-  const controlsEl = document.getElementById("playControls");
-  const pauseBtn   = document.getElementById("pauseResumeBtn");
+  statusDot.className = 'dot';
+  statusText.className = 'status-text';
+  waveBars.forEach(b => b.classList.remove('animating'));
 
-  statusEl.style.display   = "block";
-  controlsEl.style.display = "flex";
-  controlsEl.style.flexDirection = "column";
-  pauseBtn.textContent     = "⏸ PAUSE";
+  if (s === 'playing') {
+    statusDot.classList.add('playing');
+    statusText.classList.add('playing');
+    statusText.textContent = 'PLAYING…';
+    waveBars.forEach(b => b.classList.add('animating'));
+  } else if (s === 'paused') {
+    statusDot.classList.add('paused');
+    statusText.classList.add('paused');
+    statusText.textContent = 'PAUSED';
+  } else if (s === 'stopped') {
+    statusDot.classList.add('stopped');
+    statusText.classList.add('stopped');
+    statusText.textContent = 'STOPPED';
+  } else {
+    statusText.classList.add('idle');
+    statusText.textContent = 'IDLE';
+  }
+  updatePlayerControlButtons();
+}
 
+function updatePlayerControlButtons() {
+  const hasAudio = currentAudio != null;
+  document.getElementById('mediaPlayBtn').disabled   = !hasAudio || playerState === 'playing';
+  document.getElementById('mediaPauseBtn').disabled  = playerState !== 'playing';
+  document.getElementById('mediaResumeBtn').disabled = playerState !== 'paused';
+  document.getElementById('mediaStopBtn').disabled   = playerState === 'idle' || playerState === 'stopped';
+  document.getElementById('mediaNextBtn').disabled   = messageQueue.length === 0;
+}
+
+async function loadAndPlayAudioInstance(url) {
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
     currentAudio = null;
   }
-
-  function hideControls() {
-    statusEl.style.display   = "none";
-    controlsEl.style.display = "none";
-  }
-
-  async function markReadAndAdvance() {
-    try {
-      await update(ref(db,
-        "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
-        { isRead: true });
-      if (pendingMessage && pendingMessage.senderId) {
-        updateBadge(pendingMessage.senderId, -1);
-      }
-    } catch(e) { console.warn("Could not mark message as read:", e); }
-    currentAudio = null;
-    document.getElementById("playModal").classList.remove("open");
-    document.getElementById("saveBtn").classList.remove("visible");
-    pendingMessage = null;
-    setTimeout(() => showNextInQueue(true), 400);
-  }
+  setPlayerUIState('idle');
 
   try {
-    currentAudio = new Audio(pendingMessage.audioUrl);
+    currentAudio = new Audio(url);
     document.getElementById("saveBtn").classList.add("visible");
 
+    // Re-synchronize standard setup ranges
+    const slider = document.getElementById("playerVolumeSlider");
+    currentAudio.volume = slider.value / 100;
+
+    // Direct wiring events
+    currentAudio.addEventListener("timeupdate", () => {
+      if (!currentAudio || !currentAudio.duration) return;
+      const cur = currentAudio.currentTime;
+      const dur = currentAudio.duration;
+      document.getElementById("playerTimeCurrent").textContent = formatTime(cur);
+      document.getElementById("playerProgressFill").style.width = ((cur / dur) * 100) + '%';
+    });
+
+    currentAudio.addEventListener("loadedmetadata", () => {
+      if(!currentAudio) return;
+      document.getElementById("playerTimeTotal").textContent = formatTime(currentAudio.duration);
+      document.getElementById("playerTrackInfo").textContent = "1 / " + (messageQueue.length + 1);
+    });
+
     currentAudio.addEventListener("ended", async () => {
-      hideControls();
-      await markReadAndAdvance();
+      setPlayerUIState('stopped');
+      await markCurrentMessageRead();
+      advanceQueueNext();
     });
 
     currentAudio.addEventListener("error", () => {
-      hideControls();
-      currentAudio = null;
-      toast("❌ Playback failed — skipping to next");
-      document.getElementById("playModal").classList.remove("open");
-      pendingMessage = null;
-      setTimeout(() => showNextInQueue(true), 400);
+      setPlayerUIState('idle');
+      toast("❌ Playback failed — skipping track");
+      advanceQueueNext();
     });
 
     await currentAudio.play();
+    setPlayerUIState('playing');
+
   } catch(err) {
-    hideControls();
-    console.error("Playback error:", err);
-    if (err.name !== "AbortError" && err.name !== "NotAllowedError") {
-      toast("❌ Playback failed — tap the banner to retry");
-    }
-    if (err.name !== "AbortError") currentAudio = null;
+    console.error("Engine playback fail:", err);
+    setPlayerUIState('idle');
   }
 }
 
-// ── PAUSE / RESUME ────────────────────────────
-document.getElementById("pauseResumeBtn").addEventListener("click", () => {
-  if (!currentAudio) return;
-  const pauseBtn = document.getElementById("pauseResumeBtn");
-  const statusEl = document.getElementById("playingStatus");
-  if (currentAudio.paused) {
-    currentAudio.play();
-    pauseBtn.textContent   = "⏸ PAUSE";
-    statusEl.style.display = "block";
-  } else {
+async function markCurrentMessageRead() {
+  if (!pendingMessage) return;
+  try {
+    await update(ref(db, "messages/" + currentUser.uid + "/" + pendingMessage.messageId), { isRead: true });
+    if (pendingMessage.senderId) {
+      updateBadge(pendingMessage.senderId, -1);
+    }
+  } catch(e) { console.warn("Failed syncing read bit:", e); }
+}
+
+function advanceQueueNext() {
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
+  document.getElementById("playModal").classList.remove("open");
+  document.getElementById("saveBtn").classList.remove("visible");
+  pendingMessage = null;
+  setPlayerUIState('idle');
+  setTimeout(() => showNextInQueue(true), 400);
+}
+
+// Wire Dashboard Integrated Audio Interactions
+document.getElementById('mediaPlayBtn').onclick = () => {
+  if (currentAudio && playerState !== 'playing') {
+    currentAudio.play().then(() => setPlayerUIState('playing'));
+  }
+};
+document.getElementById('mediaPauseBtn').onclick = () => {
+  if (currentAudio && playerState === 'playing') {
     currentAudio.pause();
-    pauseBtn.textContent   = "▶ RESUME";
-    statusEl.style.display = "none";
+    setPlayerUIState('paused');
   }
-});
-
-// ── STOP (marks read, closes, no next) ───────
-document.getElementById("stopBtn").addEventListener("click", async () => {
-  if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
-  document.getElementById("playingStatus").style.display   = "none";
-  document.getElementById("playControls").style.display    = "none";
-  // Mark as read since user chose to stop (they've heard enough)
-  if (pendingMessage) {
-    try {
-      await update(ref(db,
-        "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
-        { isRead: true });
-      if (pendingMessage.senderId) updateBadge(pendingMessage.senderId, -1);
-    } catch(e) { console.warn("Stop: could not mark read:", e); }
+};
+document.getElementById('mediaResumeBtn').onclick = () => {
+  if (currentAudio && playerState === 'paused') {
+    currentAudio.play().then(() => setPlayerUIState('playing'));
   }
-  document.getElementById("playModal").classList.remove("open");
-  document.getElementById("saveBtn").classList.remove("visible");
-  pendingMessage = null;
-  updateInboxBanner();
-});
+};
+document.getElementById('mediaStopBtn').onclick = async () => {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+  }
+  setPlayerUIState('stopped');
+  document.getElementById("playerProgressFill").style.width = '0%';
+  document.getElementById("playerTimeCurrent").textContent = '0:00';
+  await markCurrentMessageRead();
+};
+document.getElementById('mediaNextBtn').onclick = () => {
+  advanceQueueNext();
+};
 
-// ── NEXT (skip to next in queue) ─────────────
-document.getElementById("nextBtn").addEventListener("click", () => {
-  if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
-  document.getElementById("playingStatus").style.display   = "none";
-  document.getElementById("playControls").style.display    = "none";
-  document.getElementById("playModal").classList.remove("open");
-  document.getElementById("saveBtn").classList.remove("visible");
-  pendingMessage = null;
-  setTimeout(() => showNextInQueue(true), 300);
-});
+// Precise Timeline Scrubbing Selector
+document.getElementById('playerProgressBarBg').onclick = (e) => {
+  if (!currentAudio || !currentAudio.duration) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const ratio = (e.clientX - rect.left) / rect.width;
+  currentAudio.currentTime = ratio * currentAudio.duration;
+};
+
+// Volume Multiplier
+document.getElementById('playerVolumeSlider').oninput = (e) => {
+  const val = e.target.value;
+  if (currentAudio) currentAudio.volume = val / 100;
+  document.getElementById('playerVolLabel').textContent = val + '%';
+};
 
 function saveMessageAudio() {
   if (!pendingMessage) return;
@@ -1603,21 +1711,19 @@ function closeModal() {
     currentAudio.src = "";
     currentAudio = null;
   }
-  document.getElementById("playingStatus").style.display   = "none";
-  document.getElementById("playControls").style.display    = "none";
+  setPlayerUIState('idle');
   document.getElementById("playModal").classList.remove("open");
   document.getElementById("saveBtn").classList.remove("visible");
   pendingMessage = null;
+  updateInboxBanner();
 }
 
-// ── EDIT SHEET ────────────────────────────────
-
+// ── EDIT SHEET ──
 function openEditSheet(idx) {
   editingIndex = idx;
   const f = myFriends[idx];
   const isBroadcast = f.id === "__broadcast__";
   document.getElementById("editTitle").textContent       = isBroadcast ? "Broadcast Card" : "Set Up Contact";
-  // Broadcast: label is locked — only town is editable
   document.getElementById("editLabel").value             = isBroadcast ? "BROADCAST (fixed)" : (f.label || "");
   document.getElementById("editLabel").disabled          = isBroadcast;
   document.getElementById("editLabel").style.opacity     = isBroadcast ? "0.4" : "1";
@@ -1637,14 +1743,13 @@ document.getElementById("editSaveBtn").onclick = async () => {
   const town  = document.getElementById("editTown").value.trim();
 
   if (!label) { toast("❌ Please enter a name for this person"); return; }
-
   const isBroadcast = f.id === "__broadcast__";
 
   if (isBroadcast) {
     myFriends[idx] = {
       id:     "__broadcast__",
-      label:  "BROADCAST",          // always fixed — cannot be renamed
-      town:   town || "Everyone",   // only town is user-editable
+      label:  "BROADCAST",          
+      town:   town || "Everyone",   
       code:   "",
       status: "broadcast"
     };
@@ -1690,7 +1795,6 @@ document.getElementById("editClearBtn").onclick = async () => {
 };
 
 document.getElementById("editCancelBtn").onclick = closeEditSheet;
-
 document.getElementById("editModal").addEventListener("click", (e) => {
   if (e.target === document.getElementById("editModal")) closeEditSheet();
 });
@@ -1702,12 +1806,11 @@ function closeEditSheet() {
   editingIndex = null;
 }
 
-// ── DASHBOARD ─────────────────────────────────
-
+// ── DASHBOARD GRID BUILDER ──
 function buildDashboard() {
   const grid = document.getElementById("friendsGrid");
   grid.innerHTML = "";
-  updateInboxBanner();  // refresh banner count
+  updateInboxBanner();  
 
   myFriends.forEach((friend, idx) => {
     const isBroadcast = friend.id === "__broadcast__";
@@ -1763,12 +1866,10 @@ function buildDashboard() {
         '<button class="cancel-rec-btn" id="cancelBtn_' + idx + '">✕ CANCEL</button>';
     }
 
-    // EDIT button
     card.querySelector(".edit-btn").addEventListener("click", (e) => {
       e.stopPropagation(); openEditSheet(idx);
     });
 
-    // HISTORY button — only on linked cards
     const histBtn = card.querySelector(".hist-btn");
     if (histBtn) {
       histBtn.addEventListener("click", (e) => {
@@ -1776,7 +1877,6 @@ function buildDashboard() {
       });
     }
 
-    // Set initial badge count from loaded unreadCounts
     if (friend.id && !isBroadcast) {
       const count = unreadCounts[friend.id] || 0;
       const badge = card.querySelector(".unread-badge");
@@ -1787,12 +1887,10 @@ function buildDashboard() {
       }
     }
 
-    // ── TAP-TO-START / TAP-TO-STOP recording ──
     let localRecording = false;
-
     function startRecording() {
       if (!mediaStream) { toast("⏳ Microphone not ready — check permissions"); return; }
-      if (isRecording) return; // another card is recording
+      if (isRecording) return; 
       try {
         audioChunks   = [];
         mediaRecorder = createMediaRecorder(mediaStream);
@@ -1802,7 +1900,6 @@ function buildDashboard() {
         mediaRecorder.onstop = () => sendMessageToFriend(friend, isBroadcast, card);
         mediaRecorder.onerror = (err) => {
           console.error("MediaRecorder error:", err);
-          toast("Recording error — please try again");
           stopRecording();
         };
         mediaRecorder.start(250);
@@ -1811,12 +1908,11 @@ function buildDashboard() {
         isRecording    = true;
         card.classList.add("recording");
         startRecTimer(card);
-        // Update button text
         const btn = card.querySelector(".rec-btn");
         if (btn) btn.textContent = "■ STOP";
       } catch(err) {
         console.error("Could not start recording:", err);
-        toast("❌ Could not start recording — check mic permission");
+        toast("❌ Could not start recording");
       }
     }
 
@@ -1833,18 +1929,16 @@ function buildDashboard() {
       if (btn) btn.textContent = "● REC";
     }
 
-    // CANCEL button — discard recording without sending
     const cancelBtn = card.querySelector(".cancel-rec-btn");
     if (cancelBtn) {
       cancelBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         if (!localRecording) return;
-        // Stop recorder but don't send — discard chunks
         if (mediaRecorder && mediaRecorder.state === "recording") {
-          mediaRecorder.onstop = null;  // remove send handler
+          mediaRecorder.onstop = null;  
           mediaRecorder.stop();
         }
-        audioChunks = [];  // discard everything recorded
+        audioChunks = [];  
         stopRecTimer();
         localRecording = false; isRecording = false;
         card.classList.remove("recording");
@@ -1854,12 +1948,11 @@ function buildDashboard() {
       });
     }
 
-    // Tap the REC button or the card body to toggle recording
     card.addEventListener("click", (e) => {
       if (e.target.classList.contains("edit-btn")) return;
       if (isEmpty) { toast("Tap EDIT to set up this contact first"); return; }
       if (!isBroadcast && !friend.id) { toast("Tap EDIT to link this contact"); return; }
-      if (card.classList.contains("sending")) return; // busy uploading
+      if (card.classList.contains("sending")) return; 
 
       if (!localRecording) {
         startRecording();
@@ -1872,24 +1965,17 @@ function buildDashboard() {
   });
 }
 
-// ── MODAL BUTTONS ─────────────────────────────
-// ── HISTORY FEATURE ─────────────────────────────
-
+// ── HISTORY SHEET PLAYER CONTROL SELECTION ──
 async function openHistorySheet(friend) {
-  // Stop any history audio already playing
   if (historyAudio) { historyAudio.pause(); historyAudio = null; }
-
   document.getElementById("historyTitle").textContent = "History: " + escapeHtml(friend.label || friend.code);
   const listEl = document.getElementById("historyList");
   listEl.innerHTML = '<div class="history-empty">Loading…</div>';
   document.getElementById("historyModal").classList.add("open");
 
   try {
-    // Simple get of all messages — filter and sort client-side
-    // Avoids needing a DB index for the history query
     const msgsRef = ref(db, "messages/" + currentUser.uid);
     const snap    = await get(msgsRef);
-
     listEl.innerHTML = "";
     let matches = [];
 
@@ -1902,7 +1988,6 @@ async function openHistorySheet(friend) {
       });
     }
 
-    // Latest first, max 5
     matches.sort((a, b) => b.time - a.time);
     const last5 = matches.slice(0, 5);
 
@@ -1933,28 +2018,22 @@ async function openHistorySheet(friend) {
         const state = btn.getAttribute("data-state");
 
         if (state === "playing") {
-          // Tap while playing → PAUSE
           if (historyAudio) historyAudio.pause();
           btn.textContent = "▶ RESUME";
           btn.setAttribute("data-state", "paused");
           return;
         }
-
         if (state === "paused") {
-          // Tap while paused → RESUME
           if (historyAudio) { historyAudio.play(); }
           btn.textContent = "⏸ PAUSE";
           btn.setAttribute("data-state", "playing");
           return;
         }
 
-        // state === "stopped" → start fresh
-        // Stop anything else playing first
-        if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
+        if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; setPlayerUIState('idle'); }
         if (historyAudio) {
           historyAudio.pause();
           historyAudio = null;
-          // Reset any other buttons in the list
           listEl.querySelectorAll(".history-play-btn").forEach(b => {
             b.textContent = "▶ PLAY";
             b.setAttribute("data-state", "stopped");
@@ -1990,7 +2069,7 @@ async function openHistorySheet(friend) {
 
   } catch(err) {
     console.error("History error:", err);
-    listEl.innerHTML = '<div class="history-empty">Could not load history: ' + escapeHtml(err.message || "unknown error") + '</div>';
+    listEl.innerHTML = '<div class="history-empty">Could not load history</div>';
   }
 }
 
@@ -2001,27 +2080,32 @@ document.getElementById("historyCloseBtn").onclick = () => {
 
 document.getElementById("inboxBanner").onclick = startListening;
 document.getElementById("saveBtn").onclick     = saveMessageAudio;
-document.getElementById("goHomeBtn").addEventListener("click", closeModal);
+document.getElementById("goHomeBtn").onclick   = closeModal;
 
 window.addEventListener("beforeunload", () => {
   if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
 });
 
-// Point 6: stop recording when user switches apps or hides the page
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden && isRecording && mediaRecorder &&
-      mediaRecorder.state === "recording") {
-    console.log("OTY: Page hidden — stopping active recording");
-    mediaRecorder.stop();
-    isRecording = false;
-    // Clean up any active recording card UI
-    document.querySelectorAll(".friend-card.recording").forEach(card => {
-      card.classList.remove("recording");
-      const btn = card.querySelector(".rec-btn");
-      if (btn) btn.textContent = "● REC";
-    });
-    stopRecTimer();
-    toast("⏹ Recording stopped — page was hidden");
+  if (document.hidden) {
+    if (isRecording && mediaRecorder && mediaRecorder.state === "recording") {
+      mediaRecorder.stop();
+      isRecording = false;
+      document.querySelectorAll(".friend-card.recording").forEach(card => {
+        card.classList.remove("recording");
+        const btn = card.querySelector(".rec-btn");
+        if (btn) btn.textContent = "● REC";
+      });
+      stopRecTimer();
+      toast("⏹ Recording stopped — page was hidden");
+    }
+    if (currentAudio && playerState === 'playing') {
+      currentAudio.pause();
+      setPlayerUIState('paused');
+    }
+    if (historyAudio) {
+      historyAudio.pause();
+    }
   }
 });
 </script>
