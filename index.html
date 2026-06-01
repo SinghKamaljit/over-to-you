@@ -438,6 +438,22 @@ body::before{
 .history-empty{
   text-align:center; color:var(--muted); font-size:0.88rem; padding:30px 0;
 }
+.history-unread{
+  border-color:var(--yellow) !important;
+  background:rgba(245,158,11,0.06) !important;
+}
+.hist-read-badge{
+  display:inline-block; font-size:0.6rem; font-family:'Rajdhani',sans-serif;
+  font-weight:700; color:var(--green); letter-spacing:1px;
+  background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3);
+  border-radius:10px; padding:1px 6px; vertical-align:middle; margin-left:4px;
+}
+.hist-unread-badge{
+  display:inline-block; font-size:0.6rem; font-family:'Rajdhani',sans-serif;
+  font-weight:700; color:var(--yellow); letter-spacing:1px;
+  background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4);
+  border-radius:10px; padding:1px 6px; vertical-align:middle; margin-left:4px;
+}
 .history-close-btn{
   width:100%; padding:13px; border:1px solid var(--border);
   border-radius:50px; background:transparent; color:var(--text);
@@ -474,12 +490,6 @@ body::before{
   border:1px solid var(--yellow); color:var(--yellow);
 }
 .save-btn.visible{ display:block; }
-
-/* ── PLAY BUTTON ACTIVE STATE (Fix 2) ── */
-.play-btn.is-playing{
-  background:linear-gradient(135deg,var(--green),#16a34a);
-  opacity:0.85; cursor:default;
-}
 
 /* ── TOAST ── */
 #toast{
@@ -553,6 +563,7 @@ body::before{
         <div class="user-dot"></div>
         <span id="headerCode">----</span>
       </div>
+      <button class="out-btn" id="homeBtn" onclick="window.location.href=window.location.href" title="Home screen">⌂</button>
       <button class="out-btn" id="signoutBtn">OUT</button>
     </div>
   </div>
@@ -609,9 +620,9 @@ body::before{
     <p  id="playTime">Received just now</p>
     <div id="playProgress" style="display:none;font-size:0.75rem;color:var(--muted);margin-top:2px;font-family:'Rajdhani',sans-serif;letter-spacing:1px"></div>
     <div id="playDuration" class="duration-pill" style="display:none">⏱ --:--</div>
-    <button class="play-btn"    id="playMsgBtn">▶ PLAY MESSAGE</button>
-    <button class="save-btn"    id="saveBtn">💾 SAVE TO PHONE</button>
-    <button class="dismiss-btn" id="closeModalBtn">Later</button>
+    <!-- Status shown while playing — no controls, no skip button -->
+    <div id="playingStatus" style="display:none;padding:14px 0 2px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--green);letter-spacing:1px;text-align:center">🔊 PLAYING…</div>
+    <button class="save-btn" id="saveBtn">💾 SAVE TO PHONE</button>
   </div>
 </div>
 
@@ -1297,8 +1308,8 @@ async function populateQueueFromDB() {
         });
       }
     });
-    // Sort by timestamp — oldest first
-    unread.sort((a,b) => a.timestamp - b.timestamp);
+    // Sort by timestamp — newest first so latest message plays first
+    unread.sort((a,b) => b.timestamp - a.timestamp);
     messageQueue.push(...unread);
     console.log("OTY: Loaded", unread.length, "unread message(s) into queue");
   } catch(e) {
@@ -1455,11 +1466,9 @@ function showNextInQueue(userInitiated) {
 async function playMessage() {
   if (!pendingMessage) return;
 
-  // Fix 2: instantly lock the button to prevent double-tap / AbortError race
-  const playBtn = document.getElementById("playMsgBtn");
-  playBtn.classList.add("is-playing");
-  playBtn.textContent = "🔊 PLAYING...";
-  playBtn.disabled = true;
+  // Show "playing" status, hide it while we start
+  const statusEl = document.getElementById("playingStatus");
+  statusEl.style.display = "block";
 
   // ── Stop any orphaned audio stream before starting a new one ──
   if (currentAudio) {
@@ -1468,46 +1477,46 @@ async function playMessage() {
     currentAudio = null;
   }
 
-  function resetPlayBtn() {
-    playBtn.classList.remove("is-playing");
-    playBtn.textContent = "▶ PLAY MESSAGE";
-    playBtn.disabled = false;
-  }
-
   try {
     currentAudio = new Audio(pendingMessage.audioUrl);
 
     // Show save button immediately
     document.getElementById("saveBtn").classList.add("visible");
 
-    // Mark as read after audio finishes — keeps message in DB for history
+    // When audio ends: mark read, close modal, auto-advance to next message
     currentAudio.addEventListener("ended", async () => {
-      resetPlayBtn();
+      statusEl.style.display = "none";
       try {
         await update(ref(db,
           "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
           { isRead: true });
-        // Decrement badge for this sender
         if (pendingMessage && pendingMessage.senderId) {
           updateBadge(pendingMessage.senderId, -1);
         }
       } catch(e) { console.warn("Could not mark message as read:", e); }
       currentAudio = null;
+      // Close this modal and automatically open next in queue
+      document.getElementById("playModal").classList.remove("open");
+      document.getElementById("saveBtn").classList.remove("visible");
+      pendingMessage = null;
+      setTimeout(() => showNextInQueue(true), 400);
     });
 
     currentAudio.addEventListener("error", () => {
-      resetPlayBtn();
+      statusEl.style.display = "none";
       currentAudio = null;
+      toast("❌ Playback failed — moving to next message");
+      document.getElementById("playModal").classList.remove("open");
+      pendingMessage = null;
+      setTimeout(() => showNextInQueue(true), 400);
     });
 
     await currentAudio.play();
   } catch(err) {
-    resetPlayBtn();
+    statusEl.style.display = "none";
     console.error("Playback error:", err);
-    // AbortError means a second tap interrupted the first play() promise
-    // — this is not a real failure, audio is actually playing fine
     if (err.name !== "AbortError" && err.name !== "NotAllowedError") {
-      toast("❌ Playback failed — tap play to retry");
+      toast("❌ Playback failed — tap the banner to retry");
     }
     if (err.name !== "AbortError") currentAudio = null;
   }
@@ -1523,27 +1532,16 @@ function saveMessageAudio() {
 }
 
 function closeModal() {
-  // ── Forcefully stop any active audio stream ──
+  // Stop audio if somehow still playing
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
     currentAudio = null;
   }
-
-  // Reset play button in case it was mid-play when dismissed
-  const playBtn = document.getElementById("playMsgBtn");
-  playBtn.classList.remove("is-playing");
-  playBtn.textContent = "▶ PLAY MESSAGE";
-  playBtn.disabled = false;
-
+  document.getElementById("playingStatus").style.display = "none";
   document.getElementById("playModal").classList.remove("open");
-
-  // Badge is managed by updateBadge() — only remove glow if count reaches 0
-  // (updateBadge handles has-message class automatically)
+  document.getElementById("saveBtn").classList.remove("visible");
   pendingMessage = null;
-
-  // Short pause before showing next — lets modal animation finish
-  setTimeout(() => showNextInQueue(true), 400);  // continue as user-initiated
 }
 
 // ── EDIT SHEET ────────────────────────────────
@@ -1833,7 +1831,7 @@ async function openHistorySheet(friend) {
       snap.forEach((child) => {
         const msg = child.val();
         if (msg.from === friend.id) {
-          matches.push({ id: child.key, url: msg.audioUrl, time: msg.timestamp, duration: msg.duration || 0 });
+          matches.push({ id: child.key, url: msg.audioUrl, time: msg.timestamp, duration: msg.duration || 0, isRead: !!msg.isRead });
         }
       });
     }
@@ -1850,12 +1848,16 @@ async function openHistorySheet(friend) {
     last5.forEach((msg) => {
       const item    = document.createElement("div");
       item.className = "history-item";
+      if (!msg.isRead) item.classList.add("history-unread");
       const timeStr  = new Date(msg.time).toLocaleDateString() + " " +
                        new Date(msg.time).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
       const durStr   = msg.duration ? formatTime(Math.round(msg.duration)) : "--:--";
+      const readBadge = msg.isRead
+        ? '<span class="hist-read-badge">✓ HEARD</span>'
+        : '<span class="hist-unread-badge">● NEW</span>';
       item.innerHTML =
         '<div class="history-item-left">' +
-          '<div class="history-time">' + timeStr + '</div>' +
+          '<div class="history-time">' + timeStr + ' ' + readBadge + '</div>' +
           '<div class="history-meta">Duration: ' + durStr + '</div>' +
         '</div>' +
         '<button class="history-play-btn">▶ PLAY</button>';
@@ -1894,10 +1896,8 @@ document.getElementById("historyCloseBtn").onclick = () => {
   document.getElementById("historyModal").classList.remove("open");
 };
 
-document.getElementById("inboxBanner").onclick   = startListening;
-document.getElementById("playMsgBtn").onclick    = playMessage;
-document.getElementById("saveBtn").onclick       = saveMessageAudio;
-document.getElementById("closeModalBtn").onclick = closeModal;
+document.getElementById("inboxBanner").onclick = startListening;
+document.getElementById("saveBtn").onclick     = saveMessageAudio;
 
 window.addEventListener("beforeunload", () => {
   if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
