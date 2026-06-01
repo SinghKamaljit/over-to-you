@@ -18,7 +18,6 @@
   --green:#22c55e; --yellow:#f59e0b; --purple:#a855f7;
   --text:#deeaf8; --muted:#5a7090; --recording:#ef4444;
   
-  /* Audio Player specific custom rules mapped to core theme colors */
   --bg-panel: #121e2e;
   --accent-gold: #f5a623;
   --accent-cyan: #00d4ff;
@@ -102,7 +101,6 @@ body::before{
   max-width:320px; padding:4px 0;
 }
 
-/* Code reveal */
 #codeReveal{
   display:none; flex-direction:column; align-items:center;
   gap:12px; width:100%; max-width:320px; text-align:center;
@@ -129,7 +127,7 @@ body::before{
   font-size:1.1rem; font-weight:700; cursor:pointer;
 }
 
-/* ── APP ── */
+/* ── APP SCREEN ── */
 #appScreen{ display:none; flex-direction:column; min-height:100vh; }
 .app-header{
   position:sticky; top:0; z-index:10;
@@ -167,23 +165,23 @@ body::before{
 /* ── INBOX BANNER ── */
 #inboxBanner{
   display:none; align-items:center; justify-content:space-between;
-  padding:10px 16px; cursor:pointer;
-  background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06));
-  border-bottom:1px solid rgba(245,158,11,0.3);
+  padding:12px 16px; cursor:pointer;
+  background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.08));
+  border-bottom:1px solid rgba(245,158,11,0.4);
   animation:bannerPulse 2s infinite;
 }
 @keyframes bannerPulse{
-  0%,100%{ background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06)); }
-  50%{     background:linear-gradient(135deg,rgba(245,158,11,0.22),rgba(245,158,11,0.10)); }
+  0%,100%{ background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.08)); }
+  50%{     background:linear-gradient(135deg,rgba(245,158,11,0.28),rgba(245,158,11,0.14)); }
 }
 #inboxBanner.visible{ display:flex; }
 .inbox-text{
-  font-family:'Rajdhani',sans-serif; font-size:0.95rem;
+  font-family:'Rajdhani',sans-serif; font-size:1rem;
   font-weight:700; color:var(--yellow);
 }
 .inbox-tap{
-  font-family:'Rajdhani',sans-serif; font-size:0.78rem;
-  color:var(--yellow); opacity:0.7; letter-spacing:1px;
+  font-family:'Rajdhani',sans-serif; font-size:0.85rem;
+  color:var(--yellow); font-weight:700; letter-spacing:1px;
 }
 
 /* ── GRID ── */
@@ -226,14 +224,7 @@ body::before{
   from{ opacity:1; transform:scale(1); }
   to{   opacity:0; transform:scale(1.05); }
 }
-.msg-indicator{
-  position:absolute; top:7px; left:8px;
-  width:10px; height:10px; border-radius:50%;
-  background:var(--yellow); display:none; box-shadow:0 0 6px var(--yellow);
-}
-.friend-card.has-message .msg-indicator{ display:block; }
 
-/* Unread badge */
 .unread-badge{
   position:absolute; top:5px; left:5px;
   min-width:20px; height:20px; border-radius:10px;
@@ -266,9 +257,7 @@ body::before{
   width:100%; white-space:nowrap; overflow:hidden;
   text-overflow:ellipsis; margin-top:2px;
 }
-.card-empty-hint{
-  font-size:0.75rem; color:var(--muted); line-height:1.4;
-}
+.card-empty-hint{ font-size:0.75rem; color:var(--muted); line-height:1.4; }
 .rec-timer{
   display:none; position:absolute; bottom:8px; left:50%;
   transform:translateX(-50%);
@@ -283,7 +272,6 @@ body::before{
 }
 .friend-card.recording .rec-bar{ display:block; }
 
-/* Sending overlay */
 .friend-card.sending{
   border-color:var(--accent) !important;
   animation:sendingPulse 1s infinite !important;
@@ -301,7 +289,6 @@ body::before{
 }
 .friend-card.sending .sending-label{ display:block; }
 
-/* Tap-to-record button */
 .rec-btn{
   display:none; position:absolute; bottom:10px; left:50%;
   transform:translateX(-50%);
@@ -309,7 +296,6 @@ body::before{
   padding:4px 12px; color:#fff;
   font-family:'Rajdhani',sans-serif; font-size:0.72rem; font-weight:700;
   cursor:pointer; white-space:nowrap; letter-spacing:1px;
-  transition:background 0.2s;
 }
 .friend-card:not(.empty):not(.broadcast) .rec-btn{ display:block; }
 .friend-card.recording .rec-btn{
@@ -320,31 +306,26 @@ body::before{
   0%,100%{ transform:translateX(-50%) scale(1); }
   50%{     transform:translateX(-50%) scale(1.06); }
 }
-.friend-card.sending .rec-btn{ display:none; }
-.friend-card.empty .rec-btn{ display:none; }
 
-/* Cancel recording button */
 .cancel-rec-btn{
   display:none; position:absolute; top:8px; right:8px;
   background:rgba(239,68,68,0.2); border:1.5px solid var(--recording);
   border-radius:20px; padding:3px 9px; color:var(--recording);
   font-family:'Rajdhani',sans-serif; font-size:0.65rem; font-weight:700;
   cursor:pointer; white-space:nowrap; z-index:6;
-  letter-spacing:0.5px;
 }
 .friend-card.recording .cancel-rec-btn{ display:block; }
-.friend-card.recording .rec-btn{ margin-right:0; }
-.friend-card.recording .edit-btn{ display:none; }
 
-.duration-pill{
-  display:inline-block;
-  background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2);
-  border-radius:20px; padding:3px 10px;
-  font-family:'Rajdhani',sans-serif; font-size:0.78rem;
-  color:var(--accent); margin-top:4px; letter-spacing:1px;
+.hist-btn{
+  position:absolute; top:7px; left:8px;
+  font-size:0.65rem; color:var(--yellow);
+  font-family:'Rajdhani',sans-serif; font-weight:700;
+  background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:20px;
+  z-index:5; display:none;
 }
+.friend-card:not(.empty):not(.broadcast) .hist-btn{ display:block; }
 
-/* ── EDIT SHEET ── */
+/* ── EDIT MODAL ── */
 #editModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
@@ -361,10 +342,7 @@ body::before{
   color:var(--accent); margin-bottom:16px; text-align:center;
 }
 .edit-field{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
-.edit-label{
-  font-size:0.72rem; color:var(--muted);
-  font-weight:700; letter-spacing:1px;
-}
+.edit-label{ font-size:0.72rem; color:var(--muted); font-weight:700; letter-spacing:1px; }
 .edit-input{
   background:var(--card); border:1.5px solid var(--border);
   border-radius:12px; padding:12px 16px; color:var(--text);
@@ -373,37 +351,24 @@ body::before{
   -webkit-user-select:text !important; user-select:text !important;
 }
 .edit-input:focus{ border-color:var(--accent); }
-.edit-input::placeholder{ color:var(--muted); }
 .edit-save-btn{
   width:100%; padding:14px; border:none; border-radius:50px;
   background:linear-gradient(135deg,var(--accent),#0099bb);
   color:#000; font-family:'Rajdhani',sans-serif;
-  font-size:1.1rem; font-weight:700; cursor:pointer; margin-top:4px;
+  font-size:1.1rem; font-weight:700; cursor:pointer;
 }
 .edit-cancel-btn{
   width:100%; padding:12px; border:1px solid var(--border);
   border-radius:50px; background:transparent; color:var(--muted);
-  font-family:'Rajdhani',sans-serif; font-size:0.95rem;
-  cursor:pointer; margin-top:8px;
+  font-family:'Rajdhani',sans-serif; font-size:0.95rem; cursor:pointer; margin-top:8px;
 }
 .edit-clear-btn{
   width:100%; padding:10px; border:1px solid #ef444455;
   border-radius:50px; background:transparent; color:#ef4444;
-  font-family:'Rajdhani',sans-serif; font-size:0.85rem;
-  cursor:pointer; margin-top:6px;
+  font-family:'Rajdhani',sans-serif; font-size:0.85rem; cursor:pointer; margin-top:6px;
 }
 
-/* ── HISTORY BUTTON on card ── */
-.hist-btn{
-  position:absolute; top:7px; left:8px;
-  font-size:0.65rem; color:var(--yellow);
-  font-family:'Rajdhani',sans-serif; font-weight:700;
-  background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:20px;
-  z-index:5; display:none; letter-spacing:0.5px;
-}
-.friend-card:not(.empty):not(.broadcast) .hist-btn{ display:block; }
-
-/* ── HISTORY SHEET ── */
+/* ── HISTORY MODAL ── */
 #historyModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
@@ -415,61 +380,33 @@ body::before{
   border-radius:24px 24px 0 0; width:100%; max-width:480px;
   padding:24px 20px 40px; display:flex; flex-direction:column; max-height:80vh;
 }
-.history-sheet h3{
-  font-family:'Rajdhani',sans-serif; font-size:1.3rem;
-  color:var(--yellow); margin-bottom:4px; text-align:center;
-}
-.history-subtitle{
-  font-size:0.82rem; color:var(--muted); text-align:center; margin-bottom:16px;
-}
-.history-list{
-  overflow-y:auto; flex:1; display:flex;
-  flex-direction:column; gap:10px; padding-right:4px;
-}
+.history-sheet h3{ font-family:'Rajdhani',sans-serif; font-size:1.3rem; color:var(--yellow); text-align:center; }
+.history-subtitle{ font-size:0.82rem; color:var(--muted); text-align:center; margin-bottom:16px; }
+.history-list{ overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px; }
 .history-item{
   background:var(--card); border:1px solid var(--border);
   border-radius:14px; padding:12px 16px;
   display:flex; justify-content:space-between; align-items:center;
 }
-.history-item-left{ display:flex; flex-direction:column; gap:2px; text-align:left; }
-.history-time{
-  font-family:'Rajdhani',sans-serif; font-size:0.9rem;
-  color:var(--text); font-weight:700;
-}
+.history-item-left{ display:flex; flex-direction:column; gap:2px; }
+.history-time{ font-family:'Rajdhani',sans-serif; font-size:0.9rem; color:var(--text); font-weight:700; }
 .history-meta{ font-size:0.75rem; color:var(--muted); }
 .history-play-btn{
   background:linear-gradient(135deg,var(--yellow),#d97706);
   border:none; border-radius:20px; padding:6px 14px; color:#000;
-  font-family:'Rajdhani',sans-serif; font-size:0.8rem;
-  font-weight:700; cursor:pointer; white-space:nowrap;
+  font-family:'Rajdhani',sans-serif; font-size:0.8rem; font-weight:700; cursor:pointer;
 }
-.history-empty{
-  text-align:center; color:var(--muted); font-size:0.88rem; padding:30px 0;
-}
-.history-unread{
-  border-color:var(--yellow) !important;
-  background:rgba(245,158,11,0.06) !important;
-}
-.hist-read-badge{
-  display:inline-block; font-size:0.6rem; font-family:'Rajdhani',sans-serif;
-  font-weight:700; color:var(--green); letter-spacing:1px;
-  background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3);
-  border-radius:10px; padding:1px 6px; vertical-align:middle; margin-left:4px;
-}
-.hist-unread-badge{
-  display:inline-block; font-size:0.6rem; font-family:'Rajdhani',sans-serif;
-  font-weight:700; color:var(--yellow); letter-spacing:1px;
-  background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.4);
-  border-radius:10px; padding:1px 6px; vertical-align:middle; margin-left:4px;
-}
+.history-empty{ text-align:center; color:var(--muted); font-size:0.88rem; padding:30px 0; }
+.history-unread{ border-color:var(--yellow) !important; background:rgba(245,158,11,0.06) !important; }
+.hist-read-badge{ font-size:0.6rem; font-family:'Rajdhani',sans-serif; color:var(--green); background:rgba(34,197,94,0.12); padding:1px 6px; border-radius:10px; margin-left:4px; }
+.hist-unread-badge{ font-size:0.6rem; font-family:'Rajdhani',sans-serif; color:var(--yellow); background:rgba(245,158,11,0.15); padding:1px 6px; border-radius:10px; margin-left:4px; }
 .history-close-btn{
   width:100%; padding:13px; border:1px solid var(--border);
   border-radius:50px; background:transparent; color:var(--text);
-  font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
-  cursor:pointer; margin-top:16px;
+  font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; cursor:pointer; margin-top:16px;
 }
 
-/* ── UPGRADED INTEGRATED AUDIO PLAYER STYLES ── */
+/* ── REVISED INTEGRATED AUDIO PLAYER SCREEN ── */
 #playModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
@@ -480,38 +417,17 @@ body::before{
   background:var(--surface); border:1px solid var(--border);
   border-radius:24px 24px 0 0; width:100%;
   max-width:480px; padding:24px 20px 40px; text-align:center;
-  box-shadow: 0 8px 48px rgba(0,0,0,0.6);
 }
 .play-sheet h3{ font-family: 'Rajdhani', sans-serif; margin-bottom:4px; font-size: 1.4rem; color: var(--accent); }
 .play-sheet p{ color:var(--muted); font-size:0.85rem; margin-bottom:12px; font-family:'Exo 2', sans-serif; }
 
-/* Status Bar Components */
 .status-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 14px;
-  padding: 10px 16px;
-  background: var(--bg-panel);
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; padding: 10px 16px; background: var(--bg-panel);
+  border-radius: 10px; border: 1px solid rgba(255,255,255,0.06);
 }
-.status-indicator {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 1px;
-}
-.dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--muted);
-  transition: background 0.3s;
-  flex-shrink: 0;
-}
+.status-indicator { display: flex; align-items: center; gap: 8px; font-family: 'Rajdhani', sans-serif; font-weight: 700; font-size: 0.95rem; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); transition: background 0.3s; }
 .dot.playing  { background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); animation: playerDotPulse 1s infinite; }
 .dot.paused   { background: var(--accent-gold);  box-shadow: 0 0 8px var(--accent-gold); }
 .dot.stopped  { background: var(--accent-red);   box-shadow: 0 0 8px var(--accent-red); }
@@ -521,142 +437,58 @@ body::before{
 .status-text.paused  { color: var(--accent-gold); }
 .status-text.stopped { color: var(--accent-red); }
 .status-text.idle    { color: var(--muted); }
-.track-info { font-family:'Rajdhani', sans-serif; font-size: 0.8rem; color: var(--muted); text-align: right; }
+.track-info { font-family:'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--accent); font-weight:700; text-align: right; }
 
-/* Timeline Progress Seek Bar */
 .progress-wrap { margin-bottom: 14px; }
-.progress-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-bottom: 5px;
-  font-family: 'Rajdhani', sans-serif;
-}
-.progress-bar-bg {
-  height: 6px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-}
-.progress-bar-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold));
-  border-radius: 10px;
-  transition: width 0.1s linear;
-}
+.progress-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-bottom: 5px; font-family: 'Rajdhani', sans-serif; }
+.progress-bar-bg { height: 8px; background: rgba(255,255,255,0.12); border-radius: 10px; overflow: hidden; cursor: pointer; position:relative; }
+.progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-gold)); border-radius: 10px; }
 
-/* Volume Layout */
-.volume-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 18px;
-}
-.volume-row span { font-size: 0.9rem; flex-shrink: 0; }
-.volume-row input[type=range] {
-  flex: 1;
-  -webkit-appearance: none;
-  height: 4px;
-  border-radius: 4px;
-  background: rgba(255,255,255,0.1);
-  outline: none;
-}
-.volume-row input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: var(--accent-cyan);
-  box-shadow: var(--glow-cyan);
-  cursor: pointer;
-}
-.vol-label { font-family:'Rajdhani', sans-serif; font-size: 0.78rem; color: var(--muted); min-width: 32px; text-align: right; }
+.volume-row { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+.volume-row span { font-size: 0.9rem; }
+.volume-row input[type=range] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.15); outline: none; }
+.volume-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--accent-cyan); cursor: pointer; }
+.vol-label { font-family:'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--muted); min-width: 35px; text-align: right; }
 
-/* Pro Media Control Button Grid Grid */
-.btn-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 10px;
-}
+.btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 .btn-grid .btn-full { grid-column: 1 / -1; }
 .btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 11px 8px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  background: var(--bg-panel);
-  color: var(--text);
+  display: flex; align-items: center; justify-content: center; gap: 6px; padding: 12px 8px;
+  border-radius: 10px; border: 1px solid transparent; font-family: 'Rajdhani', sans-serif;
+  font-weight: 700; font-size: 0.95rem; text-transform: uppercase; cursor: pointer;
+  background: var(--bg-panel); color: var(--text); transition: background 0.2s;
 }
 .btn:active { transform: scale(0.97); }
-.btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
+.btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none !important; }
 .btn-play { border-color: rgba(46,204,113,0.3); color: var(--accent-green); }
 .btn-pause { border-color: rgba(245,166,35,0.3); color: var(--accent-gold); }
 .btn-resume { border-color: rgba(0,212,255,0.3); color: var(--accent-cyan); }
 .btn-stop { border-color: rgba(255,68,68,0.3); color: var(--accent-red); }
-.btn-next { border-color: rgba(0,212,255,0.2); color: var(--text); }
+.btn-next { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,0.05); }
 
-/* Decorative cosmetic visualizer element */
-.wave-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  height: 20px;
-  margin: 10px 0;
-}
-.wave-bar {
-  width: 3px;
-  background: linear-gradient(to top, var(--accent-cyan), var(--accent-gold));
-  border-radius: 2px;
-  height: 4px;
-}
+.wave-container { display: flex; align-items: center; justify-content: center; gap: 4px; height: 24px; margin: 12px 0; }
+.wave-bar { width: 3px; background: linear-gradient(to top, var(--accent-cyan), var(--accent-gold)); border-radius: 2px; height: 4px; }
 .wave-bar.animating { animation: playWaveAnim 0.8s ease-in-out infinite; }
 .wave-bar:nth-child(1)  { animation-delay: 0.0s; }
-.wave-bar:nth-child(2)  { animation-delay: 0.1s; }
-.wave-bar:nth-child(3)  { animation-delay: 0.2s; }
-.wave-bar:nth-child(4)  { animation-delay: 0.3s; }
-.wave-bar:nth-child(5)  { animation-delay: 0.15s; }
-.wave-bar:nth-child(6)  { animation-delay: 0.25s; }
-@keyframes playWaveAnim { 0%,100% { height: 4px; } 50% { height: 18px; } }
+.wave-bar:nth-child(2)  { animation-delay: 0.15s; }
+.wave-bar:nth-child(3)  { animation-delay: 0.3s; }
+.wave-bar:nth-child(4)  { animation-delay: 0.1s; }
+.wave-bar:nth-child(5)  { animation-delay: 0.2s; }
+.wave-bar:nth-child(6)  { animation-delay: 0.05s; }
+@keyframes playWaveAnim { 0%,100% { height: 4px; } 50% { height: 22px; } }
 
-/* Main app action buttons */
-.play-btn, .dismiss-btn, .save-btn{
-  width:100%; border-radius:50px; padding:12px 20px; margin-top:8px;
-  cursor:pointer; font-family:'Rajdhani',sans-serif;
-  font-size:1rem; font-weight:700;
-}
-.dismiss-btn{ background:transparent; border:1px solid var(--border); color:var(--muted); }
-.save-btn{ display:none; background:transparent; border:1px solid var(--yellow); color:var(--yellow); }
-.save-btn.visible{ display:block; }
+.dismiss-btn, .save-btn{ width:100%; border-radius:50px; padding:12px 20px; margin-top:8px; cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; }
+.dismiss-btn{ background:transparent; border:1px solid var(--border); color:var(--text); }
+.save-btn { display:none; background:transparent; border:1px solid var(--yellow); color:var(--yellow); }
+.save-btn.visible { display:block; }
 
-/* ── TOAST ── */
-#toast{
-  position:fixed; bottom:20px; left:50%;
-  transform:translateX(-50%) translateY(80px);
-  background:var(--surface); border:1px solid var(--border);
-  border-radius:12px; padding:10px 20px; z-index:200;
-  transition:0.3s; pointer-events:none;
-  font-size:0.85rem; white-space:nowrap;
-}
+#toast{ position:fixed; bottom:20px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:10px 20px; z-index:200; transition:0.3s; pointer-events:none; font-size:0.85rem; white-space:nowrap; }
 #toast.show{ transform:translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="login-logo">OVER TO<br><span>YOU</span> 📡</div>
   <div class="login-subtitle">Voice messenger for your circle</div>
@@ -667,24 +499,19 @@ body::before{
   </div>
 
   <div id="signupFields">
-    <input id="signupName"  class="login-input" type="text"
-           placeholder="Your name (e.g. Kamal)" maxlength="20" autocomplete="off">
-    <input id="signupEmail" class="login-input" type="email"
-           placeholder="Email address" autocomplete="email">
+    <input id="signupName" class="login-input" type="text" placeholder="Your name (e.g. Kamal)" maxlength="20" autocomplete="off">
+    <input id="signupEmail" class="login-input" type="email" placeholder="Email address" autocomplete="email">
     <div class="pass-wrap">
-      <input id="signupPass" class="login-input" type="password"
-             placeholder="Password (min 6 chars)" autocomplete="new-password">
+      <input id="signupPass" class="login-input" type="password" placeholder="Password (min 6 chars)" autocomplete="new-password">
       <button class="eye-btn" type="button" onclick="togglePass('signupPass',this)">👁</button>
     </div>
     <button class="login-btn" id="signupBtn">CREATE ACCOUNT →</button>
   </div>
 
   <div id="signinFields" style="display:none">
-    <input id="signinEmail" class="login-input" type="email"
-           placeholder="Email address" autocomplete="email">
+    <input id="signinEmail" class="login-input" type="email" placeholder="Email address" autocomplete="email">
     <div class="pass-wrap">
-      <input id="signinPass" class="login-input" type="password"
-             placeholder="Password" autocomplete="current-password">
+      <input id="signinPass" class="login-input" type="password" placeholder="Password" autocomplete="current-password">
       <button class="eye-btn" type="button" onclick="togglePass('signinPass',this)">👁</button>
     </div>
     <button class="login-btn" id="signinBtn">SIGN IN →</button>
@@ -694,10 +521,7 @@ body::before{
   <div id="codeReveal">
     <div class="code-label">YOUR FRIEND CODE</div>
     <div class="code-box" id="codeDisplay">----</div>
-    <div class="code-hint">
-      Share this with friends so they can find you.
-      Tap your code in the app anytime to copy it.
-    </div>
+    <div class="code-hint">Share this code with friends so they can add you inside their app dashboard grid.</div>
     <button class="code-copy-btn" id="codeCopyBtn">📋 COPY CODE</button>
     <button class="code-go-btn"   id="codeGoBtn">LET'S GO →</button>
   </div>
@@ -705,7 +529,7 @@ body::before{
   <div id="loginError" class="login-error"></div>
 </div>
 
-<!-- APP -->
+<!-- MAIN APP DASHBOARD -->
 <div id="appScreen">
   <div class="app-header">
     <div class="app-title">📡 OVER TO YOU</div>
@@ -714,79 +538,73 @@ body::before{
         <div class="user-dot"></div>
         <span id="headerCode">----</span>
       </div>
-      <button class="out-btn" id="homeBtn" onclick="window.location.href=window.location.href" title="Home screen">⌂</button>
+      <button class="out-btn" onclick="window.location.href=window.location.href">⌂</button>
       <button class="out-btn" id="signoutBtn">OUT</button>
     </div>
   </div>
-  <div class="instructions">
-    Tap card to record · Tap again to send · Tap badge to play messages
+  <div class="instructions">Tap contact card to record voice message · Tap again to upload &amp; transit</div>
+  
+  <!-- Inbox Banner Element for First Screen -->
+  <div id="inboxBanner" style="display:none;">
+    <div class="inbox-text" id="inboxBannerText">📩 0 new messages waiting</div>
+    <div class="inbox-tap">TAP TO LISTEN NOW ›</div>
   </div>
-  <!-- Inbox banner — shown when messages are waiting -->
-  <div id="inboxBanner">
-    <div class="inbox-text" id="inboxBannerText">📩 1 new message</div>
-    <div class="inbox-tap">TAP TO LISTEN ›</div>
-  </div>
+  
   <div class="grid-container" id="friendsGrid"></div>
 </div>
 
-<!-- EDIT SHEET -->
+<!-- CONTACT EDIT SHEET -->
 <div id="editModal">
   <div class="edit-sheet">
     <h3 id="editTitle">Set Up Contact</h3>
     <div class="edit-field">
       <div class="edit-label">WHAT DO YOU CALL THIS PERSON?</div>
-      <input id="editLabel" class="edit-input" type="text"
-             placeholder="e.g. Papaji, Mummyji, Deedi, Bhai…" maxlength="20">
+      <input id="editLabel" class="edit-input" type="text" placeholder="e.g. Papaji, Mummyji, Deedi..." maxlength="20">
     </div>
     <div class="edit-field" id="editCodeField">
       <div class="edit-label">THEIR FRIEND CODE</div>
-      <input id="editCode" class="edit-input" type="text"
-             placeholder="e.g. KAMAL-4837" maxlength="15" autocomplete="off">
+      <input id="editCode" class="edit-input" type="text" placeholder="e.g. KAMAL-4837" maxlength="15">
     </div>
     <div class="edit-field">
       <div class="edit-label">THEIR TOWN / CITY</div>
-      <input id="editTown" class="edit-input" type="text"
-             placeholder="e.g. Amritsar, Ludhiana, Delhi…" maxlength="20">
+      <input id="editTown" class="edit-input" type="text" placeholder="e.g. Amritsar, Delhi..." maxlength="20">
     </div>
-    <button class="edit-save-btn"   id="editSaveBtn">SAVE →</button>
-    <button class="edit-clear-btn"  id="editClearBtn">Remove this contact</button>
+    <button class="edit-save-btn"   id="editSaveBtn">SAVE CONTACT</button>
+    <button class="edit-clear-btn"  id="editClearBtn">Remove Contact</button>
     <button class="edit-cancel-btn" id="editCancelBtn">Cancel</button>
   </div>
 </div>
 
-<!-- HISTORY MODAL -->
+<!-- HISTORY ARCHIVE MODAL -->
 <div id="historyModal">
   <div class="history-sheet">
     <h3 id="historyTitle">Message History</h3>
-    <div class="history-subtitle">Last 5 received messages</div>
+    <div class="history-subtitle">Last 5 audio logs from this user</div>
     <div class="history-list" id="historyList"></div>
-    <button class="history-close-btn" id="historyCloseBtn">Close</button>
+    <button class="history-close-btn" id="historyCloseBtn">Close Logs</button>
   </div>
 </div>
 
-<!-- UPGRADED PLAY MODAL CONTROLS -->
+<!-- AUDIO PLAYER MODAL (SCREEN TWO) -->
 <div id="playModal">
   <div class="play-sheet">
     <h3 id="playFromName">Voice Message</h3>
-    <p  id="playTime">Received just now</p>
-    <div id="playProgress" style="display:none;font-size:0.75rem;color:var(--muted);margin-top:2px;font-family:'Rajdhani',sans-serif;letter-spacing:1px;margin-bottom:8px"></div>
+    <p id="playTime">Received just now</p>
+    <div id="playProgress" style="font-size:0.8rem;color:var(--yellow);margin:4px 0;font-family:'Rajdhani',sans-serif;font-weight:700;"></div>
     
-    <!-- Cosmetic Audio Visualizer bars -->
     <div class="wave-container" id="playWaveContainer">
       <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
       <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
     </div>
 
-    <!-- Status Bar Area -->
     <div class="status-bar">
       <div class="status-indicator">
         <div class="dot" id="playerStatusDot"></div>
         <span class="status-text idle" id="playerStatusText">IDLE</span>
       </div>
-      <div class="track-info" id="playerTrackInfo">— / —</div>
+      <div class="track-info" id="playerTrackInfo">0 / 0</div>
     </div>
 
-    <!-- Interactive Seekable Progress Bar Elements -->
     <div class="progress-wrap">
       <div class="progress-labels">
         <span id="playerTimeCurrent">0:00</span>
@@ -797,7 +615,6 @@ body::before{
       </div>
     </div>
 
-    <!-- Live Volume Slider Component Matrix -->
     <div class="volume-row">
       <span>🔈</span>
       <input type="range" id="playerVolumeSlider" min="0" max="100" value="80" />
@@ -805,8 +622,7 @@ body::before{
       <span class="vol-label" id="playerVolLabel">80%</span>
     </div>
 
-    <!-- Media Engineering Control Matrix Buttons Grid Row -->
-    <div class="btn-grid" id="integratedMediaGrid">
+    <div class="btn-grid">
       <button class="btn btn-play" id="mediaPlayBtn">▶ Play</button>
       <button class="btn btn-pause" id="mediaPauseBtn" disabled>⏸ Pause</button>
       <button class="btn btn-resume" id="mediaResumeBtn" disabled>▶ Resume</button>
@@ -814,8 +630,8 @@ body::before{
       <button class="btn btn-next btn-full" id="mediaNextBtn" disabled>NEXT MESSAGE ⏭</button>
     </div>
 
-    <button class="save-btn"    id="saveBtn">💾 SAVE TO PHONE</button>
-    <button class="dismiss-btn" id="goHomeBtn">✕ Close &amp; go back</button>
+    <button class="save-btn"    id="saveBtn">💾 SAVE TO DEVICE</button>
+    <button class="dismiss-btn" id="goHomeBtn">✕ CLOSE PLAYER</button>
   </div>
 </div>
 
@@ -823,18 +639,9 @@ body::before{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
-  sendPasswordResetEmail, onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getDatabase, ref, set, get, update, push, remove,
-  onChildAdded, query, orderByChild, startAt, limitToLast
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, set, get, update, push, remove, onChildAdded, query, orderByChild, startAt } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// =============================================
-//  FIREBASE CONFIG
-// =============================================
 const firebaseConfig = {
   apiKey:            "AIzaSyAlWc8AFDTF42DyrqlXOFMv5qeFseIxwZk",
   authDomain:        "over-to-you.firebaseapp.com",
@@ -844,22 +651,20 @@ const firebaseConfig = {
   messagingSenderId: "248483734626",
   appId:             "1:248483734626:web:492766d8b748d7fb875d3b"
 };
-// =============================================
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
 
-// Cloudinary
 const CLOUDINARY_CLOUD  = "dqwaiio4d";
 const CLOUDINARY_PRESET = "oty123";
+const MAX_RECORD_SECS   = 90;
+const TOTAL_CARDS       = 10;
 
-const MAX_INBOX       = 20;
-const MAX_RECORD_SECS = 90;
-const TOTAL_CARDS     = 10;
-
-const messageQueue = [];
-let   queuePlaying = false;
+// Central Processing Message Queues
+let messageQueue   = [];
+let totalCountTrack = 0;
+let currentTrackIdx = 0;
 
 let currentUser        = null;
 let myProfile          = null;  
@@ -881,11 +686,9 @@ let recTimerInterval  = null;
 let recAutoStopTimer  = null;
 let recSecondsElapsed = 0;
 let activeRecCard     = null;
+let playerState       = 'idle'; 
 
-let playerState       = 'idle'; // idle | playing | paused | stopped
-
-// ── UI helpers ────────────────────────────────
-
+// ── APP SCREEN RUNTIME MATRIX ──
 window.switchTab = function(tab) {
   const su = tab === "signup";
   document.getElementById("signupFields").style.display = su ? "flex" : "none";
@@ -893,7 +696,7 @@ window.switchTab = function(tab) {
   document.getElementById("codeReveal").style.display   = "none";
   document.getElementById("tabSignup").classList.toggle("active",  su);
   document.getElementById("tabSignin").classList.toggle("active", !su);
-  clearLoginError();
+  document.getElementById("loginError").style.display = "none";
 };
 
 window.togglePass = function(id, btn) {
@@ -904,94 +707,35 @@ window.togglePass = function(id, btn) {
 
 function showError(msg) {
   const el = document.getElementById("loginError");
-  el.style.color   = "#ff6b6b";
-  el.textContent   = msg;
-  el.style.display = "block";
+  el.style.color = "#ff6b6b"; el.textContent = msg; el.style.display = "block";
 }
 function showSuccess(msg) {
   const el = document.getElementById("loginError");
-  el.style.color   = "var(--green)";
-  el.textContent   = msg;
-  el.style.display = "block";
-}
-function clearLoginError() {
-  document.getElementById("loginError").style.display = "none";
+  el.style.color = "var(--green)"; el.textContent = msg; el.style.display = "block";
 }
 
-function toast(msg, duration) {
+function toast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg; t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), duration || 4000);
+  setTimeout(() => t.classList.remove("show"), 3500);
 }
 function escapeHtml(s) {
   if (!s) return "";
-  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 function formatTime(s) {
   if (!s || isNaN(s)) return '0:00';
-  return String(Math.floor(s/60)).padStart(2,"0")+":"+String(Math.floor(s%60)).padStart(2,"0");
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ":" + String(sec).padStart(2, "0");
 }
-function vibrateStart() { try { if (navigator.vibrate) navigator.vibrate(80); } catch(e){} }
-function vibrateSent()  { try { if (navigator.vibrate) navigator.vibrate([60,40,60]); } catch(e){} }
 
 function copyToClipboard(text, msg) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text)
-      .then(() => toast(msg))
-      .catch(() => clipboardFallback(text, msg));
+    navigator.clipboard.writeText(text).then(() => toast(msg));
   } else {
-    clipboardFallback(text, msg);
+    toast("Friend code: " + text);
   }
-}
-function clipboardFallback(text, msg) {
-  try {
-    const ta = document.createElement("textarea");
-    ta.value = text;
-    ta.style.cssText = "position:fixed;top:-9999px;opacity:0";
-    document.body.appendChild(ta); ta.focus(); ta.select();
-    document.execCommand("copy"); document.body.removeChild(ta);
-    toast(msg);
-  } catch(e) { toast("Your code: " + text); }
-}
-
-function friendlyAuthError(code) {
-  const m = {
-    "auth/email-already-in-use":   "❌ Email already registered. Try signing in.",
-    "auth/invalid-email":          "❌ Invalid email address.",
-    "auth/weak-password":          "❌ Password needs 6+ characters.",
-    "auth/user-not-found":         "❌ No account found for that email.",
-    "auth/wrong-password":         "❌ Wrong password.",
-    "auth/invalid-credential":     "❌ Wrong email or password.",
-    "auth/too-many-requests":      "❌ Too many attempts. Try later.",
-    "auth/network-request-failed": "❌ Network error. Check connection.",
-  };
-  return m[code] || "❌ " + (code || "Unknown error");
-}
-
-function validateName(raw) {
-  if (!raw || !raw.trim()) return null;
-  const trimmed = raw.trim();
-  if (trimmed.replace(/[^a-zA-Z]/g, "").length < 2) return null;
-  if (!/^[a-zA-Z][a-zA-Z\s.\-']+$/.test(trimmed)) return null;
-  return trimmed;
-}
-
-function makeCodePrefix(name) {
-  const first = name.trim().split(/\s+/)[0] || name;
-  return first.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 6) || "USER";
-}
-
-async function generateUniqueFriendCode(name) {
-  const prefix = makeCodePrefix(name);
-  let code, snap, attempts = 0;
-  do {
-    const digits = String(Math.floor(Math.random() * 9000) + 1000);
-    code = prefix + "-" + digits;
-    snap = await get(ref(db, "global_directory/" + code.toLowerCase()));
-    if (++attempts > 20) throw new Error("Could not generate a unique friend code");
-  } while (snap.exists());
-  return code;
 }
 
 function getDefaultFriends() {
@@ -999,63 +743,19 @@ function getDefaultFriends() {
   for (let i = 0; i < TOTAL_CARDS; i++) {
     slots.push({ id: null, label: "", town: "", code: "", status: "empty" });
   }
-  slots.push({
-    id: "__broadcast__", label: "BROADCAST",
-    town: "Everyone", code: "", status: "broadcast"
-  });
+  slots.push({ id: "__broadcast__", label: "BROADCAST", town: "Everyone", code: "", status: "broadcast" });
   return slots;
-}
-
-async function saveUserProfile() {
-  if (!currentUser || !myProfile) return;
-  await set(ref(db, "users/" + currentUser.uid), {
-    name:       myProfile.name,
-    email:      myProfile.email,
-    friendCode: myProfile.friendCode,
-    friends:    myFriends,
-    lastSeen:   Date.now()
-  });
-}
-
-function showLoginScreen() {
-  document.getElementById("appScreen").style.display    = "none";
-  document.getElementById("loginScreen").style.display  = "flex";
-  document.getElementById("signupFields").style.display = "flex";
-  document.getElementById("signinFields").style.display = "none";
-  document.getElementById("codeReveal").style.display   = "none";
-  document.getElementById("tabSignup").classList.add("active");
-  document.getElementById("tabSignin").classList.remove("active");
-  clearLoginError();
-  if (messageListenerOff) { messageListenerOff(); messageListenerOff = null; }
-  currentUser = null; myProfile = null; myFriends = [];
-  listenerAttached = false;
 }
 
 async function bootApp(user) {
   currentUser = user;
   const snap = await get(ref(db, "users/" + currentUser.uid));
   if (!snap.exists()) {
-    console.warn("OTY: Auth session found but no DB record. Signing out.");
-    await signOut(auth);
-    showLoginScreen();
-    return;
+    await signOut(auth); showLoginScreen(); return;
   }
   const data = snap.val();
-  if (!data.name || data.name.trim().length < 2) {
-    console.warn("OTY: DB record has no valid name. Signing out.");
-    await signOut(auth);
-    showLoginScreen();
-    showError("❌ Account data incomplete. Please register again.");
-    return;
-  }
-
-  myProfile = {
-    name:       data.name,
-    email:      data.email,
-    friendCode: data.friendCode
-  };
-  myFriends          = (data.friends && data.friends.length >= TOTAL_CARDS)
-                       ? data.friends : getDefaultFriends();
+  myProfile = { name: data.name, email: data.email, friendCode: data.friendCode };
+  myFriends = (data.friends && data.friends.length >= TOTAL_CARDS) ? data.friends : getDefaultFriends();
   lastLoginTimestamp = data.lastSeen || 0;
 
   await update(ref(db, "users/" + currentUser.uid), { lastSeen: Date.now() });
@@ -1064,487 +764,126 @@ async function bootApp(user) {
   document.getElementById("appScreen").style.display   = "flex";
   document.getElementById("headerCode").textContent    = myProfile.friendCode;
 
-  document.getElementById("userBadge").onclick = () =>
-    copyToClipboard(myProfile.friendCode, "📋 " + myProfile.friendCode + " copied!");
+  document.getElementById("userBadge").onclick = () => copyToClipboard(myProfile.friendCode, "📋 Code copied!");
 
   await initMicrophone();
-  await loadUnreadCounts();
+  await syncInboxState();
   buildDashboard();
-  if (!listenerAttached) { listenerAttached = true; listenForMessages(); }
-  cleanupOldMessages().catch(e => console.warn("Cleanup error:", e));
-}
-
-// ── SIGN UP ──
-document.getElementById("signupBtn").onclick = async () => {
-  const btn = document.getElementById("signupBtn");
-  btn.disabled = true; btn.textContent = "Please wait…";  
-  clearLoginError();
-
-  const rawName = document.getElementById("signupName").value;
-  const name    = validateName(rawName);
-  if (!name) {
-    showError("❌ Please enter your real name (at least 2 letters).");
-    document.getElementById("signupName").focus();
-    btn.disabled = false; btn.textContent = "CREATE ACCOUNT →";
-    return;
-  }
-
-  const email = document.getElementById("signupEmail").value.trim();
-  const pass  = document.getElementById("signupPass").value;
-
-  if (!email) { showError("❌ Enter your email address."); btn.disabled = false; btn.textContent = "CREATE ACCOUNT →"; return; }
-  if (pass.length < 6) { showError("❌ Password needs at least 6 characters."); btn.disabled = false; btn.textContent = "CREATE ACCOUNT →"; return; }
-
-  try {
-    const friendCode = await generateUniqueFriendCode(name);
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    currentUser = cred.user;
-
-    myProfile = { name, email, friendCode };
-    myFriends = getDefaultFriends();
-    lastLoginTimestamp = Date.now();
-
-    const profileData = {
-      name, email, friendCode,
-      friends:  myFriends,
-      lastSeen: Date.now()
-    };
-    await set(ref(db, "users/" + currentUser.uid), profileData);
-    await set(ref(db, "global_directory/" + friendCode.toLowerCase()), { uid: currentUser.uid, name });
-
-    document.getElementById("signupFields").style.display = "none";
-    showSuccess("✅ Account created successfully!");
-    document.getElementById("codeDisplay").textContent   = friendCode;
-    document.getElementById("codeReveal").style.display  = "flex";
-
-  } catch(err) {
-    console.error("Signup error:", err);
-    if (currentUser && err.code !== "auth/email-already-in-use") {
-      try { await currentUser.delete(); } catch(e) { console.warn("Rollback failed:", e); }
-      currentUser = null;
-    }
-    showError(friendlyAuthError(err.code || err.message));
-  } finally {
-    btn.disabled = false; btn.textContent = "CREATE ACCOUNT →";
-  }
-};
-
-document.getElementById("codeCopyBtn").onclick = () => {
-  const code = document.getElementById("codeDisplay").textContent;
-  copyToClipboard(code, "📋 " + code + " copied!");
-};
-
-document.getElementById("codeGoBtn").onclick = async () => {
-  try {
-    await bootApp(currentUser);
-  } catch(e) {
-    console.error(e);
-    showError("❌ Error loading app. Please try signing in.");
-  }
-};
-
-// ── SIGN IN ──
-document.getElementById("signinBtn").onclick = async () => {
-  clearLoginError();
-  const email = document.getElementById("signinEmail").value.trim();
-  const pass  = document.getElementById("signinPass").value;
-  if (!email || !pass) { showError("❌ Enter your email and password."); return; }
-  const btn = document.getElementById("signinBtn");
-  btn.disabled = true; btn.textContent = "Please wait…";
-  try {
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    await bootApp(cred.user);
-  } catch(err) {
-    console.error("Signin error:", err);
-    showError(friendlyAuthError(err.code));
-  } finally {
-    btn.disabled = false; btn.textContent = "SIGN IN →";
-  }
-};
-
-// ── FORGOT PASSWORD ──
-document.getElementById("forgotBtn").onclick = async () => {
-  clearLoginError();
-  const email = document.getElementById("signinEmail").value.trim();
-  if (!email) { showError("❌ Enter your email address above first."); return; }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    showSuccess("✅ Reset email sent! Check your inbox.");
-  } catch(err) { showError(friendlyAuthError(err.code)); }
-};
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return;  
-  if (document.getElementById("appScreen").style.display === "flex") return;
-  if (document.getElementById("codeReveal").style.display === "flex") return;
-  try {
-    await bootApp(user);
-  } catch(e) {
-    console.error("Session restore failed:", e);
-    await signOut(auth).catch(() => {});
-    showLoginScreen();
-  }
-});
-
-document.getElementById("signoutBtn").onclick = async () => {
-  if (!confirm("Sign out?")) return;
-  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-  try { await signOut(auth); } catch(e) { console.error(e); }
-  showLoginScreen();
-};
-
-// ── MICROPHONE ──
-async function initMicrophone() {
-  try {
-    if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,    
-        noiseSuppression: false,   
-        autoGainControl:  true,    
-        sampleRate:       44100    
-      }
-    });
-  } catch(err) {
-    try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch(e) {
-      console.error("Mic error:", e);
-      toast("❌ Microphone access denied — check browser permissions");
-    }
+  
+  if (!listenerAttached) { 
+    listenerAttached = true; 
+    listenForIncomingRealtime(); 
   }
 }
 
-// ── RECORDING TIMER ──
-function startRecTimer(card) {
-  recSecondsElapsed = 0; activeRecCard = card;
-  const timerEl = card.querySelector(".rec-timer");
-  const barEl   = card.querySelector(".rec-bar");
-  barEl.style.transition = "none"; barEl.style.width = "0%";
-  requestAnimationFrame(() => {
-    barEl.style.transition = "width " + MAX_RECORD_SECS + "s linear";
-    barEl.style.width = "100%";
-  });
-  timerEl.textContent = "● " + formatTime(0);
-  recTimerInterval = setInterval(() => {
-    recSecondsElapsed++;
-    timerEl.textContent = "● " + formatTime(recSecondsElapsed);
-    if (recSecondsElapsed === MAX_RECORD_SECS - 10) toast("⚠️ 10 seconds left");
-  }, 1000);
-  recAutoStopTimer = setTimeout(() => {
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-      toast("⏹ Max length — sending…");
-      mediaRecorder.stop();
-      card.classList.remove("recording");
-      isRecording = false;
-    }
-    stopRecTimer();
-  }, MAX_RECORD_SECS * 1000);
+function showLoginScreen() {
+  document.getElementById("appScreen").style.display = "none";
+  document.getElementById("loginScreen").style.display = "flex";
 }
 
-function stopRecTimer() {
-  clearInterval(recTimerInterval); clearTimeout(recAutoStopTimer);
-  recTimerInterval = recAutoStopTimer = null; recSecondsElapsed = 0;
-  if (activeRecCard) {
-    const b = activeRecCard.querySelector(".rec-bar");
-    if (b) { b.style.transition = "none"; b.style.width = "0%"; }
-    activeRecCard = null;
-  }
-}
-
-function createMediaRecorder(stream) {
-  const preferred = [
-    "audio/mp4;codecs=mp4a.40.2",
-    "audio/mp4",
-    "audio/webm;codecs=opus",
-    "audio/webm"
-  ];
-  const recorderOptions = { audioBitsPerSecond: 128000 };
-
-  for (const mime of preferred) {
-    if (!MediaRecorder.isTypeSupported(mime)) continue;
-    try {
-      const mr = new MediaRecorder(stream, { mimeType: mime, ...recorderOptions });
-      console.log("OTY: Using audio format:", mime, "@ 128kbps");
-      return mr;
-    } catch(e) {
-      console.warn("OTY: Format rejected at runtime:", mime, e);
-    }
-  }
-  console.warn("OTY: All preferred formats failed. Using browser default @ 128kbps.");
-  return new MediaRecorder(stream, recorderOptions);
-}
-
-function extForRecorder(mr) {
-  const mime = mr.mimeType || "";
-  if (mime.includes("mp4")) return ".m4a";
-  if (mime.includes("ogg")) return ".ogg";
-  return ".webm";
-}
-
-// ── AUDIO UPLOAD ──
-async function uploadAudio(blob, recipientUid, ext) {
-  if (!blob || blob.size === 0) {
-    throw new Error("Audio blob is empty — recording may have failed");
-  }
-  const fd = new FormData();
-  const filename = currentUser.uid + "_" + recipientUid + "_" + Date.now() + ext;
-  fd.append("file",          new File([blob], filename, { type: blob.type || "audio/webm" }));
-  fd.append("upload_preset", CLOUDINARY_PRESET);
-  fd.append("resource_type", "video");
-
-  let res;
-  try {
-    res = await fetch(
-      "https://api.cloudinary.com/v1_1/" + CLOUDINARY_CLOUD + "/video/upload",
-      { method: "POST", body: fd }
-    );
-  } catch(networkErr) {
-    throw new Error("Network error reaching Cloudinary: " + networkErr.message);
-  }
-
-  if (!res.ok) {
-    let detail = "";
-    try {
-      const errBody = await res.json();
-      detail = errBody.error && errBody.error.message ? errBody.error.message : JSON.stringify(errBody);
-    } catch(e) {
-      detail = "HTTP " + res.status;
-    }
-    throw new Error("Cloudinary rejected upload: " + detail);
-  }
-
-  const data = await res.json();
-  if (!data.secure_url) {
-    throw new Error("Cloudinary response missing secure_url: " + JSON.stringify(data));
-  }
-  return data.secure_url;
-}
-
-// ── SEND MESSAGE ──
-async function sendToOne(friendId, friendLabel, audioUrl, duration) {
-  const msgRef = push(ref(db, "messages/" + friendId));
-  await set(msgRef, {
-    from:      currentUser.uid,
-    fromName:  myProfile.name,
-    audioUrl,
-    duration:  duration || 0,
-    timestamp: Date.now(),
-    isRead:    false
-  });
-  return true;
-}
-
-async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
-  if (!audioChunks.length) { toast("No audio recorded"); return; }
-  if (sendingCard) {
-    sendingCard.classList.add("sending");
-    const sl = sendingCard.querySelector(".sending-label");
-    if (sl) sl.textContent = "Sending…";
-  }
-
-  try {
-    const mime     = mediaRecorder.mimeType || "";
-    const ext      = extForRecorder(mediaRecorder);
-    const blob     = new Blob(audioChunks, { type: mime || "audio/webm" });
-    const duration = recSecondsElapsed; 
-    const audioUrl = await uploadAudio(blob, isBroadcast ? "broadcast" : friend.id, ext);
-
-    if (isBroadcast) {
-      const linked = myFriends.filter(f => f.id && f.id !== "__broadcast__");
-      if (!linked.length) { toast("❌ No contacts linked yet"); return; }
-      let sent = 0;
-      for (const f of linked) {
-        if (await sendToOne(f.id, f.label, audioUrl, duration)) sent++;
-      }
-      vibrateSent();
-      toast("📢 Broadcast sent to " + sent + " contact" + (sent !== 1 ? "s" : ""));
-    } else {
-      await sendToOne(friend.id, friend.label, audioUrl, duration);
-      vibrateSent();
-      toast("✓ Sent to " + escapeHtml(friend.label || "contact"));
-    }
-  } catch(err) {
-    console.error("Send error:", err);
-    toast("❌ " + (err.message || "Failed to send — check connection"), 5000);
-  } finally {
-    if (sendingCard) {
-      sendingCard.classList.remove("sending");
-      const sl = sendingCard.querySelector(".sending-label");
-      if (sl) sl.textContent = "";
-    }
-  }
-}
-
-// ── UNREAD COUNTS ──
-async function loadUnreadCounts() {
+// ── SYNC LOGIC & QUEUE FIXES ──
+async function syncInboxState() {
   try {
     const msgsRef = ref(db, "messages/" + currentUser.uid);
     const snap    = await get(msgsRef);
     unreadCounts  = {};
-    if (!snap.exists()) return;
-    snap.forEach((child) => {
-      const msg = child.val();
-      if (msg && !msg.isRead && msg.from) {
-        unreadCounts[msg.from] = (unreadCounts[msg.from] || 0) + 1;
-      }
-    });
-    const totalUnread = Object.values(unreadCounts).reduce((a,b) => a+b, 0);
-    if (totalUnread > 0) {
-      await populateQueueFromDB();
+    const unreadMessagesList = [];
+
+    if (snap.exists()) {
+      snap.forEach((child) => {
+        const msg = child.val();
+        if (msg && !msg.isRead) {
+          if (msg.from) {
+            unreadCounts[msg.from] = (unreadCounts[msg.from] || 0) + 1;
+          }
+          unreadMessagesList.push({
+            audioUrl:   msg.audioUrl,
+            senderName: msg.fromName || "Unknown",
+            messageId:  child.key,
+            senderId:   msg.from,
+            timestamp:  msg.timestamp
+          });
+        }
+      });
     }
+
+    // Sort: Oldest message first so Next button works in chron-order
+    unreadMessagesList.sort((a, b) => a.timestamp - b.timestamp);
+    messageQueue = unreadMessagesList;
+    totalCountTrack = messageQueue.length;
+    currentTrackIdx = totalCountTrack > 0 ? 1 : 0;
+    
+    refreshBannerUI();
   } catch(e) {
-    console.warn("OTY: Could not load unread counts:", e.message);
+    console.error("Sync error:", e);
   }
 }
 
-async function populateQueueFromDB() {
-  try {
-    const msgsRef = ref(db, "messages/" + currentUser.uid);
-    const snap    = await get(msgsRef);
-    if (!snap.exists()) return;
-    const unread = [];
-    snap.forEach((child) => {
-      const msg = child.val();
-      if (msg && !msg.isRead && msg.timestamp > lastLoginTimestamp) {
-        unread.push({
-          audioUrl:   msg.audioUrl,
-          senderName: msg.fromName,
-          messageId:  child.key,
-          senderId:   msg.from,
-          timestamp:  msg.timestamp,
-          duration:   msg.duration || 0
-        });
-      }
-    });
-    unread.sort((a,b) => b.timestamp - a.timestamp);
-    messageQueue.push(...unread);
-  } catch(e) {
-    console.warn("OTY: Could not populate queue:", e.message);
-  }
-}
+function refreshBannerUI() {
+  const banner = document.getElementById("inboxBanner");
+  const textEl = document.getElementById("inboxBannerText");
+  const count  = messageQueue.length;
 
-function updateBadge(senderId, delta) {
-  unreadCounts[senderId] = Math.max(0, (unreadCounts[senderId] || 0) + delta);
-  const card = document.querySelector(".friend-card[data-friend-id='" + senderId + "']");
-  if (!card) return;
-  const badge = card.querySelector(".unread-badge");
-  if (!badge) return;
-  const count = unreadCounts[senderId];
-  badge.textContent = count > 9 ? "9+" : String(count);
   if (count > 0) {
-    card.classList.add("has-message");
-    badge.style.display = "flex";
+    textEl.textContent = `📩 ${count} new voice message${count > 1 ? 's' : ''} waiting`;
+    banner.style.display = "flex";
+    banner.classList.add("visible");
   } else {
-    card.classList.remove("has-message");
-    badge.style.display = "none";
+    banner.style.display = "none";
+    banner.classList.remove("visible");
   }
 }
 
-// ── 30-DAY CLEANUP ──
-async function cleanupOldMessages() {
-  const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
-  const cutoff         = Date.now() - THIRTY_DAYS_MS;
-  try {
-    const msgsRef = ref(db, "messages/" + currentUser.uid);
-    const snap    = await get(msgsRef);
-    if (!snap.exists()) return;
-    const deletions = [];
-    snap.forEach((child) => {
-      const msg = child.val();
-      if (msg.timestamp && msg.timestamp < cutoff && msg.isRead) {
-        deletions.push(remove(ref(db, "messages/" + currentUser.uid + "/" + child.key)));
-      }
-    });
-    if (deletions.length) {
-      await Promise.all(deletions);
-    }
-  } catch(e) {
-    console.warn("OTY Cleanup failed:", e.message);
-  }
-}
+// Fixed Realtime sync attachment hook
+function listenForIncomingRealtime() {
+  const msgsRef = ref(db, "messages/" + currentUser.uid);
+  messageListenerOff = onChildAdded(query(msgsRef), (snap) => {
+    const msg = snap.val();
+    if (!msg || msg.isRead || msg.timestamp <= lastLoginTimestamp) return;
 
-function listenForMessages() {
-  const msgsRef  = ref(db, "messages/" + currentUser.uid);
-  const msgQuery = query(msgsRef, orderByChild("timestamp"), startAt(lastLoginTimestamp + 1));
-  messageListenerOff = onChildAdded(msgQuery, (snap) => {
-    const data = snap.val(); if (!data) return;
-    if (data.isRead) return; 
+    // Avoid duplicating records
+    if (messageQueue.some(m => m.messageId === snap.key)) return;
+
     messageQueue.push({
-      audioUrl:   data.audioUrl,
-      senderName: data.fromName,
+      audioUrl:   msg.audioUrl,
+      senderName: msg.fromName || "Unknown",
       messageId:  snap.key,
-      senderId:   data.from,
-      timestamp:  data.timestamp,
-      duration:   data.duration || 0
+      senderId:   msg.from,
+      timestamp:  msg.timestamp
     });
-    updateBadge(data.from, +1);  
-    if (!queuePlaying) showNextInQueue();
+
+    if (msg.from) {
+      unreadCounts[msg.from] = (unreadCounts[msg.from] || 0) + 1;
+    }
+    
+    totalCountTrack = messageQueue.length;
+    if (currentTrackIdx === 0) currentTrackIdx = 1;
+    
+    refreshBannerUI();
+    buildDashboard();
   });
 }
 
-// ── INBOX BANNER MANAGEMENT ──
-function updateInboxBanner() {
-  const banner  = document.getElementById("inboxBanner");
-  const textEl  = document.getElementById("inboxBannerText");
-  const total   = messageQueue.length;
-  if (total === 0) {
-    banner.classList.remove("visible");
-  } else {
-    const word = total === 1 ? "message" : "messages";
-    textEl.textContent = "📩 " + total + " new " + word + " waiting";
-    banner.classList.add("visible");
-  }
-}
-
-function startListening() {
-  if (!messageQueue.length) {
-    document.getElementById("inboxBanner").classList.remove("visible");
+// ── BANNER LAUNCH FIX (SCREEN 1 -> SCREEN 2) ──
+document.getElementById("inboxBanner").onclick = function() {
+  if (messageQueue.length === 0) {
+    refreshBannerUI();
     return;
   }
-  showNextInQueue(true);
-}
-
-function showNextInQueue(userInitiated) {
-  if (document.getElementById("playModal").classList.contains("open")) return;
-  if (!messageQueue.length) {
-    queuePlaying = false;
-    document.getElementById("inboxBanner").classList.remove("visible");
-    return;
-  }
-
-  updateInboxBanner();
-  if (!userInitiated) { queuePlaying = false; return; }
-
-  queuePlaying   = true;
-  pendingMessage = messageQueue.shift();
-  updateInboxBanner(); 
-
-  document.getElementById("playFromName").textContent = "📩 From " + escapeHtml(pendingMessage.senderName);
-  document.getElementById("playTime").textContent = new Date(pendingMessage.timestamp).toLocaleTimeString();
-
-  const total      = messageQueue.length;  
-  const progEl     = document.getElementById("playProgress");
-  if (total > 0) {
-    progEl.textContent = (total + 1) + " messages — listening in order";
-    progEl.style.display = "block";
-  } else {
-    progEl.style.display = "none";
-  }
-
-  document.getElementById("saveBtn").classList.remove("visible");
+  // Open the audio player sheet modal component layout container
   document.getElementById("playModal").classList.add("open");
   
-  // Initialize and auto-play item
-  loadAndPlayAudioInstance(pendingMessage.audioUrl);
-}
+  // Directly extract the current item at index 0 and fire playback engine setup
+  pendingMessage = messageQueue[0];
+  loadTrackEngine(pendingMessage);
+};
 
-// ── ADVANCED AUDIO PLAYER DRIVER ENGINE ──
+// ── ADVANCED AUDIO DRIVER MATRIX ──
 function setPlayerUIState(s) {
   playerState = s;
-  const statusDot = document.getElementById("playerStatusDot");
+  const statusDot  = document.getElementById("playerStatusDot");
   const statusText = document.getElementById("playerStatusText");
-  const waveBars = document.querySelectorAll("#playWaveContainer .wave-bar");
+  const waveBars   = document.querySelectorAll("#playWaveContainer .wave-bar");
 
   statusDot.className = 'dot';
   statusText.className = 'status-text';
@@ -1567,19 +906,21 @@ function setPlayerUIState(s) {
     statusText.classList.add('idle');
     statusText.textContent = 'IDLE';
   }
-  updatePlayerControlButtons();
+  
+  // Update reactive rules matrices
+  document.getElementById('mediaPlayBtn').disabled   = (currentAudio == null) || (s === 'playing');
+  document.getElementById('mediaPauseBtn').disabled  = (s !== 'playing');
+  document.getElementById('mediaResumeBtn').disabled = (s !== 'paused');
+  document.getElementById('mediaStopBtn').disabled   = (s === 'idle' || s === 'stopped');
+  
+  // Next button is valid if there are additional message segments left in queue array
+  document.getElementById('mediaNextBtn').disabled   = (messageQueue.length <= 1);
 }
 
-function updatePlayerControlButtons() {
-  const hasAudio = currentAudio != null;
-  document.getElementById('mediaPlayBtn').disabled   = !hasAudio || playerState === 'playing';
-  document.getElementById('mediaPauseBtn').disabled  = playerState !== 'playing';
-  document.getElementById('mediaResumeBtn').disabled = playerState !== 'paused';
-  document.getElementById('mediaStopBtn').disabled   = playerState === 'idle' || playerState === 'stopped';
-  document.getElementById('mediaNextBtn').disabled   = messageQueue.length === 0;
-}
-
-async function loadAndPlayAudioInstance(url) {
+async function loadTrackEngine(msgObj) {
+  if (!msgObj) return;
+  
+  // Terminate any runtime instances cleanly
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
@@ -1587,101 +928,123 @@ async function loadAndPlayAudioInstance(url) {
   }
   setPlayerUIState('idle');
 
+  document.getElementById("playFromName").textContent = "📩 From " + escapeHtml(msgObj.senderName);
+  document.getElementById("playTime").textContent     = new Date(msgObj.timestamp).toLocaleTimeString();
+  
+  // Show queue tracks progression status index metrics
+  document.getElementById("playerTrackInfo").textContent = `${currentTrackIdx} / ${totalCountTrack}`;
+  
+  const remnant = messageQueue.length - 1;
+  document.getElementById("playProgress").textContent = remnant > 0 
+    ? `＋ ${remnant} more voice file${remnant > 1 ? 's' : ''} queued` 
+    : "🎯 Last voice message";
+
+  document.getElementById("saveBtn").classList.add("visible");
+  
+  // Re-synchronize timeline tracks layout styles
+  document.getElementById("playerProgressFill").style.width = "0%";
+  document.getElementById("playerTimeCurrent").textContent  = "0:00";
+  document.getElementById("playerTimeTotal").textContent    = "0:00";
+
   try {
-    currentAudio = new Audio(url);
-    document.getElementById("saveBtn").classList.add("visible");
+    currentAudio = new Audio(msgObj.audioUrl);
+    currentAudio.volume = document.getElementById("playerVolumeSlider").value / 100;
 
-    // Re-synchronize standard setup ranges
-    const slider = document.getElementById("playerVolumeSlider");
-    currentAudio.volume = slider.value / 100;
+    currentAudio.addEventListener("loadedmetadata", () => {
+      if (currentAudio) document.getElementById("playerTimeTotal").textContent = formatTime(currentAudio.duration);
+    });
 
-    // Direct wiring events
     currentAudio.addEventListener("timeupdate", () => {
       if (!currentAudio || !currentAudio.duration) return;
       const cur = currentAudio.currentTime;
       const dur = currentAudio.duration;
       document.getElementById("playerTimeCurrent").textContent = formatTime(cur);
-      document.getElementById("playerProgressFill").style.width = ((cur / dur) * 100) + '%';
-    });
-
-    currentAudio.addEventListener("loadedmetadata", () => {
-      if(!currentAudio) return;
-      document.getElementById("playerTimeTotal").textContent = formatTime(currentAudio.duration);
-      document.getElementById("playerTrackInfo").textContent = "1 / " + (messageQueue.length + 1);
+      document.getElementById("playerProgressFill").style.width = ((cur / dur) * 100) + "%";
     });
 
     currentAudio.addEventListener("ended", async () => {
       setPlayerUIState('stopped');
-      await markCurrentMessageRead();
-      advanceQueueNext();
+      await clearReadBitOnFirebase(msgObj);
+      
+      // Auto advance loop context sequence if more tracks remain natively
+      if (messageQueue.length > 1) {
+        advanceNextTrackSequence();
+      }
     });
 
     currentAudio.addEventListener("error", () => {
+      toast("⚠️ Playback node failed — skipping track");
       setPlayerUIState('idle');
-      toast("❌ Playback failed — skipping track");
-      advanceQueueNext();
     });
 
     await currentAudio.play();
     setPlayerUIState('playing');
 
-  } catch(err) {
-    console.error("Engine playback fail:", err);
-    setPlayerUIState('idle');
+  } catch(e) {
+    console.error("Audio trigger crash:", e);
   }
 }
 
-async function markCurrentMessageRead() {
-  if (!pendingMessage) return;
+async function clearReadBitOnFirebase(msgObj) {
+  if (!msgObj || !msgObj.messageId) return;
   try {
-    await update(ref(db, "messages/" + currentUser.uid + "/" + pendingMessage.messageId), { isRead: true });
-    if (pendingMessage.senderId) {
-      updateBadge(pendingMessage.senderId, -1);
+    await update(ref(db, `messages/${currentUser.uid}/${msgObj.messageId}`), { isRead: true });
+    
+    // Decrease memory mapping balances
+    if (msgObj.senderId && unreadCounts[msgObj.senderId]) {
+      unreadCounts[msgObj.senderId] = Math.max(0, unreadCounts[msgObj.senderId] - 1);
     }
-  } catch(e) { console.warn("Failed syncing read bit:", e); }
-}
-
-function advanceQueueNext() {
-  if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
-  document.getElementById("playModal").classList.remove("open");
-  document.getElementById("saveBtn").classList.remove("visible");
-  pendingMessage = null;
-  setPlayerUIState('idle');
-  setTimeout(() => showNextInQueue(true), 400);
-}
-
-// Wire Dashboard Integrated Audio Interactions
-document.getElementById('mediaPlayBtn').onclick = () => {
-  if (currentAudio && playerState !== 'playing') {
-    currentAudio.play().then(() => setPlayerUIState('playing'));
+    
+    // Remove completed record index 0 from data queue
+    messageQueue = messageQueue.filter(m => m.messageId !== msgObj.messageId);
+    
+    refreshBannerUI();
+    buildDashboard();
+  } catch(err) {
+    console.warn("Read state write fail:", err);
   }
+}
+
+// ── NEXT BUTTON FIX ──
+function advanceNextTrackSequence() {
+  if (messageQueue.length <= 1) {
+    toast("No remaining messages in active queue");
+    return;
+  }
+  
+  // Extract completed current file from the engine loop array context
+  const activeFinished = messageQueue[0];
+  clearReadBitOnFirebase(activeFinished);
+
+  // Increment tracking values indexes layout rules
+  currentTrackIdx++;
+  
+  // Re-aim layout configurations to next item inside messageQueue arrays index 0
+  pendingMessage = messageQueue[0];
+  loadTrackEngine(pendingMessage);
+}
+
+// Bind Button Operations
+document.getElementById("mediaNextBtn").onclick = function() {
+  advanceNextTrackSequence();
+};
+
+document.getElementById('mediaPlayBtn').onclick = () => {
+  if (currentAudio && playerState !== 'playing') currentAudio.play().then(() => setPlayerUIState('playing'));
 };
 document.getElementById('mediaPauseBtn').onclick = () => {
-  if (currentAudio && playerState === 'playing') {
-    currentAudio.pause();
-    setPlayerUIState('paused');
-  }
+  if (currentAudio && playerState === 'playing') { currentAudio.pause(); setPlayerUIState('paused'); }
 };
 document.getElementById('mediaResumeBtn').onclick = () => {
-  if (currentAudio && playerState === 'paused') {
-    currentAudio.play().then(() => setPlayerUIState('playing'));
-  }
+  if (currentAudio && playerState === 'paused') currentAudio.play().then(() => setPlayerUIState('playing'));
 };
-document.getElementById('mediaStopBtn').onclick = async () => {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
-  }
+document.getElementById('mediaStopBtn').onclick = () => {
+  if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
   setPlayerUIState('stopped');
   document.getElementById("playerProgressFill").style.width = '0%';
   document.getElementById("playerTimeCurrent").textContent = '0:00';
-  await markCurrentMessageRead();
-};
-document.getElementById('mediaNextBtn').onclick = () => {
-  advanceQueueNext();
 };
 
-// Precise Timeline Scrubbing Selector
 document.getElementById('playerProgressBarBg').onclick = (e) => {
   if (!currentAudio || !currentAudio.duration) return;
   const rect = e.currentTarget.getBoundingClientRect();
@@ -1689,425 +1052,224 @@ document.getElementById('playerProgressBarBg').onclick = (e) => {
   currentAudio.currentTime = ratio * currentAudio.duration;
 };
 
-// Volume Multiplier
 document.getElementById('playerVolumeSlider').oninput = (e) => {
   const val = e.target.value;
   if (currentAudio) currentAudio.volume = val / 100;
   document.getElementById('playerVolLabel').textContent = val + '%';
 };
 
-function saveMessageAudio() {
-  if (!pendingMessage) return;
-  const ext = pendingMessage.audioUrl.includes(".m4a") ? ".m4a" : ".webm";
-  const a   = document.createElement("a");
-  a.href = pendingMessage.audioUrl;
-  a.download = "voice_" + Date.now() + ext;
-  document.body.appendChild(a); a.click(); document.body.removeChild(a);
-}
-
 function closeModal() {
-  if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.src = "";
-    currentAudio = null;
-  }
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
   setPlayerUIState('idle');
   document.getElementById("playModal").classList.remove("open");
-  document.getElementById("saveBtn").classList.remove("visible");
   pendingMessage = null;
-  updateInboxBanner();
+  syncInboxState();
 }
 
-// ── EDIT SHEET ──
-function openEditSheet(idx) {
-  editingIndex = idx;
-  const f = myFriends[idx];
-  const isBroadcast = f.id === "__broadcast__";
-  document.getElementById("editTitle").textContent       = isBroadcast ? "Broadcast Card" : "Set Up Contact";
-  document.getElementById("editLabel").value             = isBroadcast ? "BROADCAST (fixed)" : (f.label || "");
-  document.getElementById("editLabel").disabled          = isBroadcast;
-  document.getElementById("editLabel").style.opacity     = isBroadcast ? "0.4" : "1";
-  document.getElementById("editCode").value              = f.code  || "";
-  document.getElementById("editTown").value              = f.town  || "";
-  document.getElementById("editCodeField").style.display = isBroadcast ? "none" : "block";
-  document.getElementById("editClearBtn").style.display  = (f.id && !isBroadcast) ? "block" : "none";
-  document.getElementById("editModal").classList.add("open");
-}
+document.getElementById("goHomeBtn").onclick = closeModal;
+document.getElementById("saveBtn").onclick = function() {
+  if (!pendingMessage) return;
+  const a = document.createElement("a"); a.href = pendingMessage.audioUrl;
+  a.download = "oty_voice_" + Date.now() + ".webm";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+};
 
-document.getElementById("editSaveBtn").onclick = async () => {
-  const idx   = editingIndex;
-  if (idx === null) return;
-  const f     = myFriends[idx];
-  const label = document.getElementById("editLabel").value.trim();
-  const code  = document.getElementById("editCode").value.trim();
-  const town  = document.getElementById("editTown").value.trim();
-
-  if (!label) { toast("❌ Please enter a name for this person"); return; }
-  const isBroadcast = f.id === "__broadcast__";
-
-  if (isBroadcast) {
-    myFriends[idx] = {
-      id:     "__broadcast__",
-      label:  "BROADCAST",          
-      town:   town || "Everyone",   
-      code:   "",
-      status: "broadcast"
-    };
-    await saveUserProfile();
-    toast("✅ Broadcast card updated");
-    closeEditSheet(); buildDashboard(); return;
-  }
-
-  if (!code) { toast("❌ Enter their friend code"); return; }
-  const key = code.toLowerCase();
-  if (!/^[a-z]+-\d{4}$/.test(key)) {
-    toast("❌ Code format should be like KAMAL-4837"); return;
-  }
-
+// ── MICROPHONE AUDIO CORE DRIVERS ──
+async function initMicrophone() {
   try {
-    const snap = await get(ref(db, "global_directory/" + key));
-    if (!snap.exists()) { toast("❌ No user found with that code"); return; }
-    const entry = snap.val();
-    if (entry.uid === currentUser.uid) { toast("❌ That's your own code!"); return; }
-
-    myFriends[idx] = {
-      id:     entry.uid,
-      label:  label,
-      code:   code.toUpperCase(),
-      town:   town || "",
-      status: "linked"
-    };
-    await saveUserProfile();
-    toast("📡 Connected to " + escapeHtml(label));
-    closeEditSheet(); buildDashboard();
+    mediaStream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: true, sampleRate: 44100 }
+    });
   } catch(err) {
-    console.error("Edit save error:", err);
-    toast("❌ Lookup failed — check connection");
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => null);
   }
-};
-
-document.getElementById("editClearBtn").onclick = async () => {
-  if (!confirm("Remove this contact?")) return;
-  myFriends[editingIndex] = { id: null, label: "", town: "", code: "", status: "empty" };
-  await saveUserProfile();
-  toast("Contact removed");
-  closeEditSheet(); buildDashboard();
-};
-
-document.getElementById("editCancelBtn").onclick = closeEditSheet;
-document.getElementById("editModal").addEventListener("click", (e) => {
-  if (e.target === document.getElementById("editModal")) closeEditSheet();
-});
-
-function closeEditSheet() {
-  document.getElementById("editModal").classList.remove("open");
-  document.getElementById("editLabel").disabled      = false;
-  document.getElementById("editLabel").style.opacity = "1";
-  editingIndex = null;
 }
 
-// ── DASHBOARD GRID BUILDER ──
+function startRecTimer(card) {
+  recSecondsElapsed = 0; activeRecCard = card;
+  const timerEl = card.querySelector(".rec-timer");
+  const barEl   = card.querySelector(".rec-bar");
+  barEl.style.transition = "none"; barEl.style.width = "0%";
+  requestAnimationFrame(() => {
+    barEl.style.transition = "width " + MAX_RECORD_SECS + "s linear";
+    barEl.style.width = "100%";
+  });
+  timerEl.textContent = "● " + formatTime(0);
+  recTimerInterval = setInterval(() => {
+    recSecondsElapsed++;
+    timerEl.textContent = "● " + formatTime(recSecondsElapsed);
+  }, 1000);
+  recAutoStopTimer = setTimeout(() => {
+    if (mediaRecorder && mediaRecorder.state === "recording") mediaRecorder.stop();
+    stopRecTimer();
+  }, MAX_RECORD_SECS * 1000);
+}
+
+function stopRecTimer() {
+  clearInterval(recTimerInterval); clearTimeout(recAutoStopTimer);
+  if (activeRecCard) {
+    const b = activeRecCard.querySelector(".rec-bar");
+    if (b) { b.style.transition = "none"; b.style.width = "0%"; }
+    activeRecCard = null;
+  }
+}
+
+async function uploadAudio(blob, recipientUid) {
+  const fd = new FormData();
+  fd.append("file", new File([blob], `oty_${Date.now()}.webm`, { type: blob.type }));
+  fd.append("upload_preset", CLOUDINARY_PRESET);
+  fd.append("resource_type", "video");
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD}/video/upload`, { method: "POST", body: fd });
+  const data = await res.json();
+  return data.secure_url;
+}
+
+async function sendMessageToFriend(friend, isBroadcast, card) {
+  if (!audioChunks.length) return;
+  card.classList.add("sending");
+  try {
+    const blob = new Blob(audioChunks, { type: "audio/webm" });
+    const audioUrl = await uploadAudio(blob, friend.id);
+    
+    if (isBroadcast) {
+      for (const f of myFriends.filter(item => item.id && item.id !== "__broadcast__")) {
+        await push(ref(db, "messages/" + f.id), { from: currentUser.uid, fromName: myProfile.name, audioUrl, timestamp: Date.now(), isRead: false });
+      }
+      toast("📢 Broadcast complete!");
+    } else {
+      await push(ref(db, "messages/" + friend.id), { from: currentUser.uid, fromName: myProfile.name, audioUrl, timestamp: Date.now(), isRead: false });
+      toast("✓ Message sent!");
+    }
+  } catch(e) {
+    toast("❌ Send failed");
+  } finally {
+    card.classList.remove("sending");
+  }
+}
+
+// ── ACCOUNT & CONTACTS ENGINE MANAGEMENT ──
 function buildDashboard() {
   const grid = document.getElementById("friendsGrid");
   grid.innerHTML = "";
-  updateInboxBanner();  
-
   myFriends.forEach((friend, idx) => {
     const isBroadcast = friend.id === "__broadcast__";
     const isEmpty     = !friend.id && !friend.label;
-
     const card = document.createElement("div");
-    card.className = "friend-card" +
-      (isBroadcast ? " broadcast" : "") +
-      (isEmpty     ? " empty"     : "");
-
-    if (friend.id && !isBroadcast) {
-      card.setAttribute("data-friend-id", friend.id);
-    }
+    card.className = "friend-card" + (isBroadcast ? " broadcast" : "") + (isEmpty ? " empty" : "");
+    if (friend.id && !isBroadcast) card.setAttribute("data-friend-id", friend.id);
 
     if (isEmpty) {
-      card.innerHTML =
-        '<div class="pulse-ring"></div>' +
-        '<div class="msg-indicator"></div>' +
-        '<div class="edit-btn">EDIT</div>' +
-        '<div class="card-empty-hint">Tap EDIT<br>to add contact</div>' +
-        '<div class="rec-timer"></div><div class="rec-bar"></div>' +
-        '<div class="sending-label"></div>';
+      card.innerHTML = `<div class="edit-btn">EDIT</div><div class="card-empty-hint">Tap EDIT<br>to add contact</div>`;
     } else if (isBroadcast) {
-      card.innerHTML =
-        '<div class="pulse-ring"></div>' +
-        '<div class="msg-indicator"></div>' +
-        '<div class="edit-btn">EDIT</div>' +
-        '<div style="font-size:1.8rem;margin-right:4px">📢</div>' +
-        '<div>' +
-          '<div class="card-town">' + escapeHtml(friend.town || "Everyone") + '</div>' +
-          '<div class="card-label">' + escapeHtml(friend.label || "BROADCAST") + '</div>' +
-          '<div class="card-status">Tap to send to all contacts</div>' +
-        '</div>' +
-        '<div class="rec-timer"></div><div class="rec-bar"></div>' +
-        '<div class="sending-label"></div>';
+      card.innerHTML = `<div class="edit-btn">EDIT</div><div style="font-size:1.8rem;margin-right:4px">📢</div><div><div class="card-town">${escapeHtml(friend.town)}</div><div class="card-label">${escapeHtml(friend.label)}</div></div><div class="rec-timer"></div><div class="rec-bar"></div>`;
     } else {
-      card.innerHTML =
-        '<div class="pulse-ring"></div>' +
-        '<div class="msg-indicator"></div>' +
-        '<div class="unread-badge" style="display:none"></div>' +
-        '<div class="hist-btn">HIST</div>' +
-        '<div class="edit-btn">EDIT</div>' +
-        '<div class="card-town">' + escapeHtml(friend.town || "—") + '</div>' +
-        '<div class="card-label">' + escapeHtml(friend.label || "") + '</div>' +
-        '<div class="card-status">' +
-          (friend.status === "linked"
-            ? "✅ " + escapeHtml(friend.code || "")
-            : "Tap EDIT to link") +
-        '</div>' +
-        '<div class="rec-timer"></div><div class="rec-bar"></div>' +
-        '<div class="sending-label"></div>' +
-        '<button class="rec-btn" id="recBtn_' + idx + '">● REC</button>' +
-        '<button class="cancel-rec-btn" id="cancelBtn_' + idx + '">✕ CANCEL</button>';
-    }
-
-    card.querySelector(".edit-btn").addEventListener("click", (e) => {
-      e.stopPropagation(); openEditSheet(idx);
-    });
-
-    const histBtn = card.querySelector(".hist-btn");
-    if (histBtn) {
-      histBtn.addEventListener("click", (e) => {
-        e.stopPropagation(); openHistorySheet(friend);
-      });
-    }
-
-    if (friend.id && !isBroadcast) {
       const count = unreadCounts[friend.id] || 0;
-      const badge = card.querySelector(".unread-badge");
-      if (badge && count > 0) {
-        badge.textContent = count > 9 ? "9+" : String(count);
-        badge.style.display = "flex";
-        card.classList.add("has-message");
-      }
+      card.innerHTML = `
+        <div class="unread-badge" style="display:${count > 0 ? 'flex' : 'none'}">${count}</div>
+        <div class="hist-btn">HIST</div><div class="edit-btn">EDIT</div>
+        <div class="card-town">${escapeHtml(friend.town || "—")}</div>
+        <div class="card-label">${escapeHtml(friend.label)}</div>
+        <div class="rec-timer"></div><div class="rec-bar"></div><div class="sending-label"></div>
+        <button class="rec-btn">● REC</button><button class="cancel-rec-btn">✕ CANCEL</button>
+      `;
+      if (count > 0) card.classList.add("has-message");
     }
+
+    card.querySelector(".edit-btn").onclick = (e) => { e.stopPropagation(); openEditSheet(idx); };
+    const hist = card.querySelector(".hist-btn");
+    if (hist) hist.onclick = (e) => { e.stopPropagation(); openHistorySheet(friend); };
 
     let localRecording = false;
-    function startRecording() {
-      if (!mediaStream) { toast("⏳ Microphone not ready — check permissions"); return; }
-      if (isRecording) return; 
-      try {
-        audioChunks   = [];
-        mediaRecorder = createMediaRecorder(mediaStream);
-        mediaRecorder.ondataavailable = (ev) => {
-          if (ev.data && ev.data.size > 0) audioChunks.push(ev.data);
-        };
+    card.onclick = async () => {
+      if (isEmpty) return;
+      if (isRecording && !localRecording) return;
+      if (!localRecording) {
+        if (!mediaStream) return;
+        audioChunks = [];
+        mediaRecorder = new MediaRecorder(mediaStream, { mimeType: "audio/webm" });
+        mediaRecorder.ondataavailable = (ev) => audioChunks.push(ev.data);
         mediaRecorder.onstop = () => sendMessageToFriend(friend, isBroadcast, card);
-        mediaRecorder.onerror = (err) => {
-          console.error("MediaRecorder error:", err);
-          stopRecording();
-        };
         mediaRecorder.start(250);
-        vibrateStart();
-        localRecording = true;
-        isRecording    = true;
+        localRecording = isRecording = true;
         card.classList.add("recording");
         startRecTimer(card);
-        const btn = card.querySelector(".rec-btn");
-        if (btn) btn.textContent = "■ STOP";
-      } catch(err) {
-        console.error("Could not start recording:", err);
-        toast("❌ Could not start recording");
-      }
-    }
-
-    function stopRecording() {
-      if (!localRecording) return;
-      if (mediaRecorder && mediaRecorder.state === "recording") {
-        mediaRecorder.stop();
-      }
-      stopRecTimer();
-      localRecording = false;
-      isRecording    = false;
-      card.classList.remove("recording");
-      const btn = card.querySelector(".rec-btn");
-      if (btn) btn.textContent = "● REC";
-    }
-
-    const cancelBtn = card.querySelector(".cancel-rec-btn");
-    if (cancelBtn) {
-      cancelBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (!localRecording) return;
-        if (mediaRecorder && mediaRecorder.state === "recording") {
-          mediaRecorder.onstop = null;  
-          mediaRecorder.stop();
-        }
-        audioChunks = [];  
-        stopRecTimer();
-        localRecording = false; isRecording = false;
-        card.classList.remove("recording");
-        const rBtn = card.querySelector(".rec-btn");
-        if (rBtn) rBtn.textContent = "● REC";
-        toast("Recording cancelled");
-      });
-    }
-
-    card.addEventListener("click", (e) => {
-      if (e.target.classList.contains("edit-btn")) return;
-      if (isEmpty) { toast("Tap EDIT to set up this contact first"); return; }
-      if (!isBroadcast && !friend.id) { toast("Tap EDIT to link this contact"); return; }
-      if (card.classList.contains("sending")) return; 
-
-      if (!localRecording) {
-        startRecording();
       } else {
-        stopRecording();
+        if (mediaRecorder) mediaRecorder.stop();
+        stopRecTimer();
+        localRecording = isRecording = false;
+        card.classList.remove("recording");
       }
-    });
-
+    };
     grid.appendChild(card);
   });
 }
 
-// ── HISTORY SHEET PLAYER CONTROL SELECTION ──
 async function openHistorySheet(friend) {
-  if (historyAudio) { historyAudio.pause(); historyAudio = null; }
-  document.getElementById("historyTitle").textContent = "History: " + escapeHtml(friend.label || friend.code);
-  const listEl = document.getElementById("historyList");
-  listEl.innerHTML = '<div class="history-empty">Loading…</div>';
   document.getElementById("historyModal").classList.add("open");
-
-  try {
-    const msgsRef = ref(db, "messages/" + currentUser.uid);
-    const snap    = await get(msgsRef);
-    listEl.innerHTML = "";
-    let matches = [];
-
-    if (snap.exists()) {
-      snap.forEach((child) => {
-        const msg = child.val();
-        if (msg.from === friend.id) {
-          matches.push({ id: child.key, url: msg.audioUrl, time: msg.timestamp, duration: msg.duration || 0, isRead: !!msg.isRead });
-        }
-      });
-    }
-
-    matches.sort((a, b) => b.time - a.time);
-    const last5 = matches.slice(0, 5);
-
-    if (!last5.length) {
-      listEl.innerHTML = '<div class="history-empty">No past messages from this contact.</div>';
-      return;
-    }
-
-    last5.forEach((msg) => {
-      const item    = document.createElement("div");
-      item.className = "history-item";
-      if (!msg.isRead) item.classList.add("history-unread");
-      const timeStr  = new Date(msg.time).toLocaleDateString() + " " +
-                       new Date(msg.time).toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
-      const durStr   = msg.duration ? formatTime(Math.round(msg.duration)) : "--:--";
-      const readBadge = msg.isRead
-        ? '<span class="hist-read-badge">✓ HEARD</span>'
-        : '<span class="hist-unread-badge">● NEW</span>';
-      item.innerHTML =
-        '<div class="history-item-left">' +
-          '<div class="history-time">' + timeStr + ' ' + readBadge + '</div>' +
-          '<div class="history-meta">Duration: ' + durStr + '</div>' +
-        '</div>' +
-        '<button class="history-play-btn" data-state="stopped">▶ PLAY</button>';
-
-      const btn = item.querySelector(".history-play-btn");
-      btn.onclick = async () => {
-        const state = btn.getAttribute("data-state");
-
-        if (state === "playing") {
-          if (historyAudio) historyAudio.pause();
-          btn.textContent = "▶ RESUME";
-          btn.setAttribute("data-state", "paused");
-          return;
-        }
-        if (state === "paused") {
-          if (historyAudio) { historyAudio.play(); }
-          btn.textContent = "⏸ PAUSE";
-          btn.setAttribute("data-state", "playing");
-          return;
-        }
-
-        if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; setPlayerUIState('idle'); }
-        if (historyAudio) {
-          historyAudio.pause();
-          historyAudio = null;
-          listEl.querySelectorAll(".history-play-btn").forEach(b => {
-            b.textContent = "▶ PLAY";
-            b.setAttribute("data-state", "stopped");
-          });
-        }
-
-        try {
-          historyAudio = new Audio(msg.url);
-          btn.textContent = "⏸ PAUSE";
-          btn.setAttribute("data-state", "playing");
-
-          historyAudio.addEventListener("ended", () => {
-            btn.textContent = "▶ PLAY";
-            btn.setAttribute("data-state", "stopped");
-            historyAudio = null;
-          });
-          historyAudio.addEventListener("error", () => {
-            btn.textContent = "▶ PLAY";
-            btn.setAttribute("data-state", "stopped");
-            historyAudio = null;
-            toast("Playback failed");
-          });
-          await historyAudio.play();
-        } catch(e) {
-          btn.textContent = "▶ PLAY";
-          btn.setAttribute("data-state", "stopped");
-          toast("Playback failed");
-        }
-      };
-
-      listEl.appendChild(item);
-    });
-
-  } catch(err) {
-    console.error("History error:", err);
-    listEl.innerHTML = '<div class="history-empty">Could not load history</div>';
+  const listEl = document.getElementById("historyList");
+  listEl.innerHTML = '<div class="history-empty">Loading logs…</div>';
+  const snap = await get(ref(db, "messages/" + currentUser.uid));
+  listEl.innerHTML = "";
+  let logs = [];
+  if (snap.exists()) {
+    snap.forEach(c => { const m = c.val(); if (m.from === friend.id) logs.push(m); });
   }
+  if (!logs.length) { listEl.innerHTML = '<div class="history-empty">No past messages found</div>'; return; }
+  logs.sort((a,b)=>b.timestamp-a.time);
+  logs.slice(0,5).forEach(m => {
+    const item = document.createElement("div"); item.className = "history-item";
+    item.innerHTML = `<div class="history-item-left"><div class="history-time">${new Date(m.timestamp).toLocaleDateString()}</div></div><button class="history-play-btn">▶ PLAY</button>`;
+    item.querySelector(".history-play-btn").onclick = () => {
+      if (historyAudio) historyAudio.pause();
+      historyAudio = new Audio(m.audioUrl); historyAudio.play();
+    };
+    listEl.appendChild(item);
+  });
 }
 
-document.getElementById("historyCloseBtn").onclick = () => {
-  if (historyAudio) { historyAudio.pause(); historyAudio = null; }
-  document.getElementById("historyModal").classList.remove("open");
-};
-
-document.getElementById("inboxBanner").onclick = startListening;
-document.getElementById("saveBtn").onclick     = saveMessageAudio;
-document.getElementById("goHomeBtn").onclick   = closeModal;
-
-window.addEventListener("beforeunload", () => {
-  if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    if (isRecording && mediaRecorder && mediaRecorder.state === "recording") {
-      mediaRecorder.stop();
-      isRecording = false;
-      document.querySelectorAll(".friend-card.recording").forEach(card => {
-        card.classList.remove("recording");
-        const btn = card.querySelector(".rec-btn");
-        if (btn) btn.textContent = "● REC";
-      });
-      stopRecTimer();
-      toast("⏹ Recording stopped — page was hidden");
-    }
-    if (currentAudio && playerState === 'playing') {
-      currentAudio.pause();
-      setPlayerUIState('paused');
-    }
-    if (historyAudio) {
-      historyAudio.pause();
+function openEditSheet(idx) {
+  editingIndex = idx; const f = myFriends[idx]; const isB = f.id === "__broadcast__";
+  document.getElementById("editLabel").value = f.label; document.getElementById("editCode").value = f.code;
+  document.getElementById("editTown").value = f.town; document.getElementById("editModal").classList.add("open");
+}
+document.getElementById("editSaveBtn").onclick = async () => {
+  const label = document.getElementById("editLabel").value;
+  const code  = document.getElementById("editCode").value;
+  const town  = document.getElementById("editTown").value;
+  if (editingIndex === 10) {
+    myFriends[10].town = town;
+  } else {
+    const key = code.toLowerCase();
+    const snap = await get(ref(db, "global_directory/" + key));
+    if (snap.exists()) {
+      myFriends[editingIndex] = { id: snap.val().uid, label, code: code.toUpperCase(), town, status: "linked" };
     }
   }
-});
+  await update(ref(db, "users/" + currentUser.uid), { friends: myFriends });
+  document.getElementById("editModal").classList.remove("open"); buildDashboard();
+};
+document.getElementById("editCancelBtn").onclick = () => document.getElementById("editModal").classList.remove("open");
+document.getElementById("historyCloseBtn").onclick = () => document.getElementById("historyModal").classList.remove("open");
+
+// Auth bindings
+document.getElementById("signupBtn").onclick = async () => {
+  const name = document.getElementById("signupName").value;
+  const email = document.getElementById("signupEmail").value;
+  const pass = document.getElementById("signupPass").value;
+  const fcode = name.toUpperCase() + "-" + Math.floor(1000+Math.random()*9000);
+  const cred = await createUserWithEmailAndPassword(auth, email, pass);
+  await set(ref(db, "users/" + cred.user.uid), { name, email, friendCode: fcode, friends: getDefaultFriends(), lastSeen: Date.now() });
+  await set(ref(db, "global_directory/" + fcode.toLowerCase()), { uid: cred.user.uid, name });
+  bootApp(cred.user);
+};
+document.getElementById("signinBtn").onclick = async () => {
+  const email = document.getElementById("signinEmail").value;
+  const pass = document.getElementById("signinPass").value;
+  const cred = await signInWithEmailAndPassword(auth, email, pass);
+  bootApp(cred.user);
+};
+document.getElementById("signoutBtn").onclick = () => signOut(auth).then(() => showLoginScreen());
+onAuthStateChanged(auth, u => { if (u) bootApp(u); else showLoginScreen(); });
 </script>
 </body>
 </html>
