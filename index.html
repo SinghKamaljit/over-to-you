@@ -316,11 +316,12 @@ body::before{
 
 /* Cancel recording button — top-right corner during recording (Fix 3 / Approach B) */
 .cancel-rec-btn{
-  display:none; position:absolute; top:7px; right:8px;
-  background:rgba(239,68,68,0.15); border:1px solid var(--recording);
-  border-radius:20px; padding:2px 8px; color:var(--recording);
+  display:none; position:absolute; top:8px; right:8px;
+  background:rgba(239,68,68,0.2); border:1.5px solid var(--recording);
+  border-radius:20px; padding:3px 9px; color:var(--recording);
   font-family:'Rajdhani',sans-serif; font-size:0.65rem; font-weight:700;
   cursor:pointer; white-space:nowrap; z-index:6;
+  letter-spacing:0.5px;
 }
 .friend-card.recording .cancel-rec-btn{ display:block; }
 /* Remove the margin offset — REC button can now be fully centered */
@@ -1449,6 +1450,7 @@ function showNextInQueue(userInitiated) {
   document.getElementById("playModal").classList.add("open");
   // Fix 1: honour the user's intent immediately — no second tap needed
   playMessage();
+}
 
 async function playMessage() {
   if (!pendingMessage) return;
