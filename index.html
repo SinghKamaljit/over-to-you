@@ -621,9 +621,16 @@ body::before{
     <div id="playProgress" style="display:none;font-size:0.75rem;color:var(--muted);margin-top:2px;font-family:'Rajdhani',sans-serif;letter-spacing:1px"></div>
     <div id="playDuration" class="duration-pill" style="display:none">⏱ --:--</div>
     <div id="playingStatus" style="display:none;padding:14px 0 2px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--green);letter-spacing:1px;text-align:center">🔊 PLAYING…</div>
-    <button class="play-btn" id="pauseResumeBtn" style="display:none" onclick="togglePauseResume()">⏸ PAUSE</button>
-    <button class="save-btn" id="saveBtn">💾 SAVE TO PHONE</button>
-    <button class="dismiss-btn" id="goHomeBtn" onclick="closeModal()">✕ Close &amp; go back</button>
+    <!-- Playback controls — shown while audio is active -->
+    <div id="playControls" style="display:none;display:none;gap:8px;margin-top:12px">
+      <button class="play-btn"    id="pauseResumeBtn">⏸ PAUSE</button>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="dismiss-btn" id="stopBtn"  style="flex:1">⏹ STOP</button>
+        <button class="dismiss-btn" id="nextBtn"  style="flex:1">NEXT ⏭</button>
+      </div>
+    </div>
+    <button class="save-btn"    id="saveBtn">💾 SAVE TO PHONE</button>
+    <button class="dismiss-btn" id="goHomeBtn">✕ Close &amp; go back</button>
   </div>
 </div>
 
@@ -1470,10 +1477,13 @@ async function playMessage() {
   if (!pendingMessage) return;
 
   const statusEl   = document.getElementById("playingStatus");
+  const controlsEl = document.getElementById("playControls");
   const pauseBtn   = document.getElementById("pauseResumeBtn");
-  statusEl.style.display = "block";
-  pauseBtn.style.display = "block";
-  pauseBtn.textContent   = "⏸ PAUSE";
+
+  statusEl.style.display   = "block";
+  controlsEl.style.display = "flex";
+  controlsEl.style.flexDirection = "column";
+  pauseBtn.textContent     = "⏸ PAUSE";
 
   if (currentAudio) {
     currentAudio.pause();
@@ -1481,9 +1491,25 @@ async function playMessage() {
     currentAudio = null;
   }
 
-  function onPlayEnd() {
-    statusEl.style.display = "none";
-    pauseBtn.style.display = "none";
+  function hideControls() {
+    statusEl.style.display   = "none";
+    controlsEl.style.display = "none";
+  }
+
+  async function markReadAndAdvance() {
+    try {
+      await update(ref(db,
+        "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
+        { isRead: true });
+      if (pendingMessage && pendingMessage.senderId) {
+        updateBadge(pendingMessage.senderId, -1);
+      }
+    } catch(e) { console.warn("Could not mark message as read:", e); }
+    currentAudio = null;
+    document.getElementById("playModal").classList.remove("open");
+    document.getElementById("saveBtn").classList.remove("visible");
+    pendingMessage = null;
+    setTimeout(() => showNextInQueue(true), 400);
   }
 
   try {
@@ -1491,26 +1517,14 @@ async function playMessage() {
     document.getElementById("saveBtn").classList.add("visible");
 
     currentAudio.addEventListener("ended", async () => {
-      onPlayEnd();
-      try {
-        await update(ref(db,
-          "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
-          { isRead: true });
-        if (pendingMessage && pendingMessage.senderId) {
-          updateBadge(pendingMessage.senderId, -1);
-        }
-      } catch(e) { console.warn("Could not mark message as read:", e); }
-      currentAudio = null;
-      document.getElementById("playModal").classList.remove("open");
-      document.getElementById("saveBtn").classList.remove("visible");
-      pendingMessage = null;
-      setTimeout(() => showNextInQueue(true), 400);
+      hideControls();
+      await markReadAndAdvance();
     });
 
     currentAudio.addEventListener("error", () => {
-      onPlayEnd();
+      hideControls();
       currentAudio = null;
-      toast("❌ Playback failed — moving to next message");
+      toast("❌ Playback failed — skipping to next");
       document.getElementById("playModal").classList.remove("open");
       pendingMessage = null;
       setTimeout(() => showNextInQueue(true), 400);
@@ -1518,7 +1532,7 @@ async function playMessage() {
 
     await currentAudio.play();
   } catch(err) {
-    onPlayEnd();
+    hideControls();
     console.error("Playback error:", err);
     if (err.name !== "AbortError" && err.name !== "NotAllowedError") {
       toast("❌ Playback failed — tap the banner to retry");
@@ -1527,10 +1541,11 @@ async function playMessage() {
   }
 }
 
-function togglePauseResume() {
+// ── PAUSE / RESUME ────────────────────────────
+document.getElementById("pauseResumeBtn").addEventListener("click", () => {
   if (!currentAudio) return;
-  const pauseBtn   = document.getElementById("pauseResumeBtn");
-  const statusEl   = document.getElementById("playingStatus");
+  const pauseBtn = document.getElementById("pauseResumeBtn");
+  const statusEl = document.getElementById("playingStatus");
   if (currentAudio.paused) {
     currentAudio.play();
     pauseBtn.textContent   = "⏸ PAUSE";
@@ -1540,7 +1555,38 @@ function togglePauseResume() {
     pauseBtn.textContent   = "▶ RESUME";
     statusEl.style.display = "none";
   }
-}
+});
+
+// ── STOP (marks read, closes, no next) ───────
+document.getElementById("stopBtn").addEventListener("click", async () => {
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
+  document.getElementById("playingStatus").style.display   = "none";
+  document.getElementById("playControls").style.display    = "none";
+  // Mark as read since user chose to stop (they've heard enough)
+  if (pendingMessage) {
+    try {
+      await update(ref(db,
+        "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
+        { isRead: true });
+      if (pendingMessage.senderId) updateBadge(pendingMessage.senderId, -1);
+    } catch(e) { console.warn("Stop: could not mark read:", e); }
+  }
+  document.getElementById("playModal").classList.remove("open");
+  document.getElementById("saveBtn").classList.remove("visible");
+  pendingMessage = null;
+  updateInboxBanner();
+});
+
+// ── NEXT (skip to next in queue) ─────────────
+document.getElementById("nextBtn").addEventListener("click", () => {
+  if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
+  document.getElementById("playingStatus").style.display   = "none";
+  document.getElementById("playControls").style.display    = "none";
+  document.getElementById("playModal").classList.remove("open");
+  document.getElementById("saveBtn").classList.remove("visible");
+  pendingMessage = null;
+  setTimeout(() => showNextInQueue(true), 300);
+});
 
 function saveMessageAudio() {
   if (!pendingMessage) return;
@@ -1557,8 +1603,8 @@ function closeModal() {
     currentAudio.src = "";
     currentAudio = null;
   }
-  document.getElementById("playingStatus").style.display = "none";
-  document.getElementById("pauseResumeBtn").style.display = "none";
+  document.getElementById("playingStatus").style.display   = "none";
+  document.getElementById("playControls").style.display    = "none";
   document.getElementById("playModal").classList.remove("open");
   document.getElementById("saveBtn").classList.remove("visible");
   pendingMessage = null;
@@ -1880,24 +1926,61 @@ async function openHistorySheet(friend) {
           '<div class="history-time">' + timeStr + ' ' + readBadge + '</div>' +
           '<div class="history-meta">Duration: ' + durStr + '</div>' +
         '</div>' +
-        '<button class="history-play-btn">▶ PLAY</button>';
+        '<button class="history-play-btn" data-state="stopped">▶ PLAY</button>';
 
       const btn = item.querySelector(".history-play-btn");
       btn.onclick = async () => {
-        try {
-          // Stop any active playback first
-          if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
-          if (historyAudio) { historyAudio.pause(); historyAudio = null; }
+        const state = btn.getAttribute("data-state");
 
+        if (state === "playing") {
+          // Tap while playing → PAUSE
+          if (historyAudio) historyAudio.pause();
+          btn.textContent = "▶ RESUME";
+          btn.setAttribute("data-state", "paused");
+          return;
+        }
+
+        if (state === "paused") {
+          // Tap while paused → RESUME
+          if (historyAudio) { historyAudio.play(); }
+          btn.textContent = "⏸ PAUSE";
+          btn.setAttribute("data-state", "playing");
+          return;
+        }
+
+        // state === "stopped" → start fresh
+        // Stop anything else playing first
+        if (currentAudio) { currentAudio.pause(); currentAudio.src = ""; currentAudio = null; }
+        if (historyAudio) {
+          historyAudio.pause();
+          historyAudio = null;
+          // Reset any other buttons in the list
+          listEl.querySelectorAll(".history-play-btn").forEach(b => {
+            b.textContent = "▶ PLAY";
+            b.setAttribute("data-state", "stopped");
+          });
+        }
+
+        try {
           historyAudio = new Audio(msg.url);
-          btn.textContent = "■ STOP";
+          btn.textContent = "⏸ PAUSE";
+          btn.setAttribute("data-state", "playing");
+
           historyAudio.addEventListener("ended", () => {
             btn.textContent = "▶ PLAY";
+            btn.setAttribute("data-state", "stopped");
             historyAudio = null;
+          });
+          historyAudio.addEventListener("error", () => {
+            btn.textContent = "▶ PLAY";
+            btn.setAttribute("data-state", "stopped");
+            historyAudio = null;
+            toast("Playback failed");
           });
           await historyAudio.play();
         } catch(e) {
           btn.textContent = "▶ PLAY";
+          btn.setAttribute("data-state", "stopped");
           toast("Playback failed");
         }
       };
@@ -1918,6 +2001,7 @@ document.getElementById("historyCloseBtn").onclick = () => {
 
 document.getElementById("inboxBanner").onclick = startListening;
 document.getElementById("saveBtn").onclick     = saveMessageAudio;
+document.getElementById("goHomeBtn").addEventListener("click", closeModal);
 
 window.addEventListener("beforeunload", () => {
   if (mediaStream) mediaStream.getTracks().forEach(t => t.stop());
