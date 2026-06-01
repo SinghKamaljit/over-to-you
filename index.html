@@ -620,9 +620,10 @@ body::before{
     <p  id="playTime">Received just now</p>
     <div id="playProgress" style="display:none;font-size:0.75rem;color:var(--muted);margin-top:2px;font-family:'Rajdhani',sans-serif;letter-spacing:1px"></div>
     <div id="playDuration" class="duration-pill" style="display:none">⏱ --:--</div>
-    <!-- Status shown while playing — no controls, no skip button -->
     <div id="playingStatus" style="display:none;padding:14px 0 2px;font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:700;color:var(--green);letter-spacing:1px;text-align:center">🔊 PLAYING…</div>
+    <button class="play-btn" id="pauseResumeBtn" style="display:none" onclick="togglePauseResume()">⏸ PAUSE</button>
     <button class="save-btn" id="saveBtn">💾 SAVE TO PHONE</button>
+    <button class="dismiss-btn" id="goHomeBtn" onclick="closeModal()">✕ Close &amp; go back</button>
   </div>
 </div>
 
@@ -1288,7 +1289,7 @@ async function loadUnreadCounts() {
   }
 }
 
-// Populate messageQueue from unread DB messages on boot
+// Populate messageQueue from unread DB messages received since last login
 async function populateQueueFromDB() {
   try {
     const msgsRef = ref(db, "messages/" + currentUser.uid);
@@ -1297,7 +1298,9 @@ async function populateQueueFromDB() {
     const unread = [];
     snap.forEach((child) => {
       const msg = child.val();
-      if (msg && !msg.isRead) {
+      // Only queue messages that are unread AND arrived after last login
+      // Older unread messages are stale backlog — visible in history, not as alerts
+      if (msg && !msg.isRead && msg.timestamp > lastLoginTimestamp) {
         unread.push({
           audioUrl:   msg.audioUrl,
           senderName: msg.fromName,
@@ -1308,10 +1311,10 @@ async function populateQueueFromDB() {
         });
       }
     });
-    // Sort by timestamp — newest first so latest message plays first
+    // Newest first
     unread.sort((a,b) => b.timestamp - a.timestamp);
     messageQueue.push(...unread);
-    console.log("OTY: Loaded", unread.length, "unread message(s) into queue");
+    console.log("OTY: Loaded", unread.length, "new unread message(s) into queue");
   } catch(e) {
     console.warn("OTY: Could not populate queue:", e.message);
   }
@@ -1466,26 +1469,29 @@ function showNextInQueue(userInitiated) {
 async function playMessage() {
   if (!pendingMessage) return;
 
-  // Show "playing" status, hide it while we start
-  const statusEl = document.getElementById("playingStatus");
+  const statusEl   = document.getElementById("playingStatus");
+  const pauseBtn   = document.getElementById("pauseResumeBtn");
   statusEl.style.display = "block";
+  pauseBtn.style.display = "block";
+  pauseBtn.textContent   = "⏸ PAUSE";
 
-  // ── Stop any orphaned audio stream before starting a new one ──
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
     currentAudio = null;
   }
 
+  function onPlayEnd() {
+    statusEl.style.display = "none";
+    pauseBtn.style.display = "none";
+  }
+
   try {
     currentAudio = new Audio(pendingMessage.audioUrl);
-
-    // Show save button immediately
     document.getElementById("saveBtn").classList.add("visible");
 
-    // When audio ends: mark read, close modal, auto-advance to next message
     currentAudio.addEventListener("ended", async () => {
-      statusEl.style.display = "none";
+      onPlayEnd();
       try {
         await update(ref(db,
           "messages/" + currentUser.uid + "/" + pendingMessage.messageId),
@@ -1495,7 +1501,6 @@ async function playMessage() {
         }
       } catch(e) { console.warn("Could not mark message as read:", e); }
       currentAudio = null;
-      // Close this modal and automatically open next in queue
       document.getElementById("playModal").classList.remove("open");
       document.getElementById("saveBtn").classList.remove("visible");
       pendingMessage = null;
@@ -1503,7 +1508,7 @@ async function playMessage() {
     });
 
     currentAudio.addEventListener("error", () => {
-      statusEl.style.display = "none";
+      onPlayEnd();
       currentAudio = null;
       toast("❌ Playback failed — moving to next message");
       document.getElementById("playModal").classList.remove("open");
@@ -1513,12 +1518,27 @@ async function playMessage() {
 
     await currentAudio.play();
   } catch(err) {
-    statusEl.style.display = "none";
+    onPlayEnd();
     console.error("Playback error:", err);
     if (err.name !== "AbortError" && err.name !== "NotAllowedError") {
       toast("❌ Playback failed — tap the banner to retry");
     }
     if (err.name !== "AbortError") currentAudio = null;
+  }
+}
+
+function togglePauseResume() {
+  if (!currentAudio) return;
+  const pauseBtn   = document.getElementById("pauseResumeBtn");
+  const statusEl   = document.getElementById("playingStatus");
+  if (currentAudio.paused) {
+    currentAudio.play();
+    pauseBtn.textContent   = "⏸ PAUSE";
+    statusEl.style.display = "block";
+  } else {
+    currentAudio.pause();
+    pauseBtn.textContent   = "▶ RESUME";
+    statusEl.style.display = "none";
   }
 }
 
@@ -1532,13 +1552,13 @@ function saveMessageAudio() {
 }
 
 function closeModal() {
-  // Stop audio if somehow still playing
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.src = "";
     currentAudio = null;
   }
   document.getElementById("playingStatus").style.display = "none";
+  document.getElementById("pauseResumeBtn").style.display = "none";
   document.getElementById("playModal").classList.remove("open");
   document.getElementById("saveBtn").classList.remove("visible");
   pendingMessage = null;
