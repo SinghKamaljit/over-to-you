@@ -465,6 +465,7 @@ body::before{
 .btn-resume { border-color: rgba(0,212,255,0.3); color: var(--accent-cyan); }
 .btn-stop { border-color: rgba(255,68,68,0.3); color: var(--accent-red); }
 .btn-next { border-color: var(--yellow); color: var(--yellow); background: rgba(245,158,11,0.05); }
+.btn-prev { border-color: rgba(168,85,247,0.4); color: var(--purple); background: rgba(168,85,247,0.05); }
 
 .wave-container { display: flex; align-items: center; justify-content: center; gap: 4px; height: 24px; margin: 12px 0; }
 .wave-bar { width: 3px; background: linear-gradient(to top, var(--accent-cyan), var(--accent-gold)); border-radius: 2px; height: 4px; }
@@ -627,7 +628,8 @@ body::before{
       <button class="btn btn-pause" id="mediaPauseBtn" disabled>⏸ Pause</button>
       <button class="btn btn-resume" id="mediaResumeBtn" disabled>▶ Resume</button>
       <button class="btn btn-stop" id="mediaStopBtn" disabled>⏹ Stop</button>
-      <button class="btn btn-next btn-full" id="mediaNextBtn" disabled>NEXT MESSAGE ⏭</button>
+      <button class="btn btn-prev" id="mediaPrevBtn" disabled>⏮ PREVIOUS</button>
+      <button class="btn btn-next" id="mediaNextBtn" disabled>NEXT ⏭</button>
     </div>
 
     <button class="save-btn"    id="saveBtn">💾 SAVE TO DEVICE</button>
@@ -663,6 +665,7 @@ const TOTAL_CARDS       = 10;
 
 // Central Processing Message Queues
 let messageQueue   = [];
+let playedHistory  = [];   // tracks already-played messages for PREVIOUS
 let totalCountTrack = 0;
 let currentTrackIdx = 0;
 
@@ -872,6 +875,7 @@ document.getElementById("inboxBanner").onclick = function() {
   }
   // Open the audio player sheet modal component layout container
   document.getElementById("playModal").classList.add("open");
+  playedHistory = [];   // fresh session — no previous history yet
   
   // Directly extract the current item at index 0 and fire playback engine setup
   pendingMessage = messageQueue[0];
@@ -915,6 +919,8 @@ function setPlayerUIState(s) {
   
   // Next button is valid if there are additional message segments left in queue array
   document.getElementById('mediaNextBtn').disabled   = (messageQueue.length <= 1);
+  // Previous button is valid if we have played history to go back to
+  document.getElementById('mediaPrevBtn').disabled   = (playedHistory.length === 0);
 }
 
 async function loadTrackEngine(msgObj) {
@@ -964,17 +970,27 @@ async function loadTrackEngine(msgObj) {
 
     currentAudio.addEventListener("ended", async () => {
       setPlayerUIState('stopped');
+      // Mark this message as read in Firebase
       await clearReadBitOnFirebase(msgObj);
       
-      // Auto advance loop context sequence if more tracks remain natively
+      // Auto-advance if more tracks remain
       if (messageQueue.length > 1) {
-        advanceNextTrackSequence();
+        // Move current to history, shift queue, load next
+        playedHistory.push(messageQueue[0]);
+        messageQueue.shift();
+        currentTrackIdx++;
+        pendingMessage = messageQueue[0];
+        loadTrackEngine(pendingMessage);
       }
     });
 
     currentAudio.addEventListener("error", () => {
-      toast("⚠️ Playback node failed — skipping track");
-      setPlayerUIState('idle');
+      // Only show error if we haven't successfully started playing at all.
+      // Some mobile browsers fire 'error' during normal loading — guard against this.
+      if (playerState === 'idle') {
+        toast("⚠️ Could not load this audio — skipping");
+        if (messageQueue.length > 1) advanceNextTrackSequence();
+      }
     });
 
     await currentAudio.play();
@@ -1012,14 +1028,44 @@ function advanceNextTrackSequence() {
     return;
   }
   
-  // Extract completed current file from the engine loop array context
-  const activeFinished = messageQueue[0];
-  clearReadBitOnFirebase(activeFinished);
-
-  // Increment tracking values indexes layout rules
+  // Move current (index 0) to played history so PREVIOUS can go back
+  const current = messageQueue[0];
+  playedHistory.push(current);
+  
+  // Remove it from the active queue
+  messageQueue.shift();
+  
+  // Increment display counter
   currentTrackIdx++;
   
-  // Re-aim layout configurations to next item inside messageQueue arrays index 0
+  // Load the new first item
+  pendingMessage = messageQueue[0];
+  loadTrackEngine(pendingMessage);
+}
+
+// ── PREVIOUS BUTTON ──
+function goToPreviousTrack() {
+  if (playedHistory.length === 0) {
+    toast("No previous messages");
+    return;
+  }
+  
+  // Put current track back at front of queue (if there is one)
+  if (messageQueue.length > 0) {
+    // Don't re-add if it's the same object
+  }
+  // Pop the last played track from history
+  const prev = playedHistory.pop();
+  
+  // Put current back at front so it doesn't get lost
+  if (pendingMessage && messageQueue[0] !== pendingMessage) {
+    messageQueue.unshift(pendingMessage);
+  }
+  
+  // Put previous at front
+  messageQueue.unshift(prev);
+  
+  currentTrackIdx = Math.max(1, currentTrackIdx - 1);
   pendingMessage = messageQueue[0];
   loadTrackEngine(pendingMessage);
 }
@@ -1027,6 +1073,9 @@ function advanceNextTrackSequence() {
 // Bind Button Operations
 document.getElementById("mediaNextBtn").onclick = function() {
   advanceNextTrackSequence();
+};
+document.getElementById("mediaPrevBtn").onclick = function() {
+  goToPreviousTrack();
 };
 
 document.getElementById('mediaPlayBtn').onclick = () => {
