@@ -38,8 +38,6 @@ body::before{
     linear-gradient(90deg,rgba(0,212,255,0.025) 1px,transparent 1px);
   background-size:36px 36px;
 }
-
-/* ── LOGIN ── */
 #loginScreen{
   position:fixed; inset:0; background:var(--bg); z-index:100;
   display:flex; flex-direction:column;
@@ -123,8 +121,6 @@ body::before{
   color:#000; font-family:'Rajdhani',sans-serif;
   font-size:1.1rem; font-weight:700; cursor:pointer;
 }
-
-/* ── APP ── */
 #appScreen{ display:none; flex-direction:column; min-height:100vh; }
 .app-header{
   position:sticky; top:0; z-index:10;
@@ -152,8 +148,6 @@ body::before{
   padding:7px 16px; background:rgba(0,212,255,0.04);
   border-bottom:1px solid var(--border);
 }
-
-/* ── INBOX BANNER ── */
 #inboxBanner{
   display:none; align-items:center; justify-content:space-between;
   padding:10px 16px; cursor:pointer;
@@ -168,8 +162,6 @@ body::before{
 #inboxBanner.visible{ display:flex; }
 .inbox-text{ font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700; color:var(--yellow); }
 .inbox-tap{ font-family:'Rajdhani',sans-serif; font-size:0.78rem; color:var(--yellow); opacity:0.7; letter-spacing:1px; }
-
-/* ── GRID ── */
 .grid-container{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:12px 10px 100px; }
 .friend-card{
   position:relative; background:var(--card);
@@ -289,8 +281,6 @@ body::before{
   font-family:'Rajdhani',sans-serif; font-size:0.78rem;
   color:var(--accent); margin-top:4px; letter-spacing:1px;
 }
-
-/* ── HIST BUTTON on card ── */
 .hist-btn{
   position:absolute; top:7px; left:8px;
   font-size:0.65rem; color:var(--yellow);
@@ -299,8 +289,6 @@ body::before{
   z-index:5; display:none; letter-spacing:0.5px;
 }
 .friend-card:not(.empty):not(.broadcast) .hist-btn{ display:block; }
-
-/* ── EDIT SHEET ── */
 #editModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
@@ -337,8 +325,6 @@ body::before{
   border-radius:50px; background:transparent; color:#ef4444;
   font-family:'Rajdhani',sans-serif; font-size:0.85rem; cursor:pointer; margin-top:6px;
 }
-
-/* ── HISTORY SHEET ── */
 #historyModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.85); backdrop-filter:blur(4px);
@@ -385,8 +371,6 @@ body::before{
   border-radius:50px; background:transparent; color:var(--text);
   font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700; cursor:pointer; margin-top:16px;
 }
-
-/* ── PLAY MODAL (upgraded full player) ── */
 #playModal{
   display:none; position:fixed; inset:0;
   background:rgba(0,0,0,0.88); backdrop-filter:blur(6px);
@@ -404,8 +388,6 @@ body::before{
   font-weight:700; color:var(--accent); margin-bottom:2px;
 }
 .play-sheet p{ color:var(--muted); font-size:0.82rem; margin-bottom:4px; }
-
-/* Status bar */
 .player-status-bar{
   display:flex; align-items:center; justify-content:space-between;
   margin:12px 0 10px; padding:10px 16px; background:var(--bg-panel);
@@ -423,8 +405,6 @@ body::before{
 .pstatus-text.stopped{ color:var(--accent-red); }
 .pstatus-text.idle   { color:var(--muted); }
 .ptrack-info{ font-family:'Rajdhani',sans-serif; font-size:0.85rem; color:var(--accent); font-weight:700; text-align:right; }
-
-/* Waveform */
 .wave-container{ display:flex; align-items:center; justify-content:center; gap:4px; height:28px; margin:10px 0; }
 .wave-bar{ width:3px; background:linear-gradient(to top,var(--accent-cyan),var(--accent-gold)); border-radius:2px; height:4px; }
 .wave-bar.animating{ animation:waveAnim 0.8s ease-in-out infinite; }
@@ -435,14 +415,10 @@ body::before{
 .wave-bar:nth-child(5){ animation-delay:0.2s; }
 .wave-bar:nth-child(6){ animation-delay:0.05s; }
 @keyframes waveAnim{ 0%,100%{height:4px}50%{height:22px} }
-
-/* Progress bar */
 .player-progress-wrap{ margin-bottom:12px; }
 .player-progress-labels{ display:flex; justify-content:space-between; font-size:0.75rem; color:var(--muted); margin-bottom:5px; font-family:'Rajdhani',sans-serif; }
 .player-progress-bg{ height:8px; background:rgba(255,255,255,0.1); border-radius:10px; overflow:hidden; cursor:pointer; }
 .player-progress-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--accent-cyan),var(--accent-gold)); border-radius:10px; transition:width 0.2s linear; }
-
-/* Volume */
 .player-volume-row{ display:flex; align-items:center; gap:10px; margin-bottom:16px; }
 .player-volume-row span{ font-size:0.9rem; }
 .player-volume-row input[type=range]{
@@ -454,8 +430,6 @@ body::before{
   background:var(--accent-cyan); cursor:pointer;
 }
 .vol-label{ font-family:'Rajdhani',sans-serif; font-size:0.85rem; color:var(--muted); min-width:35px; text-align:right; }
-
-/* Player buttons */
 .btn-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
 .btn-grid .btn-full{ grid-column:1/-1; }
 .pbtn{
@@ -479,7 +453,6 @@ body::before{
 .pbtn-prev:hover:not(:disabled){ background:rgba(168,85,247,0.08); }
 .pbtn-next  { border-color:rgba(245,158,11,0.45); color:var(--yellow); }
 .pbtn-next:hover:not(:disabled){ background:rgba(245,158,11,0.08); }
-
 .save-btn{
   display:none; width:100%; border-radius:50px; padding:12px 20px; margin-top:8px;
   cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
@@ -491,8 +464,6 @@ body::before{
   cursor:pointer; font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
   background:transparent; border:1px solid var(--border); color:var(--muted);
 }
-
-/* ── TOAST ── */
 #toast{
   position:fixed; bottom:20px; left:50%;
   transform:translateX(-50%) translateY(80px);
@@ -588,28 +559,24 @@ body::before{
 <div id="historyModal">
   <div class="history-sheet">
     <h3 id="historyTitle">Message History</h3>
-    <div class="history-subtitle">Last 5 received messages</div>
+    <div class="history-subtitle">Last 5 · newest first</div>
     <div class="history-list" id="historyList"></div>
     <button class="history-close-btn" id="historyCloseBtn">Close</button>
   </div>
 </div>
 
-<!-- PLAY MODAL — upgraded full player -->
+<!-- PLAY MODAL -->
 <div id="playModal">
   <div class="play-sheet">
     <h3 id="playFromName">📩 Voice Message</h3>
     <p  id="playTime">Received just now</p>
     <p  id="playProgress" style="color:var(--yellow);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.85rem;margin-bottom:2px"></p>
     <div id="playDuration" class="duration-pill" style="display:none">⏱ --:--</div>
-
-    <!-- Waveform -->
     <div class="wave-container" id="playerWave">
       <div class="wave-bar"></div><div class="wave-bar"></div>
       <div class="wave-bar"></div><div class="wave-bar"></div>
       <div class="wave-bar"></div><div class="wave-bar"></div>
     </div>
-
-    <!-- Status bar -->
     <div class="player-status-bar">
       <div class="player-status-indicator">
         <div class="pdot" id="playerDot"></div>
@@ -617,8 +584,6 @@ body::before{
       </div>
       <div class="ptrack-info" id="playerTrackInfo">0 / 0</div>
     </div>
-
-    <!-- Progress bar -->
     <div class="player-progress-wrap">
       <div class="player-progress-labels">
         <span id="playerTimeCurrent">0:00</span>
@@ -628,16 +593,12 @@ body::before{
         <div class="player-progress-fill" id="playerProgressFill"></div>
       </div>
     </div>
-
-    <!-- Volume -->
     <div class="player-volume-row">
       <span>🔈</span>
       <input type="range" id="playerVolumeSlider" min="0" max="100" value="80"/>
       <span>🔊</span>
       <span class="vol-label" id="playerVolLabel">80%</span>
     </div>
-
-    <!-- Controls -->
     <div class="btn-grid">
       <button class="pbtn pbtn-play"   id="btnPlay">▶ PLAY</button>
       <button class="pbtn pbtn-pause"  id="btnPause"  disabled>⏸ PAUSE</button>
@@ -646,7 +607,6 @@ body::before{
       <button class="pbtn pbtn-prev"   id="btnPrev"   disabled>⏮ PREVIOUS</button>
       <button class="pbtn pbtn-next"   id="btnNext"   disabled>NEXT ⏭</button>
     </div>
-
     <button class="save-btn"    id="saveBtn">💾 SAVE TO DEVICE</button>
     <button class="dismiss-btn" id="goHomeBtn">✕ CLOSE PLAYER</button>
   </div>
@@ -679,14 +639,15 @@ const CLOUDINARY_CLOUD  = "dqwaiio4d";
 const CLOUDINARY_PRESET = "oty123";
 const MAX_RECORD_SECS   = 90;
 const TOTAL_CARDS       = 10;
+const MAX_QUEUE         = 5;   // max messages loaded into inbox queue at once
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getDatabase(app);
 
 // ── STATE ─────────────────────────────────────
-const messageQueue = [];   // unread messages waiting to play
-let   playedHistory = [];  // messages already played (for PREVIOUS)
+const messageQueue = [];
+let   playedHistory = [];
 let   queuePlaying  = false;
 
 let currentUser        = null;
@@ -703,8 +664,9 @@ let messageListenerOff = null;
 let editingIndex       = null;
 let currentAudio       = null;
 let unreadCounts       = {};
+let totalUnreadRaw     = 0;  // true total before queue cap
 let historyAudio       = null;
-let playerState        = 'idle';  // idle | playing | paused | stopped
+let playerState        = 'idle';
 
 let recTimerInterval  = null;
 let recAutoStopTimer  = null;
@@ -951,7 +913,7 @@ function stopRecTimer() {
   if (activeRecCard) { const b=activeRecCard.querySelector(".rec-bar"); if(b){b.style.transition="none";b.style.width="0%";} activeRecCard=null; }
 }
 
-// ── MEDIA RECORDER with format fallback ──────
+// ── MEDIA RECORDER ────────────────────────────
 function createMediaRecorder(stream) {
   const preferred=["audio/mp4;codecs=mp4a.40.2","audio/mp4","audio/webm;codecs=opus","audio/webm"];
   const opts={ audioBitsPerSecond:128000 };
@@ -1020,24 +982,30 @@ async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
 }
 
 // ── UNREAD COUNTS ─────────────────────────────
+// Loads unread messages, sorts newest first, caps queue at MAX_QUEUE.
+// Tracks true total (totalUnreadRaw) for accurate banner display.
 async function loadUnreadCounts() {
   try {
     const snap=await get(ref(db,"messages/"+currentUser.uid));
-    unreadCounts={};
+    unreadCounts={}; totalUnreadRaw=0;
     if (!snap.exists()) return;
     const unread=[];
     snap.forEach(child=>{
       const msg=child.val();
       if (msg&&!msg.isRead) {
         if (msg.from) unreadCounts[msg.from]=(unreadCounts[msg.from]||0)+1;
-        if (msg.timestamp>lastLoginTimestamp)
+        if (msg.timestamp>lastLoginTimestamp) {
+          totalUnreadRaw++;
           unread.push({ audioUrl:msg.audioUrl, senderName:msg.fromName, messageId:child.key, senderId:msg.from, timestamp:msg.timestamp, duration:msg.duration||0 });
+        }
       }
     });
-    unread.sort((a,b)=>a.timestamp-b.timestamp);
-    messageQueue.push(...unread);
+    // Newest first, then cap at MAX_QUEUE
+    unread.sort((a,b)=>b.timestamp-a.timestamp);
+    messageQueue.push(...unread.slice(0, MAX_QUEUE));
   } catch(e) { console.warn("OTY: Could not load unread counts:",e.message); }
 }
+
 function updateBadge(senderId, delta) {
   unreadCounts[senderId]=Math.max(0,(unreadCounts[senderId]||0)+delta);
   const card=document.querySelector(".friend-card[data-friend-id='"+senderId+"']");
@@ -1049,16 +1017,27 @@ function updateBadge(senderId, delta) {
   else { card.classList.remove("has-message"); badge.style.display="none"; }
 }
 
-// ── 30-DAY CLEANUP ────────────────────────────
+// ── CLEANUP — read msgs >30d, unread msgs >60d ─
 async function cleanupOldMessages() {
-  const cutoff=Date.now()-(30*24*60*60*1000);
+  const READ_CUTOFF   = Date.now() - (30 * 24 * 60 * 60 * 1000); // 30 days
+  const UNREAD_CUTOFF = Date.now() - (60 * 24 * 60 * 60 * 1000); // 60 days
   try {
-    const snap=await get(ref(db,"messages/"+currentUser.uid));
+    const snap = await get(ref(db, "messages/" + currentUser.uid));
     if (!snap.exists()) return;
-    const del=[];
-    snap.forEach(child=>{ const m=child.val(); if(m.timestamp&&m.timestamp<cutoff&&m.isRead) del.push(remove(ref(db,"messages/"+currentUser.uid+"/"+child.key))); });
-    if (del.length) { await Promise.all(del); console.log("OTY Cleanup: removed",del.length,"old message(s)"); }
-  } catch(e) { console.warn("OTY Cleanup failed:",e.message); }
+    const del = [];
+    snap.forEach(child => {
+      const m = child.val();
+      if (!m.timestamp) return;
+      const isOldRead   =  m.isRead && m.timestamp < READ_CUTOFF;
+      const isOldUnread = !m.isRead && m.timestamp < UNREAD_CUTOFF;
+      if (isOldRead || isOldUnread)
+        del.push(remove(ref(db, "messages/" + currentUser.uid + "/" + child.key)));
+    });
+    if (del.length) {
+      await Promise.all(del);
+      console.log("OTY Cleanup: removed", del.length, "message(s) (read>30d or unread>60d)");
+    }
+  } catch(e) { console.warn("OTY Cleanup failed:", e.message); }
 }
 
 // ── REALTIME LISTENER ─────────────────────────
@@ -1066,8 +1045,12 @@ function listenForMessages() {
   const msgQuery=query(ref(db,"messages/"+currentUser.uid),orderByChild("timestamp"),startAt(lastLoginTimestamp+1));
   messageListenerOff=onChildAdded(msgQuery,(snap)=>{
     const data=snap.val(); if(!data||data.isRead) return;
-    if (messageQueue.some(m=>m.messageId===snap.key)) return; // dedup
-    messageQueue.push({ audioUrl:data.audioUrl, senderName:data.fromName, messageId:snap.key, senderId:data.from, timestamp:data.timestamp, duration:data.duration||0 });
+    if (messageQueue.some(m=>m.messageId===snap.key)) return;
+    totalUnreadRaw++;
+    // Only add to queue if under cap
+    if (messageQueue.length < MAX_QUEUE) {
+      messageQueue.push({ audioUrl:data.audioUrl, senderName:data.fromName, messageId:snap.key, senderId:data.from, timestamp:data.timestamp, duration:data.duration||0 });
+    }
     updateBadge(data.from,+1);
     updateInboxBanner();
     if (!queuePlaying) buildDashboard();
@@ -1078,14 +1061,19 @@ function listenForMessages() {
 function updateInboxBanner() {
   const banner=document.getElementById("inboxBanner");
   const textEl=document.getElementById("inboxBannerText");
-  const total=messageQueue.length;
-  if (total===0) { banner.classList.remove("visible"); }
-  else { textEl.textContent="📩 "+total+" new "+(total===1?"message":"messages")+" waiting"; banner.classList.add("visible"); }
+  const queued=messageQueue.length;
+  if (queued===0) {
+    banner.classList.remove("visible");
+  } else {
+    const capNote = totalUnreadRaw > queued ? " ("+queued+" of "+totalUnreadRaw+" loaded)" : "";
+    textEl.textContent = "📩 "+queued+" new "+(queued===1?"message":"messages")+" waiting"+capNote;
+    banner.classList.add("visible");
+  }
 }
 
 document.getElementById("inboxBanner").onclick = function() {
   if (!messageQueue.length) { updateInboxBanner(); return; }
-  playedHistory=[];      // fresh listening session
+  playedHistory=[];
   queuePlaying=true;
   openPlayerWithMessage(messageQueue[0]);
 };
@@ -1108,7 +1096,6 @@ function setPlayerState(s) {
   } else {
     statusTxt.classList.add("idle"); statusTxt.textContent="IDLE";
   }
-  // Button enable/disable
   document.getElementById("btnPlay").disabled   = (currentAudio===null)||(s==="playing");
   document.getElementById("btnPause").disabled  = s!=="playing";
   document.getElementById("btnResume").disabled = s!=="paused";
@@ -1156,7 +1143,6 @@ async function loadAndPlayAudio(msgObj) {
     currentAudio.addEventListener("ended",async()=>{
       setPlayerState("stopped");
       await markMessageRead(msgObj);
-      // Auto-advance if more in queue
       if (messageQueue.length>1) {
         playedHistory.push(messageQueue.shift());
         openPlayerWithMessage(messageQueue[0]);
@@ -1167,16 +1153,11 @@ async function loadAndPlayAudio(msgObj) {
     });
     let playStarted = false;
     currentAudio.addEventListener("error",()=>{
-      // Only show error if play() never actually succeeded.
-      // Mobile browsers (Chrome on Android especially) fire the error event
-      // during normal buffering even when playback is fine — the playStarted
-      // flag is the only reliable way to distinguish a real failure.
       if (!playStarted) {
         toast("❌ Could not load audio — skipping");
         if (messageQueue.length>1) { messageQueue.shift(); openPlayerWithMessage(messageQueue[0]); }
       }
     });
-
     await currentAudio.play();
     playStarted = true;
     setPlayerState("playing");
@@ -1190,23 +1171,22 @@ async function markMessageRead(msgObj) {
   try {
     await update(ref(db,"messages/"+currentUser.uid+"/"+msgObj.messageId),{isRead:true});
     if (msgObj.senderId) updateBadge(msgObj.senderId,-1);
+    if (totalUnreadRaw > 0) totalUnreadRaw--;
   } catch(e) { console.warn("Could not mark read:",e); }
 }
 
-// Seek on progress bar tap
 document.getElementById("playerProgressBg").onclick=(e)=>{
   if (!currentAudio||!currentAudio.duration) return;
   const rect=e.currentTarget.getBoundingClientRect();
   currentAudio.currentTime=((e.clientX-rect.left)/rect.width)*currentAudio.duration;
 };
 
-// Volume
 document.getElementById("playerVolumeSlider").oninput=(e)=>{
   if (currentAudio) currentAudio.volume=e.target.value/100;
   document.getElementById("playerVolLabel").textContent=e.target.value+"%";
 };
 
-// ── PLAYER BUTTON HANDLERS ────────────────────
+// ── PLAYER BUTTONS ────────────────────────────
 document.getElementById("btnPlay").onclick=()=>{
   if (currentAudio && playerState!=="playing") currentAudio.play().then(()=>setPlayerState("playing")).catch(()=>{});
 };
@@ -1309,7 +1289,7 @@ document.getElementById("editClearBtn").onclick=async()=>{
 document.getElementById("editCancelBtn").onclick=closeEditSheet;
 document.getElementById("editModal").addEventListener("click",e=>{ if(e.target===document.getElementById("editModal")) closeEditSheet(); });
 
-// ── HISTORY SHEET ─────────────────────────────
+// ── HISTORY SHEET — last 5, newest first ──────
 async function openHistorySheet(friend) {
   if (historyAudio) { historyAudio.pause(); historyAudio=null; }
   document.getElementById("historyTitle").textContent="History: "+escapeHtml(friend.label||friend.code);
@@ -1322,6 +1302,7 @@ async function openHistorySheet(friend) {
     if (snap.exists()) {
       snap.forEach(child=>{ const m=child.val(); if(m.from===friend.id) matches.push({id:child.key,url:m.audioUrl,time:m.timestamp,duration:m.duration||0,isRead:!!m.isRead}); });
     }
+    // Newest first
     matches.sort((a,b)=>b.time-a.time);
     const last5=matches.slice(0,5);
     if (!last5.length) { listEl.innerHTML='<div class="history-empty">No past messages from this contact.</div>'; return; }
