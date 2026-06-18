@@ -148,21 +148,110 @@ body::before{
   padding:7px 16px; background:rgba(0,212,255,0.04);
   border-bottom:1px solid var(--border);
 }
-#inboxBanner{
-  display:none; align-items:center; justify-content:space-between;
-  padding:10px 16px; cursor:pointer;
-  background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06));
-  border-bottom:1px solid rgba(245,158,11,0.3);
-  animation:bannerPulse 2s infinite;
+/* ── APP TAB NAV ── */
+.app-tab-nav{
+  display:flex; border-bottom:1px solid var(--border);
+  background:rgba(9,14,26,0.97); position:sticky; top:0; z-index:9;
 }
-@keyframes bannerPulse{
-  0%,100%{ background:linear-gradient(135deg,rgba(245,158,11,0.12),rgba(245,158,11,0.06)); }
-  50%{     background:linear-gradient(135deg,rgba(245,158,11,0.22),rgba(245,158,11,0.10)); }
+.app-tab-btn{
+  flex:1; padding:11px 6px; border:none; background:transparent;
+  color:var(--muted); font-family:'Rajdhani',sans-serif; font-size:0.9rem;
+  font-weight:700; letter-spacing:1px; cursor:pointer; position:relative;
+  transition:color 0.18s; border-bottom:2px solid transparent;
 }
-#inboxBanner.visible{ display:flex; }
-.inbox-text{ font-family:'Rajdhani',sans-serif; font-size:0.95rem; font-weight:700; color:var(--yellow); }
-.inbox-tap{ font-family:'Rajdhani',sans-serif; font-size:0.78rem; color:var(--yellow); opacity:0.7; letter-spacing:1px; }
+.app-tab-btn.active{ color:var(--accent); border-bottom-color:var(--accent); }
+.app-tab-btn .tab-badge{
+  display:none; position:absolute; top:6px; right:18%;
+  min-width:17px; height:17px; border-radius:9px;
+  background:var(--yellow); color:#000;
+  font-size:0.65rem; font-family:'Rajdhani',sans-serif; font-weight:700;
+  align-items:center; justify-content:center; padding:0 4px;
+  box-shadow:0 0 6px rgba(245,158,11,0.6);
+}
+.app-tab-btn .tab-badge.show{ display:flex; }
+
+/* ── TAB PANELS ── */
+.tab-panel{ display:none; flex:1; flex-direction:column; }
+.tab-panel.active{ display:flex; }
+
+/* ── CONTACTS PANEL ── */
 .grid-container{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; padding:12px 10px 100px; }
+
+/* ── INBOX PANEL ── */
+#inboxPanel{
+  flex-direction:column; overflow-y:auto; padding:12px 10px 100px;
+}
+.inbox-header-row{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:4px 4px 12px; border-bottom:1px solid var(--border); margin-bottom:10px;
+}
+.inbox-heading{
+  font-family:'Rajdhani',sans-serif; font-size:1.1rem; font-weight:700;
+  color:var(--accent); letter-spacing:1px;
+}
+.inbox-count{ font-size:0.75rem; color:var(--muted); font-family:'Rajdhani',sans-serif; }
+.inbox-refresh-btn{
+  background:none; border:1px solid var(--border); border-radius:20px;
+  padding:5px 12px; color:var(--muted); font-family:'Rajdhani',sans-serif;
+  font-size:0.75rem; font-weight:700; cursor:pointer; letter-spacing:1px;
+}
+.inbox-refresh-btn:active{ opacity:0.6; }
+.inbox-item{
+  background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:13px 14px 11px;
+  display:flex; flex-direction:column; gap:6px; margin-bottom:10px;
+  transition:border-color 0.15s;
+}
+.inbox-item.unread{ border-color:var(--yellow); background:rgba(245,158,11,0.04); }
+.inbox-item-top{
+  display:flex; justify-content:space-between; align-items:flex-start;
+}
+.inbox-sender{
+  font-family:'Rajdhani',sans-serif; font-size:1rem; font-weight:700;
+  color:var(--text);
+}
+.inbox-time{ font-size:0.72rem; color:var(--muted); font-family:'Rajdhani',sans-serif; text-align:right; }
+.inbox-meta{
+  display:flex; align-items:center; justify-content:space-between; gap:8px;
+}
+.inbox-dur{
+  font-family:'Rajdhani',sans-serif; font-size:0.78rem; color:var(--muted);
+}
+.inbox-badges{ display:flex; gap:5px; align-items:center; }
+.inbox-new-badge{
+  font-size:0.62rem; font-family:'Rajdhani',sans-serif; font-weight:700;
+  color:var(--yellow); background:rgba(245,158,11,0.15);
+  border:1px solid rgba(245,158,11,0.4); border-radius:10px;
+  padding:1px 7px; letter-spacing:1px;
+}
+.inbox-read-badge{
+  font-size:0.62rem; font-family:'Rajdhani',sans-serif; font-weight:700;
+  color:var(--green); background:rgba(34,197,94,0.1);
+  border:1px solid rgba(34,197,94,0.3); border-radius:10px;
+  padding:1px 7px; letter-spacing:1px;
+}
+.inbox-actions{ display:flex; gap:8px; }
+.inbox-play-btn{
+  flex:1; padding:7px 12px; border:none; border-radius:20px;
+  background:linear-gradient(135deg,var(--accent),#0099bb);
+  color:#000; font-family:'Rajdhani',sans-serif;
+  font-size:0.8rem; font-weight:700; cursor:pointer; letter-spacing:1px;
+}
+.inbox-save-btn{
+  padding:7px 12px; border:1px solid var(--yellow); border-radius:20px;
+  background:transparent; color:var(--yellow);
+  font-family:'Rajdhani',sans-serif; font-size:0.8rem; font-weight:700;
+  cursor:pointer; letter-spacing:1px;
+}
+.inbox-play-btn:active,.inbox-save-btn:active{ opacity:0.7; }
+.inbox-empty{
+  text-align:center; color:var(--muted); font-size:0.9rem;
+  padding:50px 20px; font-family:'Rajdhani',sans-serif; letter-spacing:1px;
+}
+.inbox-loading{
+  text-align:center; color:var(--muted); font-size:0.85rem;
+  padding:40px 20px;
+}
 .friend-card{
   position:relative; background:var(--card);
   border:1.5px solid var(--border); border-radius:18px;
@@ -525,12 +614,32 @@ body::before{
       <button class="out-btn" id="signoutBtn">OUT</button>
     </div>
   </div>
-  <div class="instructions">Tap card to record · Tap again to send · Tap banner to play messages</div>
-  <div id="inboxBanner">
-    <div class="inbox-text" id="inboxBannerText">📩 1 new message</div>
-    <div class="inbox-tap">TAP TO LISTEN ›</div>
+  <!-- TAB NAV -->
+  <nav class="app-tab-nav">
+    <button class="app-tab-btn active" id="tabContacts">CONTACTS</button>
+    <button class="app-tab-btn" id="tabInbox">
+      INBOX
+      <span class="tab-badge" id="inboxTabBadge"></span>
+    </button>
+  </nav>
+
+  <!-- CONTACTS PANEL -->
+  <div class="tab-panel active" id="panelContacts">
+    <div class="instructions">Tap card to record · Tap again to send</div>
+    <div class="grid-container" id="friendsGrid"></div>
   </div>
-  <div class="grid-container" id="friendsGrid"></div>
+
+  <!-- INBOX PANEL -->
+  <div class="tab-panel" id="panelInbox">
+    <div id="inboxPanel">
+      <div class="inbox-header-row">
+        <span class="inbox-heading">📩 INBOX</span>
+        <span class="inbox-count" id="inboxCountLabel"></span>
+        <button class="inbox-refresh-btn" id="inboxRefreshBtn">↺ REFRESH</button>
+      </div>
+      <div id="inboxList"><div class="inbox-loading">Loading messages…</div></div>
+    </div>
+  </div>
 </div>
 
 <!-- EDIT SHEET -->
@@ -622,7 +731,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getDatabase, ref, set, get, update, push, remove,
-  onChildAdded, query, orderByChild, startAt
+  onChildAdded, query, orderByChild, startAt, limitToLast
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // ── CONFIG ────────────────────────────────────
@@ -639,7 +748,6 @@ const CLOUDINARY_CLOUD  = "dqwaiio4d";
 const CLOUDINARY_PRESET = "oty123";
 const MAX_RECORD_SECS   = 90;
 const TOTAL_CARDS       = 10;
-const MAX_QUEUE         = 5;   // max messages loaded into inbox queue at once
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -796,6 +904,7 @@ async function bootApp(user) {
 
   await initMicrophone();
   await loadUnreadCounts();
+  updateInboxBanner();
   buildDashboard();
   if (!listenerAttached) { listenerAttached=true; listenForMessages(); }
   cleanupOldMessages().catch(e=>console.warn("Cleanup error:",e));
@@ -982,8 +1091,7 @@ async function sendMessageToFriend(friend, isBroadcast, sendingCard) {
 }
 
 // ── UNREAD COUNTS ─────────────────────────────
-// Loads unread messages, sorts newest first, caps queue at MAX_QUEUE.
-// Tracks true total (totalUnreadRaw) for accurate banner display.
+// Loads all unread messages for badge counts and the realtime play queue.
 async function loadUnreadCounts() {
   try {
     const snap=await get(ref(db,"messages/"+currentUser.uid));
@@ -1000,9 +1108,9 @@ async function loadUnreadCounts() {
         }
       }
     });
-    // Newest first, then cap at MAX_QUEUE
+    // Newest first — no cap
     unread.sort((a,b)=>b.timestamp-a.timestamp);
-    messageQueue.push(...unread.slice(0, MAX_QUEUE));
+    messageQueue.push(...unread);
   } catch(e) { console.warn("OTY: Could not load unread counts:",e.message); }
 }
 
@@ -1047,36 +1155,116 @@ function listenForMessages() {
     const data=snap.val(); if(!data||data.isRead) return;
     if (messageQueue.some(m=>m.messageId===snap.key)) return;
     totalUnreadRaw++;
-    // Only add to queue if under cap
-    if (messageQueue.length < MAX_QUEUE) {
-      messageQueue.push({ audioUrl:data.audioUrl, senderName:data.fromName, messageId:snap.key, senderId:data.from, timestamp:data.timestamp, duration:data.duration||0 });
-    }
+    messageQueue.push({ audioUrl:data.audioUrl, senderName:data.fromName, messageId:snap.key, senderId:data.from, timestamp:data.timestamp, duration:data.duration||0 });
     updateBadge(data.from,+1);
     updateInboxBanner();
-    if (!queuePlaying) buildDashboard();
+    if (document.getElementById("panelInbox").classList.contains("active")) {
+      loadInboxPanel();
+    } else if (!queuePlaying) {
+      buildDashboard();
+    }
   });
 }
 
-// ── INBOX BANNER ─────────────────────────────
-function updateInboxBanner() {
-  const banner=document.getElementById("inboxBanner");
-  const textEl=document.getElementById("inboxBannerText");
-  const queued=messageQueue.length;
-  if (queued===0) {
-    banner.classList.remove("visible");
+// ── TAB SWITCHING ────────────────────────────
+function switchAppTab(tab) {
+  const isInbox = tab === "inbox";
+  document.getElementById("panelContacts").classList.toggle("active", !isInbox);
+  document.getElementById("panelInbox").classList.toggle("active",  isInbox);
+  document.getElementById("tabContacts").classList.toggle("active", !isInbox);
+  document.getElementById("tabInbox").classList.toggle("active",    isInbox);
+  if (isInbox) loadInboxPanel();
+}
+document.getElementById("tabContacts").addEventListener("click", () => switchAppTab("contacts"));
+document.getElementById("tabInbox").addEventListener("click",    () => switchAppTab("inbox"));
+document.getElementById("inboxRefreshBtn").addEventListener("click", () => loadInboxPanel());
+
+// ── INBOX TAB BADGE ──────────────────────────
+function updateInboxBanner() {   // kept same name — called by existing code
+  const badge = document.getElementById("inboxTabBadge");
+  const total = totalUnreadRaw;
+  if (total > 0) {
+    badge.textContent = total > 99 ? "99+" : String(total);
+    badge.classList.add("show");
   } else {
-    const capNote = totalUnreadRaw > queued ? " ("+queued+" of "+totalUnreadRaw+" loaded)" : "";
-    textEl.textContent = "📩 "+queued+" new "+(queued===1?"message":"messages")+" waiting"+capNote;
-    banner.classList.add("visible");
+    badge.classList.remove("show");
   }
 }
 
-document.getElementById("inboxBanner").onclick = function() {
-  if (!messageQueue.length) { updateInboxBanner(); return; }
-  playedHistory=[];
-  queuePlaying=true;
-  openPlayerWithMessage(messageQueue[0]);
-};
+// ── INBOX PANEL — last 30, newest first ──────
+async function loadInboxPanel() {
+  const listEl = document.getElementById("inboxList");
+  const countEl = document.getElementById("inboxCountLabel");
+  listEl.innerHTML = '<div class="inbox-loading">Loading…</div>';
+  countEl.textContent = "";
+  try {
+    const snap = await get(ref(db, "messages/" + currentUser.uid));
+    if (!snap.exists()) {
+      listEl.innerHTML = '<div class="inbox-empty">No messages yet.</div>';
+      return;
+    }
+    const all = [];
+    snap.forEach(child => {
+      const m = child.val();
+      if (m && m.audioUrl) {
+        all.push({ id: child.key, url: m.audioUrl, from: m.from, fromName: m.fromName||"Unknown",
+                   time: m.timestamp||0, duration: m.duration||0, isRead: !!m.isRead });
+      }
+    });
+    all.sort((a,b) => b.time - a.time);
+    const shown = all.slice(0, 30);
+    countEl.textContent = shown.length + " of " + all.length + " messages";
+    if (!shown.length) { listEl.innerHTML = '<div class="inbox-empty">No messages yet.</div>'; return; }
+    listEl.innerHTML = "";
+    shown.forEach(msg => {
+      const senderFriend = myFriends.find(f => f.id === msg.from);
+      const displayName  = senderFriend ? (senderFriend.label || msg.fromName) : msg.fromName;
+      const timeStr = new Date(msg.time).toLocaleDateString("en-IN", {day:"2-digit",month:"short"})
+                    + " " + new Date(msg.time).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
+      const durStr  = msg.duration ? fmtTime(Math.round(msg.duration)) : "--:--";
+
+      const item = document.createElement("div");
+      item.className = "inbox-item" + (msg.isRead ? "" : " unread");
+      item.innerHTML =
+        '<div class="inbox-item-top">'
+          + '<div class="inbox-sender">' + escapeHtml(displayName) + '</div>'
+          + '<div class="inbox-time">' + timeStr + '</div>'
+        + '</div>'
+        + '<div class="inbox-meta">'
+          + '<span class="inbox-dur">⏱ ' + durStr + '</span>'
+          + '<span class="inbox-badges">'
+            + (msg.isRead
+                ? '<span class="inbox-read-badge">✓ HEARD</span>'
+                : '<span class="inbox-new-badge">● NEW</span>')
+          + '</span>'
+        + '</div>'
+        + '<div class="inbox-actions">'
+          + '<button class="inbox-play-btn">▶ PLAY</button>'
+          + '<button class="inbox-save-btn">💾 SAVE</button>'
+        + '</div>';
+
+      item.querySelector(".inbox-play-btn").addEventListener("click", () => {
+        // build a single-item play through the existing player
+        playedHistory = [];
+        queuePlaying  = false;
+        openPlayerWithMessage({ audioUrl:msg.url, senderName:displayName,
+                                messageId:msg.id, senderId:msg.from,
+                                timestamp:msg.time, duration:msg.duration });
+        // After play, mark read and refresh badge
+      });
+      item.querySelector(".inbox-save-btn").addEventListener("click", () => {
+        const ext = msg.url.includes(".m4a") ? ".m4a" : ".webm";
+        const a = document.createElement("a"); a.href = msg.url;
+        a.download = "voice_" + Date.now() + ext;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        toast("💾 Saving audio…");
+      });
+      listEl.appendChild(item);
+    });
+  } catch(err) {
+    listEl.innerHTML = '<div class="inbox-empty">Could not load messages. Check connection.</div>';
+  }
+}
 
 // ── PLAYER STATE MACHINE ─────────────────────
 function setPlayerState(s) {
@@ -1225,7 +1413,12 @@ function closePlayerModal() {
   document.getElementById("playerTimeCurrent").textContent="0:00";
   document.getElementById("playerTimeTotal").textContent="0:00";
   pendingMessage=null; queuePlaying=false;
-  updateInboxBanner(); buildDashboard();
+  updateInboxBanner();
+  if (document.getElementById("panelInbox").classList.contains("active")) {
+    loadInboxPanel();
+  } else {
+    buildDashboard();
+  }
 }
 document.getElementById("goHomeBtn").onclick=closePlayerModal;
 
@@ -1340,7 +1533,6 @@ document.getElementById("historyCloseBtn").onclick=()=>{
 function buildDashboard() {
   const grid=document.getElementById("friendsGrid");
   grid.innerHTML="";
-  updateInboxBanner();
   myFriends.forEach((friend,idx)=>{
     const isB=friend.id==="__broadcast__";
     const isEmpty=!friend.id&&!friend.label;
