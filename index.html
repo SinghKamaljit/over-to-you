@@ -990,7 +990,12 @@ async function initMicrophone() {
   try {
     if (mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
     mediaStream = await navigator.mediaDevices.getUserMedia({
-      audio:{ echoCancellation:true, noiseSuppression:false, autoGainControl:true, sampleRate:44100 }
+      audio:{
+        echoCancellation:false,
+        noiseSuppression:false,
+        autoGainControl:false,
+        sampleRate:44100
+      }
     });
   } catch(err) {
     try { mediaStream=await navigator.mediaDevices.getUserMedia({audio:true}); }
