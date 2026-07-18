@@ -1051,6 +1051,7 @@ async function uploadAudio(blob, recipientUid, ext) {
   fd.append("file", new File([blob], currentUser.uid+"_"+recipientUid+"_"+Date.now()+ext, {type:blob.type||"audio/webm"}));
   fd.append("upload_preset", CLOUDINARY_PRESET);
   fd.append("resource_type","video");
+  fd.append("tags","autoclear,oty");
   let res;
   try { res=await fetch("https://api.cloudinary.com/v1_1/"+CLOUDINARY_CLOUD+"/video/upload",{method:"POST",body:fd}); }
   catch(e) { throw new Error("Network error: "+e.message); }
